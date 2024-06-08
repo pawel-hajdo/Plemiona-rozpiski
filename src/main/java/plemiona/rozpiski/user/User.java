@@ -26,7 +26,7 @@ public class User implements UserDetails {
     private String password;
 
     @Column(name = "player_id")
-    private Long playerId;
+    private Integer playerId;
 
     @Override
     public Collection<? extends GrantedAuthority> getAuthorities() {

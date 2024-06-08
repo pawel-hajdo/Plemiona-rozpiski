@@ -18,8 +18,8 @@ public class UserController {
     }
 
     @PostMapping()
-    public ResponseEntity<AuthenticationResponse> register(@RequestBody User newUser){
-        return ResponseEntity.ok(userService.registerUser(newUser));
+    public ResponseEntity<AuthenticationResponse> register(@RequestBody RegisterRequest request){
+        return ResponseEntity.ok(userService.registerUser(request));
     }
 
     @PostMapping("/auth")

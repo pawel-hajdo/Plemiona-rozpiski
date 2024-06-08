@@ -19,6 +19,11 @@ public class CustomExceptionHandler {
     public ResponseEntity<String> handleInvalidCommandRequestException(InvalidCommandRequestException ex) {
         return new ResponseEntity<>(ex.getMessage(), HttpStatus.BAD_REQUEST);
     }
+    @ExceptionHandler(UserWithSameNameExistsException.class)
+    @ResponseStatus(HttpStatus.BAD_REQUEST)
+    public ResponseEntity<String> handleUserWithSameNameExistsException(UserWithSameNameExistsException ex) {
+        return new ResponseEntity<>(ex.getMessage(), HttpStatus.BAD_REQUEST);
+    }
 
     @ExceptionHandler(Exception.class)
     @ResponseStatus(HttpStatus.INTERNAL_SERVER_ERROR)
