@@ -11,6 +11,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.web.client.RestTemplate;
 import plemiona.rozpiski.config.JwtService;
 import plemiona.rozpiski.exceptions.UserCodeNotMatchingException;
+import plemiona.rozpiski.exceptions.UserNotFoundException;
 import plemiona.rozpiski.exceptions.UserWithSameNameExistsException;
 
 import java.net.URI;
@@ -117,5 +118,15 @@ public class UserService {
         }
 
         return extractPlayerIdFromUrl(profileUrl);
+    }
+
+    public void changePassword(ChangePasswordRequest request) {
+        var user = userRepository.findByName(request.getName())
+                .orElseThrow(() -> new UserNotFoundException("User not found"));
+
+        String hashedPassword = passwordEncoder.encode(request.getNewPassword());
+        user.setPassword(hashedPassword);
+
+        userRepository.save(user);
     }
 }
