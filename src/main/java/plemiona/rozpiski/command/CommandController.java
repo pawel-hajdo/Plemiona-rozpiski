@@ -1,10 +1,8 @@
 package plemiona.rozpiski.command;
 
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 
@@ -26,5 +24,20 @@ public class CommandController {
     @GetMapping("/player/{playerId}")
     public List<Command> getCommandsByPlayerId(@PathVariable String playerId){
         return commandService.getCommandsByPlayerId(playerId);
+    }
+
+    @GetMapping("/player/{playerId}/deleted")
+    public List<Command> getDeletedCommandsByPlayerId(@PathVariable String playerId){
+        return commandService.getDeletedCommandsByPlayerId(playerId);
+    }
+
+    @DeleteMapping
+    public ResponseEntity<String> softDeleteCommands(@RequestBody CommandRequest request) {
+        return commandService.softDeleteCommands(request.getCommandIds());
+    }
+
+    @PutMapping
+    public ResponseEntity<String> restoreDeletedCommands(@RequestBody CommandRequest request) {
+        return commandService.restoreDeletedCommands(request.getCommandIds());
     }
 }
