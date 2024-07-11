@@ -163,7 +163,7 @@ export function CommandsTable({ commands }) {
                 <a href={row.getValue("link")} target="_blank" rel="noopener noreferrer">
                     <Button
                         variant="ghost"
-                        className="bg-transparent hover:bg-black text-black font-semibold hover:text-white py-2 px-4 border border-black hover:border-transparent rounded"
+                        className="bg-transparent hover:bg-black text-black dark:text-white font-semibold hover:text-white py-2 px-4 border border-black dark:border-gray-200 hover:border-transparent rounded"
                         onClick={(e) => {
                             e.currentTarget.classList.add("bg-gray-400");
                         }}

@@ -1,4 +1,5 @@
 import Link from 'next/link';
+import {ModeToggle} from "@/components/modeToogle";
 
 const Menu = () => {
     return (
@@ -9,6 +10,7 @@ const Menu = () => {
                     <Link href="/" className="text-gray-300 hover:text-white">Home</Link>
                     <Link href="/settings" className="text-gray-300 hover:text-white">Ustawienia</Link>
                     <Link href="#" className="text-gray-300 hover:text-white">Wyloguj</Link>
+                    <ModeToggle/>
                 </div>
             </div>
         </nav>

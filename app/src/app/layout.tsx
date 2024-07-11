@@ -3,6 +3,8 @@ import { Inter } from "next/font/google";
 import "./globals.css";
 import Footer from "@/components/footer";
 import Menu from "@/components/menu";
+import { ThemeProvider } from "@/components/theme-provider"
+
 const inter = Inter({ subsets: ["latin"] });
 
 export const metadata: Metadata = {
@@ -18,9 +20,16 @@ export default function RootLayout({
   return (
     <html lang="en">
       <body className={inter.className}>
-        <Menu/>
-        <main className="container mx-auto p-4">{children}</main>
-        <Footer/>
+      <ThemeProvider
+          attribute="class"
+          defaultTheme="system"
+          enableSystem
+          disableTransitionOnChange
+      >
+          <Menu/>
+          <main className="container mx-auto p-4">{children}</main>
+          <Footer/>
+      </ThemeProvider>
       </body>
 
     </html>
