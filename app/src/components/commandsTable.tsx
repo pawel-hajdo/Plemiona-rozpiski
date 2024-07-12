@@ -54,6 +54,48 @@ export function CommandsTable({ commands }) {
         pageIndex: 0,
         pageSize: 10,
     })
+    const [clickedRows, setClickedRows] = React.useState({});
+
+    const openLinksInTabs = () => {
+        const rows = table.getRowModel().rows;
+        let openedCount = 0;
+        rows.forEach((row, index) => {
+            const rowId = row.id;
+            const link = row.original.link;
+            if (!clickedRows[rowId] && !isButtonDisabled(row) && openedCount < 10) {
+                setTimeout(() => {
+                    window.open(link, '_blank');
+                    handleClickLink(rowId);
+                }, index * 400);
+                openedCount++;
+            }
+        });
+
+    };
+
+    const handleClickLink = (rowId) => {
+        setRowSelection((prev) => ({ ...prev, [rowId]: true }));
+        setClickedRows((prev) => ({ ...prev, [rowId]: true }));
+    };
+
+    const isButtonDisabled = (row) => {
+        const currentTime = new Date();
+        const minTime = new Date(row.original.minTime);
+        return currentTime < minTime;
+    };
+
+    const getRowClasses = (row) => {
+        const currentTime = new Date();
+        const minTime = new Date(row.original.minTime);
+        const maxTime = new Date(row.original.maxTime);
+
+        if (currentTime > maxTime) {
+            return  'bg-red-700';
+        } else if (currentTime < minTime) {
+            return 'bg-gray-500';
+        }
+        return '';
+    };
 
     const columns: ColumnDef<typeof commands[0]>[] = [
         {
@@ -160,12 +202,19 @@ export function CommandsTable({ commands }) {
             accessorKey: "link",
             header: "Link",
             cell: ({ row }) => (
-                <a href={row.getValue("link")} target="_blank" rel="noopener noreferrer">
+                <a
+                    href={row.getValue("link")}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    style={{ pointerEvents: isButtonDisabled(row) || clickedRows[row.id] ? 'none' : 'auto' }}
+                >
                     <Button
-                        variant="ghost"
-                        className="bg-transparent hover:bg-black text-black dark:text-white font-semibold hover:text-white py-2 px-4 border border-black dark:border-gray-200 hover:border-transparent rounded"
-                        onClick={(e) => {
-                            e.currentTarget.classList.add("bg-gray-400");
+                        variant="outline"
+                        onClick={()=>handleClickLink(row.id)}
+                      //  disabled={isButtonDisabled(row) || clickedRows[row.id]}
+                        style={{
+                            backgroundColor: isButtonDisabled(row) || clickedRows[row.id] ? 'gray' : 'none',
+                           // cursor: isButtonDisabled(row) || clickedRows[row.id] ? 'not-allowed' : 'pointer',
                         }}
                     >
                         Link
@@ -173,6 +222,7 @@ export function CommandsTable({ commands }) {
                 </a>
             ),
         },
+
     ]
 
     const table = useReactTable({
@@ -195,6 +245,7 @@ export function CommandsTable({ commands }) {
             rowSelection,
             pagination
         },
+
     })
 
     return (
@@ -212,19 +263,25 @@ export function CommandsTable({ commands }) {
                     value={pagination.pageSize.toString()}
                     onValueChange={(value) => setPagination({ ...pagination, pageSize: Number(value) })}
                 >
-                    <SelectTrigger className="w-[200px] mx-4">
+                    <SelectTrigger className="w-[120px] mx-4">
                         <SelectValue placeholder="Number of commands" />
                     </SelectTrigger>
                     <SelectContent>
                         <SelectGroup>
-                            <SelectItem value="10">10</SelectItem>
-                            <SelectItem value="20">20</SelectItem>
-                            <SelectItem value="50">50</SelectItem>
-                            <SelectItem value="100">100</SelectItem>
-                            <SelectItem value={commands.length.toString()}>All</SelectItem>
+                            <SelectItem value="10">Show 10</SelectItem>
+                            <SelectItem value="20">Show 20</SelectItem>
+                            <SelectItem value="50">Show 50</SelectItem>
+                            <SelectItem value="100">Show 100</SelectItem>
+                            <SelectItem value={commands.length.toString()}>Show All</SelectItem>
                         </SelectGroup>
                     </SelectContent>
                 </Select>
+                <Button
+                    onClick={openLinksInTabs}
+                    variant={"outline"}
+                >
+                    Open 10
+                </Button>
                 <DropdownMenu>
                     <DropdownMenuTrigger asChild>
                         <Button variant="outline" className="ml-auto">
@@ -278,6 +335,7 @@ export function CommandsTable({ commands }) {
                                 <TableRow
                                     key={row.id}
                                     data-state={row.getIsSelected() && "selected"}
+                                    className={getRowClasses(row)}
                                 >
                                     {row.getVisibleCells().map((cell) => (
                                         <TableCell key={cell.id}>
