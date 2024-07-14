@@ -68,7 +68,9 @@ public class UserService {
                 new UsernamePasswordAuthenticationToken(request.getName(), request.getPassword())
         );
         var user = userRepository.findByName(request.getName()).orElseThrow();
-        var jwtToken = jwtService.generateToken(user);
+        Map<String, Object> claims = new HashMap<>();
+        claims.put("playerId", user.getPlayerId());
+        var jwtToken = jwtService.generateToken(claims, user);
         return AuthenticationResponse.builder().token(jwtToken).build();
     }
 
