@@ -44,6 +44,7 @@ import {
     SelectTrigger,
     SelectValue,
 } from "@/components/ui/select"
+import {softDeleteCommands} from "@/lib/api";
 
 export function CommandsTable({ commands }) {
     const [sorting, setSorting] = React.useState<SortingState>([])
@@ -62,11 +63,11 @@ export function CommandsTable({ commands }) {
         rows.forEach((row, index) => {
             const rowId = row.id;
             const link = row.original.link;
-            if (!clickedRows[rowId] && !isButtonDisabled(row) && openedCount < 10) {
+            if (!clickedRows[rowId] && !isButtonDisabled(row) && openedCount < 50) {
                 setTimeout(() => {
                     window.open(link, '_blank');
                     handleClickLink(rowId);
-                }, index * 400);
+                }, openedCount * 150);
                 openedCount++;
             }
         });
@@ -95,6 +96,24 @@ export function CommandsTable({ commands }) {
             return 'bg-gray-500';
         }
         return '';
+    };
+
+    const handleDeleteSelected = async () => {
+        const selectedRows = Object.keys(rowSelection);
+        if (selectedRows.length === 0) return;
+
+        const selectedCommands = selectedRows.map(rowId => {
+            const row = table.getRow(rowId);
+            return row.original.id;
+        });
+
+        try {
+            console.log("deleted", selectedCommands);
+            await softDeleteCommands(selectedCommands);
+            window.location.reload();
+        } catch (error) {
+            console.error('Error deleting commands:', error);
+        }
     };
 
     const columns: ColumnDef<typeof commands[0]>[] = [
@@ -250,20 +269,19 @@ export function CommandsTable({ commands }) {
 
     return (
         <div className="w-full">
-            <div className="flex items-center py-4">
-                <Input
-                    placeholder="Filter type..."
-                    value={(table.getColumn("type")?.getFilterValue() as string) ?? ""}
-                    onChange={(event) =>
-                        table.getColumn("type")?.setFilterValue(event.target.value)
-                    }
-                    className="max-w-sm"
-                />
+            <div className="flex flex-wrap items-center py-4 gap-3">
+                <Button
+                    onClick={handleDeleteSelected}
+                    variant="outline"
+                    disabled={Object.keys(rowSelection).length === 0}
+                >
+                    Delete
+                </Button>
                 <Select
                     value={pagination.pageSize.toString()}
                     onValueChange={(value) => setPagination({ ...pagination, pageSize: Number(value) })}
                 >
-                    <SelectTrigger className="w-[120px] mx-4">
+                    <SelectTrigger className="w-[120px]">
                         <SelectValue placeholder="Number of commands" />
                     </SelectTrigger>
                     <SelectContent>
@@ -282,6 +300,14 @@ export function CommandsTable({ commands }) {
                 >
                     Open 10
                 </Button>
+                <Input
+                    placeholder="Filter type..."
+                    value={(table.getColumn("type")?.getFilterValue() as string) ?? ""}
+                    onChange={(event) =>
+                        table.getColumn("type")?.setFilterValue(event.target.value)
+                    }
+                    className="max-w-sm"
+                />
                 <DropdownMenu>
                     <DropdownMenuTrigger asChild>
                         <Button variant="outline" className="ml-auto">
