@@ -44,11 +44,11 @@ import {
     SelectTrigger,
     SelectValue,
 } from "@/components/ui/select"
-import {getPlayerCommands, softDeleteCommands} from "@/lib/api";
+import {getDeletedCommands, getPlayerCommands, restoreCommands, softDeleteCommands} from "@/lib/api";
 import {useEffect, useState} from "react";
 import {loadLinksToOpenCount, loadPageSize, savePageSize} from "@/lib/utils";
 
-export function CommandsTable() {
+export function CommandsTable({deleted}) {
     const [commands, setCommands] = useState([]);
     const [sorting, setSorting] = React.useState<SortingState>([])
     const [columnFilters, setColumnFilters] = React.useState<ColumnFiltersState>([])
@@ -64,7 +64,12 @@ export function CommandsTable() {
     useEffect(() => {
         const fetchCommandsData = async () => {
             try {
-                const data = await getPlayerCommands(698962117);
+                let data;
+                if(deleted) {
+                    data = await getDeletedCommands(698962117);
+                } else {
+                    data = await getPlayerCommands(698962117);
+                }
                 setCommands(data);
             } catch (error) {
                 console.log(error);
@@ -131,13 +136,29 @@ export function CommandsTable() {
         });
 
         try {
-            console.log("deleted", selectedCommands);
             await softDeleteCommands(selectedCommands);
             window.location.reload();
         } catch (error) {
             console.error('Error deleting commands:', error);
         }
     };
+
+    const handleRestoreSelected = async () => {
+        const selectedRows = Object.keys(rowSelection);
+        if (selectedRows.length === 0) return;
+
+        const selectedCommands = selectedRows.map(rowId => {
+            const row = table.getRow(rowId);
+            return row.original.id;
+        });
+
+        try {
+            await restoreCommands(selectedCommands);
+            window.location.reload();
+        } catch (error) {
+            console.error('Error restoring commands:', error);
+        }
+    }
 
     const columns: ColumnDef<typeof commands[0]>[] = [
         {
@@ -293,13 +314,24 @@ export function CommandsTable() {
     return (
         <div className="w-full">
             <div className="flex flex-wrap items-center py-4 gap-3">
-                <Button
-                    onClick={handleDeleteSelected}
-                    variant="outline"
-                    disabled={Object.keys(rowSelection).length === 0}
-                >
-                    Delete
-                </Button>
+                {deleted ? (
+                    <Button
+                        onClick={handleRestoreSelected}
+                        variant="outline"
+                        disabled={Object.keys(rowSelection).length === 0}
+                    >
+                        Restore
+                    </Button>
+                ) :
+                (
+                    <Button
+                        onClick={handleDeleteSelected}
+                        variant="outline"
+                        disabled={Object.keys(rowSelection).length === 0}
+                    >
+                        Delete
+                    </Button>
+                )}
                 <Select
                     value={pagination.pageSize.toString()}
                     onValueChange={(value) => setPagination({ ...pagination, pageSize: Number(value) })}
