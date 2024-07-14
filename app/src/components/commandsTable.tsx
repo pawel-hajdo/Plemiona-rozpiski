@@ -44,18 +44,41 @@ import {
     SelectTrigger,
     SelectValue,
 } from "@/components/ui/select"
-import {softDeleteCommands} from "@/lib/api";
+import {getPlayerCommands, softDeleteCommands} from "@/lib/api";
+import {useEffect, useState} from "react";
+import {loadLinksToOpenCount, loadPageSize, savePageSize} from "@/lib/utils";
 
-export function CommandsTable({ commands }) {
+export function CommandsTable() {
+    const [commands, setCommands] = useState([]);
     const [sorting, setSorting] = React.useState<SortingState>([])
     const [columnFilters, setColumnFilters] = React.useState<ColumnFiltersState>([])
     const [columnVisibility, setColumnVisibility] = React.useState<VisibilityState>({})
     const [rowSelection, setRowSelection] = React.useState({})
     const [pagination, setPagination] = React.useState<PaginationState>({
         pageIndex: 0,
-        pageSize: 10,
+        pageSize: loadPageSize(),
     })
     const [clickedRows, setClickedRows] = React.useState({});
+    const [linksToOpenCount, setLinkToOpenCount] = React.useState(loadLinksToOpenCount);
+
+    useEffect(() => {
+        const fetchCommandsData = async () => {
+            try {
+                const data = await getPlayerCommands(698962117);
+                setCommands(data);
+            } catch (error) {
+                console.log(error);
+            }
+        };
+
+        fetchCommandsData();
+
+    }, []);
+
+    useEffect(() => {
+        savePageSize(pagination.pageSize);
+    }, [pagination.pageSize]);
+
 
     const openLinksInTabs = () => {
         const rows = table.getRowModel().rows;
@@ -63,7 +86,7 @@ export function CommandsTable({ commands }) {
         rows.forEach((row, index) => {
             const rowId = row.id;
             const link = row.original.link;
-            if (!clickedRows[rowId] && !isButtonDisabled(row) && openedCount < 50) {
+            if (!clickedRows[rowId] && !isButtonDisabled(row) && openedCount < linksToOpenCount) {
                 setTimeout(() => {
                     window.open(link, '_blank');
                     handleClickLink(rowId);
@@ -298,7 +321,7 @@ export function CommandsTable({ commands }) {
                     onClick={openLinksInTabs}
                     variant={"outline"}
                 >
-                    Open 10
+                    Open {linksToOpenCount}
                 </Button>
                 <Input
                     placeholder="Filter type..."
