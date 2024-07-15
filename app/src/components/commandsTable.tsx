@@ -46,11 +46,11 @@ import {
 } from "@/components/ui/select"
 import {getDeletedCommands, getPlayerCommands, restoreCommands, softDeleteCommands} from "@/lib/api";
 import {useEffect, useState} from "react";
-import {loadLinksToOpenCount, loadPageSize, savePageSize} from "@/lib/utils";
+import {loadLinksToOpenCount, loadPageSize, loadSortingPreference, savePageSize} from "@/components/localStorage";
 
 export function CommandsTable({deleted}) {
     const [commands, setCommands] = useState([]);
-    const [sorting, setSorting] = React.useState<SortingState>([])
+    const [sorting, setSorting] = React.useState<SortingState>([loadSortingPreference()])
     const [columnFilters, setColumnFilters] = React.useState<ColumnFiltersState>([])
     const [columnVisibility, setColumnVisibility] = React.useState<VisibilityState>({})
     const [rowSelection, setRowSelection] = React.useState({})
