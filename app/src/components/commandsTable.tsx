@@ -47,6 +47,7 @@ import {
 import {getDeletedCommands, getPlayerCommands, restoreCommands, softDeleteCommands} from "@/lib/api";
 import {useEffect, useState} from "react";
 import {loadLinksToOpenCount, loadPageSize, loadSortingPreference, savePageSize} from "@/components/localStorage";
+import {getPlayerId} from "@/lib/utils";
 
 export function CommandsTable({deleted}) {
     const [commands, setCommands] = useState([]);
@@ -60,15 +61,16 @@ export function CommandsTable({deleted}) {
     })
     const [clickedRows, setClickedRows] = React.useState({});
     const [linksToOpenCount, setLinkToOpenCount] = React.useState(loadLinksToOpenCount);
+    const playerId = getPlayerId();
 
     useEffect(() => {
         const fetchCommandsData = async () => {
             try {
                 let data;
                 if(deleted) {
-                    data = await getDeletedCommands(698962117);
+                    data = await getDeletedCommands(playerId);
                 } else {
-                    data = await getPlayerCommands(698962117);
+                    data = await getPlayerCommands(playerId);
                 }
                 setCommands(data);
             } catch (error) {

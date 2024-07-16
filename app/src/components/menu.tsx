@@ -2,10 +2,21 @@
 import Link from 'next/link';
 import * as DropdownMenu from '@radix-ui/react-dropdown-menu';
 import {usePathname} from "next/navigation";
-import {useState} from "react";
+import {useEffect, useState} from "react";
+import Cookies from 'js-cookie';
+import {getPlayerName} from "@/lib/utils";
 
 const Menu = () => {
-    const userName = useState();
+    const [userName, setUserName] = useState('');
+
+    useEffect(() => {
+        setUserName(getPlayerName)
+    }, []);
+
+    const handleLogout = () => {
+        Cookies.remove('token');
+        window.location.reload();
+    };
 
     const pathname = usePathname();
     const hideMenu = pathname === '/login' || pathname === '/register';
@@ -34,7 +45,7 @@ const Menu = () => {
                                 <Link href="/settings" className="text-gray-300 hover:text-white">Ustawienia</Link>
                             </DropdownMenu.Item>
                             <DropdownMenu.Item className="p-2 hover:bg-gray-600 rounded">
-                                <Link href="#" className="text-gray-300 hover:text-white">Wyloguj</Link>
+                                <button onClick={handleLogout} className="text-gray-300 hover:text-white">Wyloguj</button>
                             </DropdownMenu.Item>
                         </DropdownMenu.Content>
                     </DropdownMenu.Root>

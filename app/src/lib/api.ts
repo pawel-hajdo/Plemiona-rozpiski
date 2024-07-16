@@ -1,25 +1,41 @@
 import axios from 'axios';
+import {getTokenFromCookies} from "@/lib/utils";
 
 const api = axios.create({
     baseURL: 'http://localhost:8080/api',
 });
 
 export const getPlayerCommands = async (playerId) => {
-    const response = await api.get(`/commands/player/${playerId}`);
+    const response = await api.get(`/commands/player/${playerId}`, {
+        headers: {
+            Authorization: `Bearer ${getTokenFromCookies()}`
+        }});
     return response.data;
 };
 
 export const getDeletedCommands = async (playerId) => {
-    const response = await api.get(`/commands/player/${playerId}/deleted`);
+    const response = await api.get(`/commands/player/${playerId}/deleted`, {
+        headers: {
+            Authorization: `Bearer ${getTokenFromCookies()}`
+    }});
     return response.data;
 }
 export const softDeleteCommands = async (commandIds) => {
-    const response = await api.delete('/commands', { data: { commandIds } });
+    const response = await api.delete('/commands', {
+        data: { commandIds },
+        headers: {
+            Authorization: `Bearer ${getTokenFromCookies()}`
+        }
+    });
     return response.data;
 }
 
 export const restoreCommands = async (commandIds) => {
-    const response = await api.put('/commands', { commandIds });
+    const response = await api.put('/commands', { commandIds }, {
+        headers: {
+            Authorization: `Bearer ${getTokenFromCookies()}`
+        }
+    });
     return response.data;
 }
 
