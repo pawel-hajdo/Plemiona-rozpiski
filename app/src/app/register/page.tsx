@@ -4,14 +4,15 @@ import {useState} from "react";
 import {Input} from "@/components/ui/input";
 import {Button} from "@/components/ui/button";
 import {Label} from "@/components/ui/label";
-import {authUser} from "@/lib/api";
+import {registerUser} from "@/lib/api";
 import {useRouter} from "next/navigation";
 import Link from "next/link";
 
-export default function Login() {
+export default function Register() {
 
     const [userLogin, setUserLogin] = useState("")
     const [userPassword, setUserPassword] = useState("")
+    const [code, setCode] = useState(null);
     const [error, setError] = useState("")
     const [isSubmitting, setIsSubmitting] = useState(false);
     const router = useRouter();
@@ -29,12 +30,12 @@ export default function Login() {
         setIsSubmitting(true);
 
         try {
-            const responseData = await authUser(userLogin, userPassword);
+            const responseData = await registerUser(userLogin, userPassword, code);
             localStorage.setItem('token', responseData.token);
             console.log(responseData);
             router.push("/");
         } catch (error) {
-            setError("Błąd logowania. \n Sprawdź dane i spróbuj ponownie.");
+            setError(error);
             console.log(error);
         } finally {
             setIsSubmitting(false);
@@ -48,7 +49,7 @@ export default function Login() {
                 onSubmit={handleSubmit}
                 className="flex flex-col gap-4 bg-white p-8 rounded-lg shadow-md w-full max-w-md"
             >
-                <h1 className="text-2xl font-semibold mb-4">Logowanie</h1>
+                <h1 className="text-2xl font-semibold mb-4">Rejestracja</h1>
                 <Label htmlFor="login">Login</Label>
                 <Input
                     type="text"
@@ -68,10 +69,10 @@ export default function Login() {
                     className="p-3 border border-gray-300 rounded-md"
                 />
                 {error && <p className="text-red-500">{error}</p>}
-                <Button type="submit" disabled={isSubmitting}>{isSubmitting ? "Wysyłanie..." : "Zaloguj się"}</Button>
+                <Button type="submit" disabled={isSubmitting}>{isSubmitting ? "Wysyłanie..." : "Zarejestruj się"}</Button>
                 <div className="mt-4 text-center">
-                    <Label htmlFor="new" className="text-gray-600">Nie masz konta?</Label>
-                    <Link href="/register" className="text-blue-500 hover:underline ml-2">Zarejestruj się</Link>
+                    <Label htmlFor="new" className="text-gray-600">Masz już konto?</Label>
+                    <Link href="/login" className="text-blue-500 hover:underline ml-2">Zaloguj się</Link>
                 </div>
             </form>
         </div>

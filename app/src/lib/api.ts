@@ -26,8 +26,18 @@ export const restoreCommands = async (commandIds) => {
 export const authUser = async (login: string, password: string) => {
     const response = await api.post('/users/auth', {
         "name": login,
-        "password": password
+        "password": password,
     })
+    return response.data;
+}
+
+export const registerUser = async (login: string, password: string, code: string) => {
+    const response = await api.post('users', {
+        "name": login,
+        "password": password,
+        "code": code
+    })
+
     return response.data;
 }
 export default api;

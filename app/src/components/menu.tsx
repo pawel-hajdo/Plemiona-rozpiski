@@ -1,7 +1,16 @@
+"use client"
 import Link from 'next/link';
 import * as DropdownMenu from '@radix-ui/react-dropdown-menu';
+import {usePathname} from "next/navigation";
+import {useState} from "react";
 
 const Menu = () => {
+    const userName = useState();
+
+    const pathname = usePathname();
+    const hideMenu = pathname === '/login' || pathname === '/register';
+    if (hideMenu) return null;
+
     return (
         <nav className="bg-gray-800 p-4">
             <div className="container mx-auto flex justify-between items-center">
@@ -13,7 +22,7 @@ const Menu = () => {
                     <DropdownMenu.Root>
                         <DropdownMenu.Trigger asChild>
                             <button className="text-gray-300 hover:text-white">
-                                Name
+                                Zalogowany jako {userName}
                             </button>
                         </DropdownMenu.Trigger>
                         <DropdownMenu.Content

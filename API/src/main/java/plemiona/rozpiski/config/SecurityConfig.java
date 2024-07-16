@@ -31,12 +31,11 @@ public class SecurityConfig {
                 .csrf(csrf -> csrf.disable())
                 .authorizeHttpRequests((authorize) ->
                         authorize
-//                                .requestMatchers(HttpMethod.POST,"/api/users").permitAll()
-//                                .requestMatchers(HttpMethod.POST,"/api/users/auth").permitAll()
-//                                .requestMatchers("/v3/api-docs/**").permitAll()
-//                                .requestMatchers("/swagger-ui/**").permitAll()
-//                                .anyRequest().authenticated())
-                                .anyRequest().permitAll())
+                                .requestMatchers(HttpMethod.POST,"/api/users").permitAll()
+                                .requestMatchers(HttpMethod.POST,"/api/users/auth").permitAll()
+                                .requestMatchers("/v3/api-docs/**").permitAll()
+                                .requestMatchers("/swagger-ui/**").permitAll()
+                                .anyRequest().authenticated())
                 .sessionManagement((session)->session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
                 .authenticationProvider(authenticationProvider)
                 .addFilterBefore(jwtAuthFilter, UsernamePasswordAuthenticationFilter.class)
