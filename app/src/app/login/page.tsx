@@ -30,9 +30,7 @@ export default function Login() {
 
         try {
             const responseData = await authUser(userLogin, userPassword);
-           // localStorage.setItem('token', responseData.token);
             document.cookie = `token=${responseData.token}; path=/`;
-            console.log(responseData);
             router.push("/");
         } catch (error) {
             setError("Błąd logowania. \n Sprawdź dane i spróbuj ponownie.");

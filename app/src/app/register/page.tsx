@@ -1,6 +1,6 @@
 "use client"
 
-import {useState} from "react";
+import {useEffect, useState} from "react";
 import {Input} from "@/components/ui/input";
 import {Button} from "@/components/ui/button";
 import {Label} from "@/components/ui/label";
@@ -12,11 +12,25 @@ export default function Register() {
 
     const [userLogin, setUserLogin] = useState("")
     const [userPassword, setUserPassword] = useState("")
-    const [code, setCode] = useState(null);
+    const [code, setCode] = useState("");
     const [error, setError] = useState("")
     const [isSubmitting, setIsSubmitting] = useState(false);
     const router = useRouter();
 
+    useEffect(() => {
+        const generatedCode = generateRandomCode();
+        setCode(generatedCode);
+    }, []);
+
+    const generateRandomCode = () => {
+        const characters = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789';
+        const length = 32;
+        let result = '';
+        for (let i = 0; i < length; i++) {
+            result += characters.charAt(Math.floor(Math.random() * characters.length));
+        }
+        return result;
+    };
 
     const handleSubmit = async (e) => {
         e.preventDefault();
@@ -31,11 +45,10 @@ export default function Register() {
 
         try {
             const responseData = await registerUser(userLogin, userPassword, code);
-            localStorage.setItem('token', responseData.token);
-            console.log(responseData);
+            document.cookie = `token=${responseData.token}; path=/`;
             router.push("/");
         } catch (error) {
-            setError(error);
+            setError(error.response.data);
             console.log(error);
         } finally {
             setIsSubmitting(false);
@@ -50,6 +63,11 @@ export default function Register() {
                 className="flex flex-col gap-4 bg-white p-8 rounded-lg shadow-md w-full max-w-md"
             >
                 <h1 className="text-2xl font-semibold mb-4">Rejestracja</h1>
+                <div className="bg-gray-100 p-4 rounded-lg text-sm text-gray-600 mb-4">
+                    <p>Użyj swojego konta w Plemionach, aby się zarejestrować. Aby to zrobić, wklej gdziekolwiek w swoim profilu następujący kod:</p>
+                    <p className="mt-2">{code}</p>
+                    <p className="mt-2">Gdy już się zarejestrujesz, możesz usunąć kod z profilu.</p>
+                </div>
                 <Label htmlFor="login">Login</Label>
                 <Input
                     type="text"
