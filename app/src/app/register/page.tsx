@@ -60,15 +60,15 @@ export default function Register() {
         <div className="flex flex-col items-center p-2 sm:p-8">
             <form
                 onSubmit={handleSubmit}
-                className="flex flex-col gap-4 bg-white p-2 sm:p-8 rounded-lg shadow-md w-full max-w-md"
+                className="flex flex-col gap-4 bg-white dark:bg-gray-800 p-2 sm:p-8 rounded-lg shadow-md w-full max-w-md"
             >
-                <h1 className="text-2xl font-semibold mt-2 mb-4">Rejestracja</h1>
+                <h1 className="text-2xl font-semibold mt-2 mb-4 dark:text-gray-200">Rejestracja</h1>
                 <div className="bg-gray-100 p-4 rounded-lg text-sm text-gray-600 mb-4">
                     <p>Użyj swojego konta w Plemionach, aby się zarejestrować. Aby to zrobić, wklej gdziekolwiek w swoim profilu następujący kod:</p>
                     <p className="mt-2">{code}</p>
                     <p className="mt-2">Gdy już się zarejestrujesz, możesz usunąć kod z profilu.</p>
                 </div>
-                <Label htmlFor="login">Login</Label>
+                <Label htmlFor="login" className="dark:text-gray-200">Login</Label>
                 <Input
                     type="text"
                     id="login"
@@ -77,7 +77,7 @@ export default function Register() {
                     onChange={(e) => setUserLogin(e.target.value)}
                     className="p-3 border border-gray-300 rounded-md"
                 />
-                <Label htmlFor="password">Hasło</Label>
+                <Label htmlFor="password" className="dark:text-gray-200">Hasło</Label>
                 <Input
                     type="password"
                     id="password"

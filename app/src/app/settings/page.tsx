@@ -8,7 +8,7 @@ import {
     loadSortingPreference,
     saveLinksToOpenCount,
     saveSortingPreference
-} from "@/components/localStorage";
+} from "@/lib/localStorage";
 
 
 export default function Settings() {

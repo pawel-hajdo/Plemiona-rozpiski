@@ -46,7 +46,7 @@ import {
 } from "@/components/ui/select"
 import {getDeletedCommands, getPlayerCommands, restoreCommands, softDeleteCommands} from "@/lib/api";
 import {useEffect, useState} from "react";
-import {loadLinksToOpenCount, loadPageSize, loadSortingPreference, savePageSize} from "@/components/localStorage";
+import {loadLinksToOpenCount, loadPageSize, loadSortingPreference, savePageSize} from "@/lib/localStorage";
 import {getPlayerId} from "@/lib/utils";
 
 

@@ -45,10 +45,10 @@ export default function Login() {
         <div className="flex flex-col items-center p-2 sm:p-8">
             <form
                 onSubmit={handleSubmit}
-                className="flex flex-col gap-4 bg-white p-2 sm:p-8 rounded-lg shadow-md w-full max-w-md"
+                className="flex flex-col gap-4 bg-white dark:bg-gray-800 p-2 sm:p-8 rounded-lg shadow-md w-full max-w-md"
             >
-                <h1 className="text-2xl font-semibold mb-4">Logowanie</h1>
-                <Label htmlFor="login">Login</Label>
+                <h1 className="text-2xl font-semibold mb-4 dark:text-gray-200">Logowanie</h1>
+                <Label htmlFor="login" className="dark:text-gray-200">Login</Label>
                 <Input
                     type="text"
                     id="login"
@@ -57,7 +57,7 @@ export default function Login() {
                     onChange={(e) => setUserLogin(e.target.value)}
                     className="p-3 border border-gray-300 rounded-md"
                 />
-                <Label htmlFor="password">Hasło</Label>
+                <Label htmlFor="password" className="dark:text-gray-200">Hasło</Label>
                 <Input
                     type="password"
                     id="password"
@@ -69,7 +69,7 @@ export default function Login() {
                 {error && <p className="text-red-500">{error}</p>}
                 <Button type="submit" disabled={isSubmitting}>{isSubmitting ? "Wysyłanie..." : "Zaloguj się"}</Button>
                 <div className="mt-4 text-center">
-                    <Label htmlFor="new" className="text-gray-600">Nie masz konta?</Label>
+                    <Label htmlFor="new" className="text-gray-600 dark:text-gray-200">Nie masz konta?</Label>
                     <Link href="/register" className="text-blue-500 hover:underline ml-2">Zarejestruj się</Link>
                 </div>
             </form>
