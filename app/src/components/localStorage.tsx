@@ -1,12 +1,12 @@
-import { decodeToken  } from "react-jwt";
-
 export const saveLinksToOpenCount = (count) => {
     localStorage.setItem('linksToOpenCount', count);
 };
 
 export const loadLinksToOpenCount = () => {
-    const count = localStorage.getItem('linksToOpenCount');
-    return count ? parseInt(count, 10) : 10;
+    if (typeof window !== 'undefined'){
+        return parseInt(localStorage.getItem('linksToOpenCount'), 10);
+    }
+    return 10;
 };
 
 export const saveSortingPreference = (sorting) => {
@@ -14,13 +14,17 @@ export const saveSortingPreference = (sorting) => {
 };
 
 export const loadSortingPreference = () => {
-    const sorting = localStorage.getItem('sortingPreference');
-    return sorting ? JSON.parse(sorting) : { id: "commandNumberId", desc: false };
+    if (typeof window !== 'undefined'){
+        return JSON.parse(localStorage.getItem('sortingPreference'))
+    }
+    return { id: "commandNumberId", desc: false };
 };
 
 export const loadPageSize = () => {
-    const size = localStorage.getItem('pageSize');
-    return size ? parseInt(size, 10) : 10;
+    if (typeof window !== 'undefined'){
+        return parseInt(localStorage.getItem('pageSize'),10);
+    }
+    return 10;
 };
 
 export const savePageSize = (size) => {
