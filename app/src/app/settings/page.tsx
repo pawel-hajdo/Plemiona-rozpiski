@@ -31,7 +31,7 @@ export default function Settings() {
     };
 
     return (
-        <div className="min-h-screen flex flex-col p-8">
+        <div className="flex flex-col p-2 sm:p-8">
             <h1 className="text-3xl font-bold mb-6">Ustawienia</h1>
             <div className="flex flex-wrap gap-4 mb-4 items-center">
                 <Label className="text-lg">Motyw strony:</Label>

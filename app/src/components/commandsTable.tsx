@@ -49,6 +49,7 @@ import {useEffect, useState} from "react";
 import {loadLinksToOpenCount, loadPageSize, loadSortingPreference, savePageSize} from "@/components/localStorage";
 import {getPlayerId} from "@/lib/utils";
 
+
 export function CommandsTable({deleted}) {
     const [commands, setCommands] = useState([]);
     const [sorting, setSorting] = React.useState<SortingState>([loadSortingPreference()])
@@ -162,7 +163,7 @@ export function CommandsTable({deleted}) {
         }
     }
 
-    const columns: ColumnDef<typeof commands[0]>[] = [
+    const columns: ColumnDef<Command>[] = [
         {
             id: "select",
             header: ({ table }) => (

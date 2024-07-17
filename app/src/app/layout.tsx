@@ -18,7 +18,7 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <html lang="en">
+    <html lang="pl" suppressHydrationWarning>
       <body className={inter.className}>
       <ThemeProvider
           attribute="class"
@@ -27,7 +27,7 @@ export default function RootLayout({
           disableTransitionOnChange
       >
           <Menu/>
-          <main className="container mx-auto p-4">{children}</main>
+          <main className="container mx-auto p-4 min-h-min">{children}</main>
           <Footer/>
       </ThemeProvider>
       </body>

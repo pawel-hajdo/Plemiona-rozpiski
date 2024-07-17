@@ -42,10 +42,10 @@ export default function Login() {
     }
 
     return (
-        <div className="min-h-screen flex flex-col items-center p-8">
+        <div className="flex flex-col items-center p-2 sm:p-8">
             <form
                 onSubmit={handleSubmit}
-                className="flex flex-col gap-4 bg-white p-8 rounded-lg shadow-md w-full max-w-md"
+                className="flex flex-col gap-4 bg-white p-2 sm:p-8 rounded-lg shadow-md w-full max-w-md"
             >
                 <h1 className="text-2xl font-semibold mb-4">Logowanie</h1>
                 <Label htmlFor="login">Login</Label>
