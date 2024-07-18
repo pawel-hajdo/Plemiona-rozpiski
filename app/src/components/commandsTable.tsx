@@ -61,7 +61,7 @@ export function CommandsTable({deleted}) {
         pageSize: loadPageSize(),
     })
     const [clickedRows, setClickedRows] = React.useState({});
-    const [linksToOpenCount, setLinkToOpenCount] = React.useState(loadLinksToOpenCount);
+    const [linksToOpenCount, setLinkToOpenCount] = React.useState(0);
     const playerId = getPlayerId();
 
     useEffect(() => {
@@ -81,6 +81,10 @@ export function CommandsTable({deleted}) {
 
         fetchCommandsData();
 
+    }, []);
+
+    useEffect(() => {
+        setLinkToOpenCount(loadLinksToOpenCount);
     }, []);
 
     useEffect(() => {

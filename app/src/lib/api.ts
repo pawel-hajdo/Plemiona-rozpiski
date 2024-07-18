@@ -56,4 +56,17 @@ export const registerUser = async (login: string, password: string, code: string
 
     return response.data;
 }
+
+export const updateUser = async (login: string, oldPassword:string, newPassword: string) => {
+    const response = await api.put('/users', {
+        "name": login,
+        "oldPassword": oldPassword,
+        "newPassword": newPassword,
+    }, {
+        headers: {
+            Authorization: `Bearer ${getTokenFromCookies()}`
+        }
+    });
+    return response.data;
+}
 export default api;

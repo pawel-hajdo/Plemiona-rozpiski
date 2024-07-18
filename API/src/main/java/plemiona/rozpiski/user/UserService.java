@@ -126,6 +126,10 @@ public class UserService {
         var user = userRepository.findByName(request.getName())
                 .orElseThrow(() -> new UserNotFoundException("User not found"));
 
+        authenticationManager.authenticate(
+                new UsernamePasswordAuthenticationToken(request.getName(), request.getOldPassword())
+        );
+
         String hashedPassword = passwordEncoder.encode(request.getNewPassword());
         user.setPassword(hashedPassword);
 
