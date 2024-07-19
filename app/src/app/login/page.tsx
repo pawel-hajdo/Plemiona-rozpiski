@@ -9,13 +9,11 @@ import {useRouter} from "next/navigation";
 import Link from "next/link";
 
 export default function Login() {
-
     const [userLogin, setUserLogin] = useState("")
     const [userPassword, setUserPassword] = useState("")
     const [error, setError] = useState("")
     const [isSubmitting, setIsSubmitting] = useState(false);
     const router = useRouter();
-
 
     const handleSubmit = async (e) => {
         e.preventDefault();
@@ -38,7 +36,6 @@ export default function Login() {
         } finally {
             setIsSubmitting(false);
         }
-
     }
 
     return (

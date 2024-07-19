@@ -78,9 +78,7 @@ export function CommandsTable({deleted}) {
                 console.log(error);
             }
         };
-
         fetchCommandsData();
-
     }, []);
 
     useEffect(() => {
@@ -90,7 +88,6 @@ export function CommandsTable({deleted}) {
     useEffect(() => {
         savePageSize(pagination.pageSize);
     }, [pagination.pageSize]);
-
 
     const openLinksInTabs = () => {
         const rows = table.getRowModel().rows;
@@ -106,7 +103,6 @@ export function CommandsTable({deleted}) {
                 openedCount++;
             }
         });
-
     };
 
     const handleClickLink = (rowId) => {
@@ -292,7 +288,6 @@ export function CommandsTable({deleted}) {
                 </a>
             ),
         },
-
     ]
 
     const table = useReactTable({
@@ -315,7 +310,6 @@ export function CommandsTable({deleted}) {
             rowSelection,
             pagination
         },
-
     })
 
     return (

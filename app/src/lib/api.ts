@@ -2,7 +2,7 @@ import axios from 'axios';
 import {getTokenFromCookies} from "@/lib/utils";
 
 const api = axios.create({
-    baseURL: 'http://localhost:8080/api',
+    baseURL: process.env.NEXT_PUBLIC_API_BASE_URL,
 });
 
 export const getPlayerCommands = async (playerId) => {

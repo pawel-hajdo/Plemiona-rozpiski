@@ -9,7 +9,6 @@ import {useRouter} from "next/navigation";
 import Link from "next/link";
 
 export default function Register() {
-
     const [userLogin, setUserLogin] = useState("")
     const [userPassword, setUserPassword] = useState("")
     const [code, setCode] = useState("");
@@ -53,7 +52,6 @@ export default function Register() {
         } finally {
             setIsSubmitting(false);
         }
-
     }
 
     return (
