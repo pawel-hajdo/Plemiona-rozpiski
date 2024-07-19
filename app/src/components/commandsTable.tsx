@@ -48,7 +48,17 @@ import {getDeletedCommands, getPlayerCommands, restoreCommands, softDeleteComman
 import {useEffect, useState} from "react";
 import {loadLinksToOpenCount, loadPageSize, loadSortingPreference, savePageSize} from "@/lib/localStorage";
 import {getPlayerId} from "@/lib/utils";
+import {
+    RankingInfo,
+    rankItem,
+} from '@tanstack/match-sorter-utils'
 
+const fuzzyFilter = (row, columnId, value, addMeta) => {
+    const itemRank = rankItem(row.getValue(columnId), value);
+    console.log(itemRank)
+    addMeta({ itemRank });
+    return itemRank.passed;
+};
 
 export function CommandsTable({deleted}) {
     const [commands, setCommands] = useState([]);
@@ -64,6 +74,7 @@ export function CommandsTable({deleted}) {
     const [linksToOpenCount, setLinkToOpenCount] = React.useState(0);
     const playerId = getPlayerId();
     const [error, setError] = useState("")
+    const [globalFilter, setGlobalFilter] = React.useState("");
 
     useEffect(() => {
         const fetchCommandsData = async () => {
@@ -211,7 +222,14 @@ export function CommandsTable({deleted}) {
                     <CaretSortIcon className="ml-2 h-4 w-4" />
                 </Button>
             ),
-            cell: ({ row }) => <div>{row.getValue("minTime")}</div>,
+            cell: ({ row }) => {
+                const date = new Date(row.getValue('minTime'));
+                const formatted = date.toLocaleString();
+                return (
+                    <div>{formatted}</div>
+                )
+            }
+
         },
         {
             accessorKey: "maxTime",
@@ -224,7 +242,13 @@ export function CommandsTable({deleted}) {
                     <CaretSortIcon className="ml-2 h-4 w-4" />
                 </Button>
             ),
-            cell: ({ row }) => <div>{row.getValue("maxTime")}</div>,
+            cell: ({ row }) => {
+                const date = new Date(row.getValue('maxTime'));
+                const formatted = date.toLocaleString();
+                return (
+                    <div>{formatted}</div>
+                )
+            }
         },
         {
             accessorKey: "source",
@@ -304,12 +328,18 @@ export function CommandsTable({deleted}) {
         onColumnVisibilityChange: setColumnVisibility,
         onRowSelectionChange: setRowSelection,
         onPaginationChange: setPagination,
+        globalFilterFn: fuzzyFilter,
+        onGlobalFilterChange: setGlobalFilter,
         state: {
             sorting,
             columnFilters,
             columnVisibility,
             rowSelection,
-            pagination
+            pagination,
+            globalFilter,
+        },
+        filterFns: {
+            fuzzy: fuzzyFilter,
         },
     })
 
@@ -358,11 +388,9 @@ export function CommandsTable({deleted}) {
                     Open {linksToOpenCount}
                 </Button>
                 <Input
-                    placeholder="Filter type..."
-                    value={(table.getColumn("type")?.getFilterValue() as string) ?? ""}
-                    onChange={(event) =>
-                        table.getColumn("type")?.setFilterValue(event.target.value)
-                    }
+                    placeholder="Filter..."
+                    value={globalFilter ?? ""}
+                    onChange={(event) => setGlobalFilter(String(event.target.value))}
                     className="max-w-sm"
                 />
                 <DropdownMenu>
