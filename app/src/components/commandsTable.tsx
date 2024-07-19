@@ -63,6 +63,7 @@ export function CommandsTable({deleted}) {
     const [clickedRows, setClickedRows] = React.useState({});
     const [linksToOpenCount, setLinkToOpenCount] = React.useState(0);
     const playerId = getPlayerId();
+    const [error, setError] = useState("")
 
     useEffect(() => {
         const fetchCommandsData = async () => {
@@ -75,7 +76,7 @@ export function CommandsTable({deleted}) {
                 }
                 setCommands(data);
             } catch (error) {
-                console.log(error);
+                setError("Pobranie komend nie powiodło się");
             }
         };
         fetchCommandsData();
@@ -142,7 +143,7 @@ export function CommandsTable({deleted}) {
             await softDeleteCommands(selectedCommands);
             window.location.reload();
         } catch (error) {
-            console.error('Error deleting commands:', error);
+            setError("Wystąpił błąd podczas usuwania komend");
         }
     };
 
@@ -159,7 +160,7 @@ export function CommandsTable({deleted}) {
             await restoreCommands(selectedCommands);
             window.location.reload();
         } catch (error) {
-            console.error('Error restoring commands:', error);
+            setError("Wystąpił błąd podczas przywracania komend");
         }
     }
 
@@ -436,6 +437,7 @@ export function CommandsTable({deleted}) {
                                     className="h-24 text-center"
                                 >
                                     No results.
+                                    {error && <p className="text-red-500">{error}</p>}
                                 </TableCell>
                             </TableRow>
                         )}

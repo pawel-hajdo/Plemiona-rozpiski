@@ -13,9 +13,13 @@ import plemiona.rozpiski.config.JwtService;
 import plemiona.rozpiski.exceptions.UserCodeNotMatchingException;
 import plemiona.rozpiski.exceptions.UserNotFoundException;
 import plemiona.rozpiski.exceptions.UserWithSameNameExistsException;
+import plemiona.rozpiski.log.Log;
+import plemiona.rozpiski.log.LogRepository;
+import plemiona.rozpiski.log.LogType;
 
 import java.net.URI;
 import java.net.URISyntaxException;
+import java.time.LocalDateTime;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -23,14 +27,17 @@ import java.util.Map;
 public class UserService {
 
     private final UserRepository userRepository;
+    private final LogRepository logRepository;
     private final PasswordEncoder passwordEncoder;
     private final JwtService jwtService;
     private final AuthenticationManager authenticationManager;
     private final RestTemplate restTemplate;
     private static final String BASE_URL = "https://pl200.plemiona.pl/";
+
     @Autowired
-    public UserService(UserRepository userRepository, PasswordEncoder passwordEncoder, JwtService jwtService, AuthenticationManager authenticationManager, RestTemplate restTemplate) {
+    public UserService(UserRepository userRepository, LogRepository logRepository, PasswordEncoder passwordEncoder, JwtService jwtService, AuthenticationManager authenticationManager, RestTemplate restTemplate) {
         this.userRepository = userRepository;
+        this.logRepository = logRepository;
         this.passwordEncoder = passwordEncoder;
         this.jwtService = jwtService;
         this.authenticationManager = authenticationManager;
@@ -55,6 +62,7 @@ public class UserService {
         newUser.setPlayerId(playerId);
 
         userRepository.save(newUser);
+        saveToLogs(newUser.getId(), LogType.USER_REGISTER);
 
         Map<String, Object> claims = new HashMap<>();
         claims.put("playerId", playerId);
@@ -71,6 +79,7 @@ public class UserService {
         Map<String, Object> claims = new HashMap<>();
         claims.put("playerId", user.getPlayerId());
         var jwtToken = jwtService.generateToken(claims, user);
+        saveToLogs(user.getId(), LogType.USER_LOGIN_SUCCESSFUL);
         return AuthenticationResponse.builder().token(jwtToken).build();
     }
 
@@ -134,5 +143,14 @@ public class UserService {
         user.setPassword(hashedPassword);
 
         userRepository.save(user);
+        saveToLogs(user.getId(), LogType.USER_UPDATE);
+    }
+
+    private void saveToLogs(Long userId, LogType logType) {
+        Log log = new Log();
+        log.setUserId(userId);
+        log.setType(logType);
+        log.setDate(LocalDateTime.now());
+        logRepository.save(log);
     }
 }

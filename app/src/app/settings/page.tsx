@@ -66,12 +66,11 @@ export default function Settings() {
 
         try {
             const userLogin = getPlayerName();
-            const responseData = await updateUser(userLogin, oldPassword, newPassword);
+            await updateUser(userLogin, oldPassword, newPassword);
             Cookies.remove('token');
             window.location.reload();
         } catch (error) {
             setError("Wystąpił błąd. \n Sprawdź dane i spróbuj ponownie.");
-            console.log(error);
         } finally {
             setIsSubmitting(false);
         }

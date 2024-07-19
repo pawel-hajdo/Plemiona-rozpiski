@@ -48,7 +48,6 @@ export default function Register() {
             router.push("/");
         } catch (error) {
             setError(error.response.data);
-            console.log(error);
         } finally {
             setIsSubmitting(false);
         }

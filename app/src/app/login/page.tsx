@@ -32,7 +32,6 @@ export default function Login() {
             router.push("/");
         } catch (error) {
             setError("Błąd logowania. \n Sprawdź dane i spróbuj ponownie.");
-            console.log(error);
         } finally {
             setIsSubmitting(false);
         }
