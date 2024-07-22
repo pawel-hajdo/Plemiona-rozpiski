@@ -13,7 +13,7 @@ import {Input} from "@/components/ui/input";
 import * as React from "react";
 import {ModeToggle} from "@/components/modeToogle";
 import {Select, SelectContent, SelectGroup, SelectItem, SelectTrigger, SelectValue} from "@/components/ui/select";
-import {useState} from "react";
+import {FormEvent, useState} from "react";
 import {
     loadLinksToOpenCount,
     loadSortingPreference,
@@ -36,19 +36,22 @@ export default function Settings() {
     const [error, setError] = useState("")
     const [isSubmitting, setIsSubmitting] = useState(false);
 
-    const handleCommandsCountChange = (value) => {
-        setCommandsCount(value);
-        saveLinksToOpenCount(value);
+    const handleCommandsCountChange = (value: string) => {
+        const numericValue = parseInt(value, 10);
+        if (!isNaN(numericValue)) {
+            setCommandsCount(numericValue);
+            saveLinksToOpenCount(numericValue);
+        }
     };
 
-    const handleSortingChange = (value) => {
+    const handleSortingChange = (value: string) => {
         const [id, order] = value.split('|');
         const sortingPreference = { id, desc: order === 'DESC' };
         setSorting(value);
         saveSortingPreference(sortingPreference);
     };
 
-    const handleSubmit = async (e) => {
+    const handleSubmit = async (e: FormEvent<HTMLFormElement>) => {
         e.preventDefault();
 
         setError("");
@@ -109,7 +112,6 @@ export default function Settings() {
                 <Select
                     value={sorting}
                     onValueChange={handleSortingChange}
-                    className="max-w-xs"
                 >
                     <SelectTrigger className="max-w-xs sm:max-w-[200px]">
                         <SelectValue placeholder="Wybierz rodzaj sortowania" />

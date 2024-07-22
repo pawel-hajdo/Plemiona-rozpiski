@@ -14,7 +14,7 @@ export function getTokenFromCookies(){
 export function getPlayerName(){
   const token = getTokenFromCookies();
   if (token) {
-    const decoded = decodeToken(token);
+    const decoded: any = decodeToken(token);
     return decoded.sub;
   }
 }
@@ -22,7 +22,7 @@ export function getPlayerName(){
 export function getPlayerId(){
   const token = getTokenFromCookies();
   if (token) {
-    const decoded = decodeToken(token);
+    const decoded: any = decodeToken(token);
     return decoded.playerId;
   }
 }

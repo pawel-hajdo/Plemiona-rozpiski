@@ -1,4 +1,4 @@
-export const saveLinksToOpenCount = (count) => {
+export const saveLinksToOpenCount = (count: any) => {
     localStorage.setItem('linksToOpenCount', count);
 };
 
@@ -10,7 +10,7 @@ export const loadLinksToOpenCount = () => {
     return 10;
 };
 
-export const saveSortingPreference = (sorting) => {
+export const saveSortingPreference = (sorting: any) => {
     localStorage.setItem('sortingPreference', JSON.stringify(sorting));
 };
 
@@ -30,6 +30,6 @@ export const loadPageSize = () => {
     return 10;
 };
 
-export const savePageSize = (size) => {
+export const savePageSize = (size: any) => {
     localStorage.setItem('pageSize', size);
 };

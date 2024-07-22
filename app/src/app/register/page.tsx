@@ -1,6 +1,6 @@
 "use client"
 
-import {useEffect, useState} from "react";
+import {FormEvent, useEffect, useState} from "react";
 import {Input} from "@/components/ui/input";
 import {Button} from "@/components/ui/button";
 import {Label} from "@/components/ui/label";
@@ -31,7 +31,7 @@ export default function Register() {
         return result;
     };
 
-    const handleSubmit = async (e) => {
+    const handleSubmit = async (e: FormEvent<HTMLFormElement>) => {
         e.preventDefault();
 
         setError("");
@@ -47,7 +47,12 @@ export default function Register() {
             document.cookie = `token=${responseData.token}; path=/`;
             router.push("/");
         } catch (error) {
-            setError(error.response.data);
+            if (error instanceof Error) {
+                const message = error.message;
+                setError(message);
+            } else {
+                setError("Wystąpił błąd. Sprawdź dane i spróbuj ponownie.");
+            }
         } finally {
             setIsSubmitting(false);
         }

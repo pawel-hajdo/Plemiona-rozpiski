@@ -23,17 +23,17 @@ public class CommandService {
 
     public List<Command> getCommandsByPlayerId(String playerId) {
         List<Command> commands = commandRepository.findByPlayerIdAndDeletedFalse(playerId);
-        if (commands.isEmpty()) {
-            throw new CommandNotFoundException("Commands not found for player id: " + playerId);
-        }
+//        if (commands.isEmpty()) {
+//            throw new CommandNotFoundException("Commands not found for player id: " + playerId);
+//        }
         return commands;
     }
 
     public List<Command> getDeletedCommandsByPlayerId(String playerId){
         List<Command> commands = commandRepository.findByPlayerIdAndDeletedTrue(playerId);
-        if (commands.isEmpty()) {
-            throw new CommandNotFoundException("Deleted commands not found for player id: " + playerId);
-        }
+//        if (commands.isEmpty()) {
+//            throw new CommandNotFoundException("Deleted commands not found for player id: " + playerId);
+//        }
         return commands;
     }
 

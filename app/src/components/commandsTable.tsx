@@ -53,14 +53,14 @@ import {
     rankItem,
 } from '@tanstack/match-sorter-utils'
 
-const fuzzyFilter = (row, columnId, value, addMeta) => {
+const fuzzyFilter = (row: any, columnId: any, value: any, addMeta: any) => {
     const itemRank = rankItem(row.getValue(columnId), value);
     console.log(itemRank)
     addMeta({ itemRank });
     return itemRank.passed;
 };
 
-export function CommandsTable({deleted}) {
+export function CommandsTable({deleted} :any) {
     const [commands, setCommands] = useState([]);
     const [sorting, setSorting] = React.useState<SortingState>([loadSortingPreference()])
     const [columnFilters, setColumnFilters] = React.useState<ColumnFiltersState>([])
@@ -70,7 +70,7 @@ export function CommandsTable({deleted}) {
         pageIndex: 0,
         pageSize: loadPageSize(),
     })
-    const [clickedRows, setClickedRows] = React.useState({});
+    const [clickedRows, setClickedRows] = React.useState<any>({});
     const [linksToOpenCount, setLinkToOpenCount] = React.useState(0);
     const playerId = getPlayerId();
     const [error, setError] = useState("")
@@ -117,18 +117,18 @@ export function CommandsTable({deleted}) {
         });
     };
 
-    const handleClickLink = (rowId) => {
-        setRowSelection((prev) => ({ ...prev, [rowId]: true }));
-        setClickedRows((prev) => ({ ...prev, [rowId]: true }));
+    const handleClickLink = (rowId: any) => {
+        setRowSelection((prev:any) => ({ ...prev, [rowId]: true }));
+        setClickedRows((prev: any) => ({ ...prev, [rowId]: true }));
     };
 
-    const isButtonDisabled = (row) => {
+    const isButtonDisabled = (row: any) => {
         const currentTime = new Date();
         const minTime = new Date(row.original.minTime);
         return currentTime < minTime;
     };
 
-    const getRowClasses = (row) => {
+    const getRowClasses = (row: any) => {
         const currentTime = new Date();
         const minTime = new Date(row.original.minTime);
         const maxTime = new Date(row.original.maxTime);
