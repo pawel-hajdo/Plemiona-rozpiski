@@ -17,9 +17,9 @@ export const saveSortingPreference = (sorting: any) => {
 export const loadSortingPreference = () => {
     if (typeof window !== 'undefined') {
         const sortingPreference = localStorage.getItem('sortingPreference');
-        return sortingPreference ? JSON.parse(sortingPreference) : { id: "commandNumberId", desc: false };
+        return sortingPreference ? JSON.parse(sortingPreference) : { id: "maxTime", desc: false };
     }
-    return { id: "commandNumberId", desc: false };
+    return { id: "maxTime", desc: false };
 };
 
 export const loadPageSize = () => {

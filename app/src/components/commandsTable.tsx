@@ -75,27 +75,27 @@ export function CommandsTable({deleted} :any) {
     const playerId = getPlayerId();
     const [error, setError] = useState("")
     const [globalFilter, setGlobalFilter] = React.useState("");
+    const [isLoading, setIsLoading] = useState(true);
 
     useEffect(() => {
-        const fetchCommandsData = async () => {
-            try {
-                let data;
-                if(deleted) {
-                    data = await getDeletedCommands(playerId);
-                } else {
-                    data = await getPlayerCommands(playerId);
-                }
-                setCommands(data);
-            } catch (error) {
-                setError("Pobranie komend nie powiodło się");
-            }
-        };
         fetchCommandsData();
-    }, []);
-
-    useEffect(() => {
         setLinkToOpenCount(loadLinksToOpenCount);
     }, []);
+
+    const fetchCommandsData = async () => {
+        try {
+            let data;
+            if(deleted) {
+                data = await getDeletedCommands(playerId);
+            } else {
+                data = await getPlayerCommands(playerId);
+            }
+            setCommands(data);
+            setIsLoading(false);
+        } catch (error) {
+            setError("Pobranie komend nie powiodło się");
+        }
+    };
 
     useEffect(() => {
         savePageSize(pagination.pageSize);
@@ -352,7 +352,7 @@ export function CommandsTable({deleted} :any) {
                         variant="outline"
                         disabled={Object.keys(rowSelection).length === 0}
                     >
-                        Restore
+                        Przywróć
                     </Button>
                 ) :
                 (
@@ -361,23 +361,22 @@ export function CommandsTable({deleted} :any) {
                         variant="outline"
                         disabled={Object.keys(rowSelection).length === 0}
                     >
-                        Delete
+                        Usuń
                     </Button>
                 )}
                 <Select
                     value={pagination.pageSize.toString()}
                     onValueChange={(value) => setPagination({ ...pagination, pageSize: Number(value) })}
                 >
-                    <SelectTrigger className="w-[120px]">
+                    <SelectTrigger className="w-[140px]">
                         <SelectValue placeholder="Number of commands" />
                     </SelectTrigger>
                     <SelectContent>
                         <SelectGroup>
-                            <SelectItem value="10">Show 10</SelectItem>
-                            <SelectItem value="20">Show 20</SelectItem>
-                            <SelectItem value="50">Show 50</SelectItem>
-                            <SelectItem value="100">Show 100</SelectItem>
-                            <SelectItem value={commands.length.toString()}>Show All</SelectItem>
+                            <SelectItem value="10">Wyświetl 10</SelectItem>
+                            <SelectItem value="20">Wyświetl 20</SelectItem>
+                            <SelectItem value="50">Wyświetl 50</SelectItem>
+                            <SelectItem value="100">Wyświetl 100</SelectItem>
                         </SelectGroup>
                     </SelectContent>
                 </Select>
@@ -385,10 +384,10 @@ export function CommandsTable({deleted} :any) {
                     onClick={openLinksInTabs}
                     variant={"outline"}
                 >
-                    Open {linksToOpenCount}
+                    Otwórz {linksToOpenCount}
                 </Button>
                 <Input
-                    placeholder="Filter..."
+                    placeholder="Filtruj po kordach lub typie rozkazu..."
                     value={globalFilter ?? ""}
                     onChange={(event) => setGlobalFilter(String(event.target.value))}
                     className="max-w-sm"
@@ -396,7 +395,7 @@ export function CommandsTable({deleted} :any) {
                 <DropdownMenu>
                     <DropdownMenuTrigger asChild>
                         <Button variant="outline" className="ml-auto">
-                            Columns <ChevronDownIcon className="ml-2 h-4 w-4" />
+                            Kolumny <ChevronDownIcon className="ml-2 h-4 w-4" />
                         </Button>
                     </DropdownMenuTrigger>
                     <DropdownMenuContent align="end">
@@ -441,7 +440,13 @@ export function CommandsTable({deleted} :any) {
                         ))}
                     </TableHeader>
                     <TableBody>
-                        {table.getRowModel().rows?.length ? (
+                        {isLoading ? (
+                            <TableRow>
+                                <TableCell colSpan={columns.length} className="h-24 text-center">
+                                    Pobieranie komend...
+                                </TableCell>
+                            </TableRow>
+                        ) : table.getRowModel().rows?.length ? (
                             table.getRowModel().rows.map((row) => (
                                 <TableRow
                                     key={row.id}
@@ -464,7 +469,7 @@ export function CommandsTable({deleted} :any) {
                                     colSpan={columns.length}
                                     className="h-24 text-center"
                                 >
-                                    No results.
+                                    Brak rozkazów.
                                     {error && <p className="text-red-500">{error}</p>}
                                 </TableCell>
                             </TableRow>
@@ -474,8 +479,8 @@ export function CommandsTable({deleted} :any) {
             </div>
             <div className="flex items-center justify-end space-x-2 py-4">
                 <div className="flex-1 text-sm text-muted-foreground">
-                    {table.getFilteredSelectedRowModel().rows.length} of{" "}
-                    {table.getFilteredRowModel().rows.length} row(s) selected.
+                    {table.getFilteredSelectedRowModel().rows.length} z{" "}
+                    {table.getFilteredRowModel().rows.length} zaznaczonych wierszy
                 </div>
                 <div className="space-x-2">
                     <Button
@@ -484,7 +489,7 @@ export function CommandsTable({deleted} :any) {
                         onClick={() => table.previousPage()}
                         disabled={!table.getCanPreviousPage()}
                     >
-                        Previous
+                        Następna
                     </Button>
                     <Button
                         variant="outline"
@@ -492,7 +497,7 @@ export function CommandsTable({deleted} :any) {
                         onClick={() => table.nextPage()}
                         disabled={!table.getCanNextPage()}
                     >
-                        Next
+                        Poprzednia
                     </Button>
                 </div>
             </div>

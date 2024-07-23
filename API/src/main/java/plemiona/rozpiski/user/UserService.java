@@ -10,6 +10,7 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.web.client.RestTemplate;
 import plemiona.rozpiski.config.JwtService;
+import plemiona.rozpiski.exceptions.PlayerDoesNotExistException;
 import plemiona.rozpiski.exceptions.UserCodeNotMatchingException;
 import plemiona.rozpiski.exceptions.UserNotFoundException;
 import plemiona.rozpiski.exceptions.UserWithSameNameExistsException;
@@ -87,8 +88,15 @@ public class UserService {
         String url = String.format(BASE_URL + "guest.php?name=%s", name);
         String response = restTemplate.getForObject(url, String.class);
 
-        String profileUrl = extractProfileUrl(response);
-        String profileResponse = restTemplate.getForObject(profileUrl, String.class);
+        String profileUrl;
+        String profileResponse;
+        try{
+             profileUrl = extractProfileUrl(response);
+             profileResponse = restTemplate.getForObject(profileUrl, String.class);
+        } catch (Exception e){
+            throw new PlayerDoesNotExistException("Couldn't find player with this name " + name);
+        }
+
 
         return profileResponse.contains(code);
     }
@@ -125,7 +133,7 @@ public class UserService {
 
         String profileUrl = extractProfileUrl(response);
         if (profileUrl == null) {
-            throw new RuntimeException("Profile URL could not be extracted for player: " + name);
+            throw new PlayerDoesNotExistException("Profile URL could not be extracted for player: " + name);
         }
 
         return extractPlayerIdFromUrl(profileUrl);

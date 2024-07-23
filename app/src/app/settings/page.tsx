@@ -23,6 +23,7 @@ import {
 import {updateUser} from "@/lib/api";
 import {getPlayerName} from "@/lib/utils";
 import Cookies from "js-cookie";
+import {EyeClosedIcon, EyeOpenIcon} from "@radix-ui/react-icons";
 
 export default function Settings() {
     const [commandsCount, setCommandsCount] = useState(loadLinksToOpenCount);
@@ -34,6 +35,7 @@ export default function Settings() {
     const [newPassword, setNewPassword] = useState("")
     const [newPasswordConfirm, setNewPasswordConfirm] = useState("")
     const [error, setError] = useState("")
+    const [showCurrentPassword, setShowCurrentPassword] = useState(false);
     const [isSubmitting, setIsSubmitting] = useState(false);
 
     const handleCommandsCountChange = (value: string) => {
@@ -78,6 +80,10 @@ export default function Settings() {
             setIsSubmitting(false);
         }
     }
+
+    const toggleShowPassword = () => {
+        setShowCurrentPassword((prevShowCurrentPassword) => !prevShowCurrentPassword);
+    };
 
     return (
         <div className="p-2 sm:p-8">
@@ -138,14 +144,23 @@ export default function Settings() {
                             <DialogDescription>Wprowadź nowe hasło.</DialogDescription>
                         </DialogHeader>
                         <form onSubmit={handleSubmit} className="space-y-4">
-                            <div>
                                 <Label htmlFor="current-password">Aktualne hasło:</Label>
-                                <Input
-                                    id="current-password"
-                                    type="password"
-                                    name="current-password" required
-                                    onChange={(e) => setOldPassword(e.target.value)}
-                                />
+                            <div className="relative">
+                            <Input
+                                id="current-password"
+                                type={showCurrentPassword ? "text" : "password"}
+                                name="current-password" required
+                                onChange={(e) => setOldPassword(e.target.value)}
+                                className="p-3 border border-gray-300 rounded-md pr-10"
+                                autoComplete="current-password"
+                            />
+                                <button
+                                    type="button"
+                                    onClick={toggleShowPassword}
+                                    className="absolute right-3 top-2"
+                                >
+                                    {showCurrentPassword ? <EyeClosedIcon className="h-6 w-6"/> : <EyeOpenIcon className="h-6 w-6"/>}
+                                </button>
                             </div>
                             <div>
                                 <Label htmlFor="new-password">Nowe hasło:</Label>
@@ -154,6 +169,7 @@ export default function Settings() {
                                     type="password"
                                     name="new-password" required
                                     onChange={(e) => setNewPassword(e.target.value)}
+                                    autoComplete="new-password"
                                 />
                             </div>
                             <div>
@@ -163,6 +179,7 @@ export default function Settings() {
                                     type="password"
                                     name="confirm-password" required
                                     onChange={(e) => setNewPasswordConfirm(e.target.value)}
+                                    autoComplete="new-password"
                                 />
                             </div>
                             <DialogFooter>

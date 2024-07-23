@@ -7,12 +7,14 @@ import {Label} from "@/components/ui/label";
 import {authUser} from "@/lib/api";
 import {useRouter} from "next/navigation";
 import Link from "next/link";
+import {EyeClosedIcon, EyeOpenIcon} from "@radix-ui/react-icons";
 
 export default function Login() {
     const [userLogin, setUserLogin] = useState("")
     const [userPassword, setUserPassword] = useState("")
     const [error, setError] = useState("")
     const [isSubmitting, setIsSubmitting] = useState(false);
+    const [showPassword, setShowPassword] = useState(false);
     const router = useRouter();
 
     const handleSubmit = async (e: FormEvent<HTMLFormElement>) => {
@@ -37,6 +39,10 @@ export default function Login() {
         }
     }
 
+    const toggleShowPassword = () => {
+        setShowPassword((prevShowPassword) => !prevShowPassword);
+    };
+
     return (
         <div className="flex flex-col items-center p-2 sm:p-8">
             <form
@@ -52,16 +58,27 @@ export default function Login() {
                     value={userLogin}
                     onChange={(e) => setUserLogin(e.target.value)}
                     className="p-3 border border-gray-300 rounded-md"
+                    autoComplete="username"
                 />
                 <Label htmlFor="password" className="dark:text-gray-200">Hasło</Label>
-                <Input
-                    type="password"
-                    id="password"
-                    placeholder="Wpisz hasło..."
-                    value={userPassword}
-                    onChange={(e) => setUserPassword(e.target.value)}
-                    className="p-3 border border-gray-300 rounded-md"
-                />
+                <div className="relative">
+                    <Input
+                        type={showPassword ? "text" : "password"}
+                        id="password"
+                        placeholder="Wpisz hasło..."
+                        value={userPassword}
+                        onChange={(e) => setUserPassword(e.target.value)}
+                        className="p-3 border border-gray-300 rounded-md pr-10"
+                        autoComplete="current-password"
+                    />
+                    <button
+                        type="button"
+                        onClick={toggleShowPassword}
+                        className="absolute right-3 top-2"
+                    >
+                        {showPassword ? <EyeClosedIcon className="h-6 w-6"/> : <EyeOpenIcon className="h-6 w-6"/>}
+                    </button>
+                </div>
                 {error && <p className="text-red-500">{error}</p>}
                 <Button type="submit" disabled={isSubmitting}>{isSubmitting ? "Wysyłanie..." : "Zaloguj się"}</Button>
                 <div className="mt-4 text-center">

@@ -5,6 +5,8 @@ import Cookies from 'js-cookie';
 import {HamburgerMenuIcon} from "@radix-ui/react-icons"
 import * as React from "react";
 import {Disclosure} from "@headlessui/react";
+import {useEffect, useState} from "react";
+import {getPlayerName} from "@/lib/utils";
 
 const navigation = [
     { name: 'Aktualne', href: '/' },
@@ -17,6 +19,10 @@ const Menu = () => {
         Cookies.remove('token');
         window.location.reload();
     };
+    const [playerName, setPlayerName] = useState("");
+    useEffect(() => {
+        setPlayerName(getPlayerName());
+    }, [getPlayerName()]);
 
     const pathname = usePathname();
     const hideMenu = pathname === '/login' || pathname === '/register';
@@ -41,12 +47,11 @@ const Menu = () => {
                         ))}
                     </div>
                     <div className="absolute inset-y-0 right-0 flex items-center pr-2 sm:static sm:inset-auto sm:ml-6 sm:pr-0">
+                        <span className="text-gray-300 pr-4">{playerName}</span>
                         <button
                             onClick={handleLogout}
                             className="text-gray-300 hover:text-white px-3 py-2 rounded-md bg-gray-700 text-sm font-medium"
-                        >
-                            Wyloguj
-                        </button>
+                        >Wyloguj</button>
                     </div>
                 </div>
             </div>

@@ -7,6 +7,8 @@ import {Label} from "@/components/ui/label";
 import {registerUser} from "@/lib/api";
 import {useRouter} from "next/navigation";
 import Link from "next/link";
+import {EyeClosedIcon, EyeOpenIcon} from "@radix-ui/react-icons";
+import {AxiosError} from "axios";
 
 export default function Register() {
     const [userLogin, setUserLogin] = useState("")
@@ -14,6 +16,7 @@ export default function Register() {
     const [code, setCode] = useState("");
     const [error, setError] = useState("")
     const [isSubmitting, setIsSubmitting] = useState(false);
+    const [showPassword, setShowPassword] = useState(false);
     const router = useRouter();
 
     useEffect(() => {
@@ -47,16 +50,28 @@ export default function Register() {
             document.cookie = `token=${responseData.token}; path=/`;
             router.push("/");
         } catch (error) {
-            if (error instanceof Error) {
-                const message = error.message;
-                setError(message);
+            if (error instanceof AxiosError) {
+                switch (error.response?.status) {
+                    case 409:
+                        setError("Użytkownik już istnieje.");
+                        break;
+                    case 400:
+                        setError("Kod na profilu jest niepoprawny lub nie ma takiego nicku.");
+                        break;
+                    default:
+                        setError("Wystąpił błąd. Proszę spróbować ponownie.");
+                }
             } else {
-                setError("Wystąpił błąd. Sprawdź dane i spróbuj ponownie.");
+                setError("Wystąpił nieoczekiwany błąd.");
             }
         } finally {
             setIsSubmitting(false);
         }
     }
+
+    const toggleShowPassword = () => {
+        setShowPassword((prevShowPassword) => !prevShowPassword);
+    };
 
     return (
         <div className="flex flex-col items-center p-2 sm:p-8">
@@ -78,16 +93,27 @@ export default function Register() {
                     value={userLogin}
                     onChange={(e) => setUserLogin(e.target.value)}
                     className="p-3 border border-gray-300 rounded-md"
+                    autoComplete="username"
                 />
                 <Label htmlFor="password" className="dark:text-gray-200">Hasło</Label>
-                <Input
-                    type="password"
-                    id="password"
-                    placeholder="Wpisz hasło..."
-                    value={userPassword}
-                    onChange={(e) => setUserPassword(e.target.value)}
-                    className="p-3 border border-gray-300 rounded-md"
-                />
+                <div className="relative">
+                    <Input
+                        type={showPassword ? "text" : "password"}
+                        id="password"
+                        placeholder="Wpisz hasło..."
+                        value={userPassword}
+                        onChange={(e) => setUserPassword(e.target.value)}
+                        className="p-3 border border-gray-300 rounded-md pr-10"
+                        autoComplete="current-password"
+                    />
+                    <button
+                        type="button"
+                        onClick={toggleShowPassword}
+                        className="absolute right-3 top-2"
+                    >
+                        {showPassword ? <EyeClosedIcon className="h-6 w-6"/> : <EyeOpenIcon className="h-6 w-6"/>}
+                    </button>
+                </div>
                 {error && <p className="text-red-500">{error}</p>}
                 <Button type="submit" disabled={isSubmitting}>{isSubmitting ? "Wysyłanie..." : "Zarejestruj się"}</Button>
                 <div className="mt-4 text-center">
