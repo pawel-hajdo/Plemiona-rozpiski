@@ -21,14 +21,31 @@ public class CommandController {
         return commandService.getAllCommands();
     }
 
+//    @GetMapping("/player/{playerId}")
+//    public List<Command> getCommandsByPlayerId(@PathVariable String playerId){
+//        return commandService.getCommandsByPlayerId(playerId);
+//    }
+//
+//    @GetMapping("/player/{playerId}/deleted")
+//    public List<Command> getDeletedCommandsByPlayerId(@PathVariable String playerId){
+//        return commandService.getDeletedCommandsByPlayerId(playerId);
+//    }
     @GetMapping("/player/{playerId}")
-    public List<Command> getCommandsByPlayerId(@PathVariable String playerId){
-        return commandService.getCommandsByPlayerId(playerId);
+    public ResponseEntity<List<Command>> getCommandsByPlayerId(
+            @PathVariable String playerId,
+            @RequestParam(defaultValue = "0") int page,
+            @RequestParam(defaultValue = "100") int size) {
+        List<Command> commands = commandService.getCommandsByPlayerId(playerId, page, size);
+        return ResponseEntity.ok(commands);
     }
 
     @GetMapping("/player/{playerId}/deleted")
-    public List<Command> getDeletedCommandsByPlayerId(@PathVariable String playerId){
-        return commandService.getDeletedCommandsByPlayerId(playerId);
+    public ResponseEntity<List<Command>> getDeletedCommandsByPlayerId(
+            @PathVariable String playerId,
+            @RequestParam(defaultValue = "0") int page,
+            @RequestParam(defaultValue = "100") int size) {
+        List<Command> commands = commandService.getDeletedCommandsByPlayerId(playerId, page, size);
+        return ResponseEntity.ok(commands);
     }
 
     @DeleteMapping

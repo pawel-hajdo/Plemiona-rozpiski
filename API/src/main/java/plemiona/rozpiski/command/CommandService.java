@@ -1,6 +1,8 @@
 package plemiona.rozpiski.command;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import plemiona.rozpiski.exceptions.CommandNotFoundException;
@@ -21,20 +23,28 @@ public class CommandService {
         return commandRepository.findAll();
     }
 
-    public List<Command> getCommandsByPlayerId(String playerId) {
-        List<Command> commands = commandRepository.findByPlayerIdAndDeletedFalse(playerId);
-//        if (commands.isEmpty()) {
-//            throw new CommandNotFoundException("Commands not found for player id: " + playerId);
-//        }
-        return commands;
+//    public List<Command> getCommandsByPlayerId(String playerId) {
+//        List<Command> commands = commandRepository.findByPlayerIdAndDeletedFalse(playerId);
+////        if (commands.isEmpty()) {
+////            throw new CommandNotFoundException("Commands not found for player id: " + playerId);
+////        }
+//        return commands;
+//    }
+    public List<Command> getCommandsByPlayerId(String playerId, int page, int size) {
+        Pageable pageable = PageRequest.of(page, size);
+        return commandRepository.findByPlayerIdAndDeletedFalseOrderByMaxTimeAsc(playerId, pageable).getContent();
     }
 
-    public List<Command> getDeletedCommandsByPlayerId(String playerId){
-        List<Command> commands = commandRepository.findByPlayerIdAndDeletedTrue(playerId);
-//        if (commands.isEmpty()) {
-//            throw new CommandNotFoundException("Deleted commands not found for player id: " + playerId);
-//        }
-        return commands;
+//    public List<Command> getDeletedCommandsByPlayerId(String playerId){
+//        List<Command> commands = commandRepository.findByPlayerIdAndDeletedTrue(playerId);
+////        if (commands.isEmpty()) {
+////            throw new CommandNotFoundException("Deleted commands not found for player id: " + playerId);
+////        }
+//        return commands;
+//    }
+    public List<Command> getDeletedCommandsByPlayerId(String playerId, int page, int size){
+        Pageable pageable = PageRequest.of(page, size);
+        return commandRepository.findByPlayerIdAndDeletedTrueOrderByMaxTimeDesc(playerId, pageable).getContent();
     }
 
     public ResponseEntity<String> softDeleteCommands(List<Long> commandIds) {
