@@ -46,7 +46,14 @@ import {
 } from "@/components/ui/select"
 import {getDeletedCommands, getPlayerCommands, restoreCommands, softDeleteCommands} from "@/lib/api";
 import {useEffect, useState} from "react";
-import {loadLinksToOpenCount, loadPageSize, loadSortingPreference, savePageSize} from "@/lib/localStorage";
+import {
+    loadColumnVisibility,
+    loadLinksToOpenCount,
+    loadPageSize,
+    loadSortingPreference,
+    saveColumnVisibility,
+    savePageSize
+} from "@/lib/localStorage";
 import {getPlayerId} from "@/lib/utils";
 import {
     RankingInfo,
@@ -55,16 +62,15 @@ import {
 
 const fuzzyFilter = (row: any, columnId: any, value: any, addMeta: any) => {
     const itemRank = rankItem(row.getValue(columnId), value);
-    console.log(itemRank)
     addMeta({ itemRank });
     return itemRank.passed;
 };
 
 export function CommandsTable({deleted} :any) {
     const [commands, setCommands] = useState([]);
-    const [sorting, setSorting] = React.useState<SortingState>([loadSortingPreference()])
+    const [sorting, setSorting] = React.useState<SortingState>([])
     const [columnFilters, setColumnFilters] = React.useState<ColumnFiltersState>([])
-    const [columnVisibility, setColumnVisibility] = React.useState<VisibilityState>({})
+    const [columnVisibility, setColumnVisibility] = React.useState<VisibilityState>({});
     const [rowSelection, setRowSelection] = React.useState({})
     const [pagination, setPagination] = React.useState<PaginationState>({
         pageIndex: 0,
@@ -78,9 +84,16 @@ export function CommandsTable({deleted} :any) {
     const [isLoading, setIsLoading] = useState(true);
 
     useEffect(() => {
+        setColumnVisibility(loadColumnVisibility());
         fetchCommandsData();
         setLinkToOpenCount(loadLinksToOpenCount);
     }, []);
+
+    useEffect(() => {
+        if (Object.keys(columnVisibility).length > 0) {
+            saveColumnVisibility(columnVisibility);
+        }
+    }, [columnVisibility]);
 
     const fetchCommandsData = async () => {
         try {
@@ -150,9 +163,12 @@ export function CommandsTable({deleted} :any) {
             return row.original.id;
         });
 
+
         try {
             await softDeleteCommands(selectedCommands);
-            window.location.reload();
+            const updatedCommands = await getPlayerCommands(playerId);
+            setCommands(updatedCommands);
+            setRowSelection({});
         } catch (error) {
             setError("Wystąpił błąd podczas usuwania komend");
         }
@@ -169,7 +185,9 @@ export function CommandsTable({deleted} :any) {
 
         try {
             await restoreCommands(selectedCommands);
-            window.location.reload();
+            const updatedCommands = await getDeletedCommands(playerId);
+            setCommands(updatedCommands);
+            setRowSelection({});
         } catch (error) {
             setError("Wystąpił błąd podczas przywracania komend");
         }
@@ -489,7 +507,7 @@ export function CommandsTable({deleted} :any) {
                         onClick={() => table.previousPage()}
                         disabled={!table.getCanPreviousPage()}
                     >
-                        Następna
+                        Poprzednia
                     </Button>
                     <Button
                         variant="outline"
@@ -497,7 +515,7 @@ export function CommandsTable({deleted} :any) {
                         onClick={() => table.nextPage()}
                         disabled={!table.getCanNextPage()}
                     >
-                        Poprzednia
+                        Następna
                     </Button>
                 </div>
             </div>

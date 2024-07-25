@@ -1,3 +1,5 @@
+import {VisibilityState} from "@tanstack/react-table";
+
 export const saveLinksToOpenCount = (count: any) => {
     localStorage.setItem('linksToOpenCount', count);
 };
@@ -32,4 +34,16 @@ export const loadPageSize = () => {
 
 export const savePageSize = (size: any) => {
     localStorage.setItem('pageSize', size);
+};
+
+export const saveColumnVisibility = (visibility: VisibilityState) => {
+    localStorage.setItem('columnVisibility', JSON.stringify(visibility));
+};
+
+export const loadColumnVisibility = (): VisibilityState => {
+    if (typeof window !== 'undefined') {
+        const savedVisibility = localStorage.getItem('columnVisibility');
+        return savedVisibility ? JSON?.parse(savedVisibility) : {};
+    }
+    return  {};
 };

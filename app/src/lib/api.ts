@@ -7,7 +7,7 @@ const api = axios.create({
 });
 
 export const getPlayerCommands = async (playerId: string) => {
-    const response = await api.get(`/commands/player/${playerId}`, {
+    const response = await api.get(`/commands/player/${playerId}?page=0&size=500`, {
         headers: {
             Authorization: `Bearer ${getTokenFromCookies()}`
         }});
@@ -15,7 +15,7 @@ export const getPlayerCommands = async (playerId: string) => {
 };
 
 export const getDeletedCommands = async (playerId: string) => {
-    const response = await api.get(`/commands/player/${playerId}/deleted`, {
+    const response = await api.get(`/commands/player/${playerId}/deleted?page=0&size=100`, {
         headers: {
             Authorization: `Bearer ${getTokenFromCookies()}`
     }});
