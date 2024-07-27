@@ -50,13 +50,11 @@ import {
     loadColumnVisibility,
     loadLinksToOpenCount,
     loadPageSize,
-    loadSortingPreference,
     saveColumnVisibility,
     savePageSize
 } from "@/lib/localStorage";
 import {getPlayerId} from "@/lib/utils";
 import {
-    RankingInfo,
     rankItem,
 } from '@tanstack/match-sorter-utils'
 
@@ -165,7 +163,7 @@ export function CommandsTable({deleted} :any) {
 
 
         try {
-            await softDeleteCommands(selectedCommands);
+            await softDeleteCommands(selectedCommands, playerId);
             const updatedCommands = await getPlayerCommands(playerId);
             setCommands(updatedCommands);
             setRowSelection({});
@@ -185,7 +183,7 @@ export function CommandsTable({deleted} :any) {
         });
 
         try {
-            await restoreCommands(selectedCommands);
+            await restoreCommands(selectedCommands, playerId);
             const updatedCommands = await getDeletedCommands(playerId);
             setCommands(updatedCommands);
             setRowSelection({});
@@ -281,7 +279,17 @@ export function CommandsTable({deleted} :any) {
                     <CaretSortIcon className="ml-2 h-4 w-4" />
                 </Button>
             ),
-            cell: ({ row }) => <div>{row.getValue("source")}</div>,
+            cell: ({ row }) => (
+                <div>
+                    <a
+                        href={`https://${row.original.world}.plemiona.pl/game.php?village=${row.original.sourceId}`}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                    >
+                        {row.getValue("source")}
+                    </a>
+                </div>
+            ),
         },
         {
             accessorKey: "target",
@@ -294,7 +302,17 @@ export function CommandsTable({deleted} :any) {
                     <CaretSortIcon className="ml-2 h-4 w-4" />
                 </Button>
             ),
-            cell: ({ row }) => <div>{row.getValue("target")}</div>,
+            cell: ({ row }) => (
+                <div>
+                    <a
+                        href={`https://${row.original.world}.plemiona.pl/game.php?screen=info_village&id=${row.original.targetId}`}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                    >
+                        {row.getValue("target")}
+                    </a>
+                </div>
+            ),
         },
         {
             accessorKey: "type",
@@ -310,28 +328,42 @@ export function CommandsTable({deleted} :any) {
             cell: ({ row }) => <div>{row.getValue("type")}</div>,
         },
         {
+            accessorKey: "commandCount",
+            header: "count",
+            cell: ({ row }) => <div>{row.getValue("commandCount")}</div>,
+        },
+        {
             accessorKey: "link",
             header: "Link",
-            cell: ({ row }) => (
-                <a
-                    href={row.getValue("link")}
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    style={{ pointerEvents: isButtonDisabled(row) || clickedRows[row.id] ? 'none' : 'auto' }}
-                >
-                    <Button
-                        variant="outline"
-                        onClick={()=>handleClickLink(row.id)}
-                      //  disabled={isButtonDisabled(row) || clickedRows[row.id]}
-                        style={{
-                            backgroundColor: isButtonDisabled(row) || clickedRows[row.id] ? 'gray' : 'none',
-                           // cursor: isButtonDisabled(row) || clickedRows[row.id] ? 'not-allowed' : 'pointer',
-                        }}
+            cell: ({ row }) => {
+                const { sourceId, targetId, type, world } = row.original;
+                let link = `https://${world}.plemiona.pl/game.php?village=${sourceId}&screen=place&target=${targetId}`;
+
+                const catapultMatch = type.match(/Katapulty-(\d+)/);
+                if (catapultMatch) {
+                    const catapultCount = catapultMatch[1];
+                    link += `&catapult=${catapultCount}`;
+                }
+
+                return (
+                    <a
+                        href={link}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        style={{ pointerEvents: isButtonDisabled(row) || clickedRows[row.id] ? 'none' : 'auto' }}
                     >
-                        Link
-                    </Button>
-                </a>
-            ),
+                        <Button
+                            variant="outline"
+                            onClick={() => handleClickLink(row.id)}
+                            style={{
+                                backgroundColor: isButtonDisabled(row) || clickedRows[row.id] ? 'gray' : 'none',
+                            }}
+                        >
+                            Link
+                        </Button>
+                    </a>
+                );
+            },
         },
     ]
 

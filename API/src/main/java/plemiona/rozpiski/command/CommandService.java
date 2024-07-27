@@ -18,13 +18,15 @@ public class CommandService {
     public CommandService(CommandRepository commandRepository) {
         this.commandRepository = commandRepository;
     }
-
+    public List<Command> getAllCommands(){
+        return commandRepository.findAll();
+    }
     public List<Command> getCommandsByPlayerId(String playerId, int page, int size) {
         Pageable pageable = PageRequest.of(page, size);
         return commandRepository.findByPlayerIdAndDeletedFalseOrderByMaxTimeAsc(playerId, pageable).getContent();
     }
 
-    public List<Command> getDeletedCommandsByPlayerId(String playerId, int page, int size){
+    public List<Command> getDeletedCommandsByPlayerId(String playerId, int page, int size) {
         Pageable pageable = PageRequest.of(page, size);
         return commandRepository.findByPlayerIdAndDeletedTrueOrderByMaxTimeDesc(playerId, pageable).getContent();
     }

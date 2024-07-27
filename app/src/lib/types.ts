@@ -1,19 +1,16 @@
 interface Command {
     id: number;
     commandNumberId: number;
-    customId: string | null;
     minTime: string;
     maxTime: string;
     source: string;
-    sourceId: string | null;
+    sourceId: string;
     target: string;
-    targetId: string | null;
+    targetId: string;
     type: string;
-    link: string;
-    linkSitting: string | null;
     playerId: string;
-    playerName: string | null;
-    world: string | null;
+    world: string;
     attackTime: string | null;
+    commandCount: string
     deleted: boolean;
 }

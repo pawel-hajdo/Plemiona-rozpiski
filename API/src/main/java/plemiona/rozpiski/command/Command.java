@@ -42,19 +42,16 @@ public class Command {
     @Column(name = "command_type")
     private String type;
 
-    @Column(name = "command_link")
-    private String link;
-
     @Column(name = "command_count")
     private String commandCount;
 
     @Column(name = "command_player_id")
     private String playerId;
 
+    @JsonIgnore
     @Column(name = "command_player_name")
     private String playerName;
 
-    @JsonIgnore
     @Column(name = "command_world")
     private String world;
 

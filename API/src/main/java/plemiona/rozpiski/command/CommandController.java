@@ -22,6 +22,10 @@ public class CommandController {
         this.jwtService = jwtService;
     }
 
+    @GetMapping
+    public List<Command> getAllCommands(){
+        return commandService.getAllCommands();
+    }
     @GetMapping("/player/{playerId}")
     public ResponseEntity<List<Command>> getCommandsByPlayerId(
             @PathVariable String playerId,
@@ -85,9 +89,6 @@ public class CommandController {
     private boolean checkUser(String playerId, HttpServletRequest request) {
         String token = extractTokenFromRequest(request);
         String tokenPlayerId = jwtService.extractPlayerId(token);
-        if(playerId.equals(tokenPlayerId)){
-            return true;
-        }
-        return false;
+        return playerId.equals(tokenPlayerId);
     }
 }

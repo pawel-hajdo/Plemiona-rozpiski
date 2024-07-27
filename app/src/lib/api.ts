@@ -3,7 +3,8 @@ import {getTokenFromCookies} from "@/lib/utils";
 
 const api = axios.create({
    // baseURL: process.env.NEXT_PUBLIC_API_BASE_URL,
-    baseURL: 'https://plemionarozpiski.pl/api'
+    //baseURL: 'http://plemionarozpiski.pl/api'
+    baseURL: 'http://localhost:8080/api'
 });
 
 export const getPlayerCommands = async (playerId: string) => {
@@ -21,8 +22,8 @@ export const getDeletedCommands = async (playerId: string) => {
     }});
     return response.data;
 }
-export const softDeleteCommands = async (commandIds: any) => {
-    const response = await api.delete('/commands', {
+export const softDeleteCommands = async (commandIds: any, playerId: string) => {
+    const response = await api.delete(`/commands/player/${playerId}`, {
         data: { commandIds },
         headers: {
             Authorization: `Bearer ${getTokenFromCookies()}`
@@ -31,8 +32,8 @@ export const softDeleteCommands = async (commandIds: any) => {
     return response.data;
 }
 
-export const restoreCommands = async (commandIds: any) => {
-    const response = await api.put('/commands', { commandIds }, {
+export const restoreCommands = async (commandIds: any, playerId: string) => {
+    const response = await api.put(`/commands/player/${playerId}`, { commandIds }, {
         headers: {
             Authorization: `Bearer ${getTokenFromCookies()}`
         }
