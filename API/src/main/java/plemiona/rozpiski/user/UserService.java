@@ -66,7 +66,7 @@ public class UserService {
         saveToLogs(newUser.getId(), LogType.USER_REGISTER);
 
         Map<String, Object> claims = new HashMap<>();
-        claims.put("playerId", playerId);
+        claims.put("playerId", playerId.toString());
 
         var jwtToken = jwtService.generateToken(claims, newUser);
         return AuthenticationResponse.builder().token(jwtToken).build();
@@ -78,7 +78,7 @@ public class UserService {
         );
         var user = userRepository.findByName(request.getName()).orElseThrow();
         Map<String, Object> claims = new HashMap<>();
-        claims.put("playerId", user.getPlayerId());
+        claims.put("playerId", user.getPlayerId().toString());
         var jwtToken = jwtService.generateToken(claims, user);
         saveToLogs(user.getId(), LogType.USER_LOGIN_SUCCESSFUL);
         return AuthenticationResponse.builder().token(jwtToken).build();

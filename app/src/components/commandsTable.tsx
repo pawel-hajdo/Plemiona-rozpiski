@@ -169,6 +169,7 @@ export function CommandsTable({deleted} :any) {
             const updatedCommands = await getPlayerCommands(playerId);
             setCommands(updatedCommands);
             setRowSelection({});
+            setClickedRows({});
         } catch (error) {
             setError("Wystąpił błąd podczas usuwania komend");
         }
@@ -188,6 +189,7 @@ export function CommandsTable({deleted} :any) {
             const updatedCommands = await getDeletedCommands(playerId);
             setCommands(updatedCommands);
             setRowSelection({});
+            setClickedRows({});
         } catch (error) {
             setError("Wystąpił błąd podczas przywracania komend");
         }
