@@ -22,10 +22,10 @@ public class CommandController {
         this.jwtService = jwtService;
     }
 
-    @GetMapping
-    public List<Command> getAllCommands(){
-        return commandService.getAllCommands();
-    }
+//    @GetMapping
+//    public List<Command> getAllCommands(){
+//        return commandService.getAllCommands();
+//    }
     @GetMapping("/player/{playerId}")
     public ResponseEntity<List<Command>> getCommandsByPlayerId(
             @PathVariable String playerId,

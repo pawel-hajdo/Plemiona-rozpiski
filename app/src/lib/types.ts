@@ -10,7 +10,13 @@ interface Command {
     type: string;
     playerId: string;
     world: string;
+    link: string;
     attackTime: string | null;
     commandCount: string
     deleted: boolean;
 }
+
+type ColumnNames = {
+    [K in keyof Command]?: string;
+}
+

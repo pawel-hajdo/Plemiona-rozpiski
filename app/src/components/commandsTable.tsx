@@ -193,6 +193,17 @@ export function CommandsTable({deleted} :any) {
         }
     }
 
+    const columnNames: ColumnNames = {
+        commandNumberId: "ID",
+        minTime: "Min time",
+        maxTime: "Max time",
+        source: "Źródło",
+        target: "Cel",
+        type: "Typ",
+        commandCount: "Ilość",
+        link: "Link"
+    };
+
     const columns: ColumnDef<Command>[] = [
         {
             id: "select",
@@ -223,7 +234,7 @@ export function CommandsTable({deleted} :any) {
                     variant="ghost"
                     onClick={() => column.toggleSorting(column.getIsSorted() === "asc")}
                 >
-                    ID
+                    {columnNames.commandNumberId}
                     <CaretSortIcon className="ml-2 h-4 w-4" />
                 </Button>
             ),
@@ -236,7 +247,7 @@ export function CommandsTable({deleted} :any) {
                     variant="ghost"
                     onClick={() => column.toggleSorting(column.getIsSorted() === "asc")}
                 >
-                    minTime
+                    {columnNames.minTime}
                     <CaretSortIcon className="ml-2 h-4 w-4" />
                 </Button>
             ),
@@ -256,7 +267,7 @@ export function CommandsTable({deleted} :any) {
                     variant="ghost"
                     onClick={() => column.toggleSorting(column.getIsSorted() === "asc")}
                 >
-                    maxTime
+                    {columnNames.maxTime}
                     <CaretSortIcon className="ml-2 h-4 w-4" />
                 </Button>
             ),
@@ -275,7 +286,7 @@ export function CommandsTable({deleted} :any) {
                     variant="ghost"
                     onClick={() => column.toggleSorting(column.getIsSorted() === "asc")}
                 >
-                    source
+                    {columnNames.source}
                     <CaretSortIcon className="ml-2 h-4 w-4" />
                 </Button>
             ),
@@ -298,7 +309,7 @@ export function CommandsTable({deleted} :any) {
                     variant="ghost"
                     onClick={() => column.toggleSorting(column.getIsSorted() === "asc")}
                 >
-                    target
+                    {columnNames.target}
                     <CaretSortIcon className="ml-2 h-4 w-4" />
                 </Button>
             ),
@@ -321,7 +332,7 @@ export function CommandsTable({deleted} :any) {
                     variant="ghost"
                     onClick={() => column.toggleSorting(column.getIsSorted() === "asc")}
                 >
-                    type
+                    {columnNames.type}
                     <CaretSortIcon className="ml-2 h-4 w-4" />
                 </Button>
             ),
@@ -329,12 +340,12 @@ export function CommandsTable({deleted} :any) {
         },
         {
             accessorKey: "commandCount",
-            header: "count",
+            header: columnNames.commandCount,
             cell: ({ row }) => <div>{row.getValue("commandCount")}</div>,
         },
         {
             accessorKey: "link",
-            header: "Link",
+            header: columnNames.link,
             cell: ({ row }) => {
                 const { sourceId, targetId, type, world } = row.original;
                 let link = `https://${world}.plemiona.pl/game.php?village=${sourceId}&screen=place&target=${targetId}`;
@@ -359,7 +370,7 @@ export function CommandsTable({deleted} :any) {
                                 backgroundColor: isButtonDisabled(row) || clickedRows[row.id] ? 'gray' : 'none',
                             }}
                         >
-                            Link
+                            {columnNames.link}
                         </Button>
                     </a>
                 );
@@ -455,6 +466,7 @@ export function CommandsTable({deleted} :any) {
                             .getAllColumns()
                             .filter((column) => column.getCanHide())
                             .map((column) => {
+                                const columnName = columnNames[column.id as keyof ColumnNames] || column.id;
                                 return (
                                     <DropdownMenuCheckboxItem
                                         key={column.id}
@@ -464,7 +476,7 @@ export function CommandsTable({deleted} :any) {
                                             column.toggleVisibility(!!value)
                                         }
                                     >
-                                        {column.id}
+                                        {columnName}
                                     </DropdownMenuCheckboxItem>
                                 )
                             })}
