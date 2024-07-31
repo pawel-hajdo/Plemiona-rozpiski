@@ -117,7 +117,15 @@ export function CommandsTable({deleted} :any) {
         let openedCount = 0;
         rows.forEach((row, index) => {
             const rowId = row.id;
-            const link = row.original.link;
+            const { sourceId, targetId, type, world } = row.original;
+            let link = `https://${world}.plemiona.pl/game.php?village=${sourceId}&screen=place&target=${targetId}`;
+
+            const catapultMatch = type.match(/Katapulty-(\d+)/);
+            if (catapultMatch) {
+                const catapultCount = catapultMatch[1];
+                link += `&catapult=${catapultCount}`;
+            }
+
             if (!clickedRows[rowId] && !isButtonDisabled(row) && openedCount < linksToOpenCount) {
                 setTimeout(() => {
                     window.open(link, '_blank');
