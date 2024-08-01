@@ -13,4 +13,5 @@ public class RegisterRequest {
     private String name;
     private String password;
     private String code;
+    private String world;
 }

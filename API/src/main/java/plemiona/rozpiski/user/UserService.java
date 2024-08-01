@@ -1,8 +1,5 @@
 package plemiona.rozpiski.user;
 
-import org.jsoup.Jsoup;
-import org.jsoup.nodes.Document;
-import org.jsoup.nodes.Element;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
@@ -20,6 +17,8 @@ import plemiona.rozpiski.log.LogType;
 
 import java.net.URI;
 import java.net.URISyntaxException;
+import java.net.URLDecoder;
+import java.nio.charset.StandardCharsets;
 import java.time.LocalDateTime;
 import java.util.HashMap;
 import java.util.Map;
@@ -33,7 +32,7 @@ public class UserService {
     private final JwtService jwtService;
     private final AuthenticationManager authenticationManager;
     private final RestTemplate restTemplate;
-    private static final String BASE_URL = "https://pl200.plemiona.pl/";
+    private Map<String, Integer> playerIdMap = new HashMap<>();
 
     @Autowired
     public UserService(UserRepository userRepository, LogRepository logRepository, PasswordEncoder passwordEncoder, JwtService jwtService, AuthenticationManager authenticationManager, RestTemplate restTemplate) {
@@ -46,11 +45,14 @@ public class UserService {
     }
 
     public AuthenticationResponse registerUser(RegisterRequest request){
-        if(userRepository.findByName(request.getName()).isPresent()){
-            throw new UserWithSameNameExistsException("User with this name already exists");
+        loadPlayersFromApi(request.getWorld());
+        var playerId = getPlayerId(request.getName());
+
+        if(userRepository.findByPlayerId(playerId).isPresent()){
+            throw new UserWithSameNameExistsException("User with this id already exists");
         }
 
-        if(!checkPlayer(request.getName(), request.getCode())){
+        if(!checkPlayer(playerId, request.getCode(), request.getWorld())){
             throw new UserCodeNotMatchingException("Provided code not matching code on user profile");
         }
 
@@ -59,7 +61,6 @@ public class UserService {
         User newUser = new User();
         newUser.setName(request.getName());
         newUser.setPassword(hashedPassword);
-        var playerId = getPlayerId(request.getName());
         newUser.setPlayerId(playerId);
 
         userRepository.save(newUser);
@@ -84,59 +85,46 @@ public class UserService {
         return AuthenticationResponse.builder().token(jwtToken).build();
     }
 
-    private boolean checkPlayer(String name, String code){
-        String url = String.format(BASE_URL + "guest.php?name=%s", name);
-        String response = restTemplate.getForObject(url, String.class);
-
-        String profileUrl;
+    private boolean checkPlayer(Integer playerId, String code, String world){
+        String profileUrl = String.format("https://%s.plemiona.pl/guest.php?screen=info_player&id=%d", world, playerId);
         String profileResponse;
+
         try{
-             profileUrl = extractProfileUrl(response);
              profileResponse = restTemplate.getForObject(profileUrl, String.class);
         } catch (Exception e){
-            throw new PlayerDoesNotExistException("Couldn't find player with this name " + name);
+            throw new PlayerDoesNotExistException("Couldn't find player with this id " + playerId);
         }
-
-
         return profileResponse.contains(code);
     }
 
-
-    private String extractProfileUrl(String response) {
-        Document doc = Jsoup.parse(response);
-        Element link = doc.select("a[href*=info_player]").first();
-        if (link != null) {
-            String relativeUrl = link.attr("href");
-            return BASE_URL + relativeUrl;
+    private Integer getPlayerId(String playerName){
+        Integer playerId = playerIdMap.get(playerName);
+        if (playerId == null) {
+            throw new PlayerDoesNotExistException("Player with name " + playerName + " does not exist.");
         }
-        return null;
+        return playerId;
     }
-    private Integer extractPlayerIdFromUrl(String profileUrl) {
+
+    private void loadPlayersFromApi(String world){
+        String apiUrl = String.format("https://%s.plemiona.pl/map/player.txt", world);
         try {
-            URI uri = new URI(profileUrl);
-            String query = uri.getQuery();
-            for (String param : query.split("&")) {
-                String[] pair = param.split("=");
-                if (pair.length == 2 && "id".equals(pair[0])) {
-                    return Integer.parseInt(pair[1]);
+            String response = restTemplate.getForObject(new URI(apiUrl), String.class);
+            if (response != null) {
+                playerIdMap.clear();
+                String[] lines = response.split("\n");
+                for (String line : lines) {
+                    String[] parts = line.split(",");
+                    if (parts.length > 1) {
+                        Integer id = Integer.valueOf(parts[0]);
+                        String name = parts[1];
+                        String decodedName = URLDecoder.decode(name, StandardCharsets.UTF_8);
+                        playerIdMap.put(decodedName, id);
+                    }
                 }
             }
-        } catch (URISyntaxException | NumberFormatException e) {
-            throw new RuntimeException("Failed to extract player ID from URL: " + profileUrl, e);
+        } catch (URISyntaxException e) {
+            e.printStackTrace();
         }
-        return null;
-    }
-
-    private Integer getPlayerId(String name){
-        String url = String.format(BASE_URL + "guest.php?name=%s", name);
-        String response = restTemplate.getForObject(url, String.class);
-
-        String profileUrl = extractProfileUrl(response);
-        if (profileUrl == null) {
-            throw new PlayerDoesNotExistException("Profile URL could not be extracted for player: " + name);
-        }
-
-        return extractPlayerIdFromUrl(profileUrl);
     }
 
     public void changePassword(ChangePasswordRequest request) {
