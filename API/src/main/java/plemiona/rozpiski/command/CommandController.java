@@ -33,7 +33,7 @@ public class CommandController {
             @RequestParam(defaultValue = "100") int size,
             HttpServletRequest request) {
 
-        if(!checkUser(playerId, request)){
+        if(!jwtService.checkUser(playerId, request)){
             return new ResponseEntity<>(HttpStatus.FORBIDDEN);
         }
         List<Command> commands = commandService.getCommandsByPlayerId(playerId, page, size);
@@ -47,7 +47,7 @@ public class CommandController {
             @RequestParam(defaultValue = "100") int size,
             HttpServletRequest request) {
 
-        if(!checkUser(playerId, request)){
+        if(!jwtService.checkUser(playerId, request)){
             return new ResponseEntity<>(HttpStatus.FORBIDDEN);
         }
         List<Command> commands = commandService.getDeletedCommandsByPlayerId(playerId, page, size);
@@ -60,7 +60,7 @@ public class CommandController {
             @PathVariable String playerId,
             HttpServletRequest request) {
 
-        if(!checkUser(playerId, request)){
+        if(!jwtService.checkUser(playerId, request)){
             return new ResponseEntity<>(HttpStatus.FORBIDDEN);
         }
         return commandService.softDeleteCommands(commandRequest.getCommandIds());
@@ -72,23 +72,9 @@ public class CommandController {
             @PathVariable String playerId,
             HttpServletRequest request) {
 
-        if(!checkUser(playerId, request)){
+        if(!jwtService.checkUser(playerId, request)){
             return new ResponseEntity<>(HttpStatus.FORBIDDEN);
         }
         return commandService.restoreDeletedCommands(commandRequest.getCommandIds());
-    }
-
-    private String extractTokenFromRequest(HttpServletRequest request) {
-        String bearerToken = request.getHeader("Authorization");
-        if (bearerToken != null && bearerToken.startsWith("Bearer ")) {
-            return bearerToken.substring(7);
-        }
-        return null;
-    }
-
-    private boolean checkUser(String playerId, HttpServletRequest request) {
-        String token = extractTokenFromRequest(request);
-        String tokenPlayerId = jwtService.extractPlayerId(token);
-        return playerId.equals(tokenPlayerId);
     }
 }
