@@ -9,11 +9,14 @@ import {useRouter} from "next/navigation";
 import Link from "next/link";
 import {EyeClosedIcon, EyeOpenIcon} from "@radix-ui/react-icons";
 import {AxiosError} from "axios";
+import {Select, SelectContent, SelectGroup, SelectItem, SelectTrigger, SelectValue} from "@/components/ui/select";
+import * as React from "react";
 
 export default function Register() {
     const [userLogin, setUserLogin] = useState("")
     const [userPassword, setUserPassword] = useState("")
     const [code, setCode] = useState("");
+    const [world, setWorld] = useState("")
     const [error, setError] = useState("")
     const [isSubmitting, setIsSubmitting] = useState(false);
     const [showPassword, setShowPassword] = useState(false);
@@ -46,7 +49,7 @@ export default function Register() {
         setIsSubmitting(true);
 
         try {
-            const responseData = await registerUser(userLogin, userPassword, code);
+            const responseData = await registerUser(userLogin, userPassword, code, world);
             document.cookie = `token=${responseData.token}; path=/`;
             router.push("/");
         } catch (error) {
@@ -85,6 +88,22 @@ export default function Register() {
                     <p className="mt-2">{code}</p>
                     <p className="mt-2">Gdy już się zarejestrujesz, możesz usunąć kod z profilu.</p>
                 </div>
+                <Label htmlFor="world" className="dark:text-gray-200">Wybierz świat</Label>
+                <Select
+                    value={world}
+                    onValueChange={(value) => setWorld(value)}
+                >
+                    <SelectTrigger className="w-[140px]">
+                        <SelectValue placeholder="Świat" />
+                    </SelectTrigger>
+                    <SelectContent>
+                        <SelectGroup>
+                            <SelectItem value="pl200">pl200</SelectItem>
+                            <SelectItem value="pl199">pl199</SelectItem>
+                            <SelectItem value="pl198">pl198</SelectItem>
+                        </SelectGroup>
+                    </SelectContent>
+                </Select>
                 <Label htmlFor="login" className="dark:text-gray-200">Login</Label>
                 <Input
                     type="text"

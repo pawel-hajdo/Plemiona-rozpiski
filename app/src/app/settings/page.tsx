@@ -20,8 +20,8 @@ import {
     saveLinksToOpenCount,
     saveSortingPreference
 } from "@/lib/localStorage";
-import {updateUser} from "@/lib/api";
-import {getPlayerName} from "@/lib/utils";
+import {getPlayerLinks, updateUser} from "@/lib/api";
+import {getPlayerId, getPlayerName} from "@/lib/utils";
 import Cookies from "js-cookie";
 import {EyeClosedIcon, EyeOpenIcon} from "@radix-ui/react-icons";
 
@@ -37,6 +37,8 @@ export default function Settings() {
     const [error, setError] = useState("")
     const [showCurrentPassword, setShowCurrentPassword] = useState(false);
     const [isSubmitting, setIsSubmitting] = useState(false);
+    const [playerLinks, setPlayerLinks] = useState([]);
+    const [isLoadingLinks, setIsLoadingLinks] = useState(false);
 
     const handleCommandsCountChange = (value: string) => {
         const numericValue = parseInt(value, 10);
@@ -83,6 +85,19 @@ export default function Settings() {
 
     const toggleShowPassword = () => {
         setShowCurrentPassword((prevShowCurrentPassword) => !prevShowCurrentPassword);
+    };
+
+    const loadPlayerLinks = async () => {
+        setIsLoadingLinks(true);
+        try {
+            const playerId = getPlayerId();
+            const response = await getPlayerLinks(playerId);
+            setPlayerLinks(response.links);
+        } catch (error) {
+            console.error("Error fetching player links:", error);
+        } finally {
+            setIsLoadingLinks(false);
+        }
     };
 
     return (
@@ -190,6 +205,28 @@ export default function Settings() {
                     </DialogContent>
                 </Dialog>
             </div>
+            <div className="flex flex-wrap gap-4 mb-4 items-center">
+                <Label className="text-lg">Linki do rozpiski gracza:</Label>
+                <Button onClick={loadPlayerLinks} variant="outline">
+                    {isLoadingLinks ? "Ładowanie..." : "Pobierz linki"}
+                </Button>
+            </div>
+            {playerLinks.length === 0 && (
+                <p>Brak linków do wyświetlenia</p>
+            )}
+            {playerLinks.length > 0 && (
+                <div className="mt-4">
+                    <ul className="list-disc pl-5 mt-2">
+                        {playerLinks.map((link, index) => (
+                            <li key={index}>
+                                <a href={link} target="_blank" rel="noopener noreferrer" className="text-blue-500 hover:underline">
+                                    {link}
+                                </a>
+                            </li>
+                        ))}
+                    </ul>
+                </div>
+            )}
         </div>
     )
 }

@@ -49,11 +49,12 @@ export const authUser = async (login: string, password: string) => {
     return response.data;
 }
 
-export const registerUser = async (login: string, password: string, code: string) => {
-    const response = await api.post('users', {
+export const registerUser = async (login: string, password: string, code: string, world: string) => {
+    const response = await api.post('/users', {
         "name": login,
         "password": password,
-        "code": code
+        "code": code,
+        "world": world
     })
 
     return response.data;
@@ -71,4 +72,13 @@ export const updateUser = async (login: string, oldPassword:string, newPassword:
     });
     return response.data;
 }
+
+export const getPlayerLinks = async (playerId: string) => {
+    const response = await api.get(`/links/player/${playerId}`, {
+        headers: {
+            Authorization: `Bearer ${getTokenFromCookies()}`
+        }});
+    return response.data;
+};
+
 export default api;
