@@ -1,5 +1,6 @@
 package plemiona.rozpiski.link;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.Setter;
@@ -20,4 +21,7 @@ public class Link {
 
     @Column(name = "url")
     private String url;
+
+    @Column(name = "operation_name")
+    private String operation_name;
 }

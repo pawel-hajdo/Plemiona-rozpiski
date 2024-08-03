@@ -62,4 +62,8 @@ public class Command {
     @JsonIgnore
     @Column(name = "deleted")
     private boolean deleted = false;
+
+    @JsonIgnore
+    @Column(name = "operation_name")
+    private String operation_name;
 }
