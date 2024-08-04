@@ -45,21 +45,21 @@ public class UserService {
     }
 
     public AuthenticationResponse registerUser(RegisterRequest request){
-        loadPlayersFromApi(request.getWorld());
-        var playerId = getPlayerId(request.getName());
+        loadPlayersFromApi(request.world());
+        var playerId = getPlayerId(request.name());
 
         if(userRepository.findByPlayerId(playerId).isPresent()){
             throw new UserWithSameNameExistsException("User with this id already exists");
         }
 
-        if(!checkPlayer(playerId, request.getCode(), request.getWorld())){
+        if(!checkPlayer(playerId, request.code(), request.world())){
             throw new UserCodeNotMatchingException("Provided code not matching code on user profile");
         }
 
-        String hashedPassword = passwordEncoder.encode(request.getPassword());
+        String hashedPassword = passwordEncoder.encode(request.password());
 
         User newUser = new User();
-        newUser.setName(request.getName());
+        newUser.setName(request.name());
         newUser.setPassword(hashedPassword);
         newUser.setPlayerId(playerId);
 
@@ -70,19 +70,19 @@ public class UserService {
         claims.put("playerId", playerId.toString());
 
         var jwtToken = jwtService.generateToken(claims, newUser);
-        return AuthenticationResponse.builder().token(jwtToken).build();
+        return new AuthenticationResponse(jwtToken);
     }
 
     public AuthenticationResponse authenticateUser(AuthenticationRequest request){
         authenticationManager.authenticate(
-                new UsernamePasswordAuthenticationToken(request.getName(), request.getPassword())
+                new UsernamePasswordAuthenticationToken(request.name(), request.password())
         );
-        var user = userRepository.findByName(request.getName()).orElseThrow();
+        var user = userRepository.findByName(request.name()).orElseThrow();
         Map<String, Object> claims = new HashMap<>();
         claims.put("playerId", user.getPlayerId().toString());
         var jwtToken = jwtService.generateToken(claims, user);
         saveToLogs(user.getId(), LogType.USER_LOGIN_SUCCESSFUL);
-        return AuthenticationResponse.builder().token(jwtToken).build();
+        return new AuthenticationResponse(jwtToken);
     }
 
     private boolean checkPlayer(Integer playerId, String code, String world){
@@ -128,14 +128,14 @@ public class UserService {
     }
 
     public void changePassword(ChangePasswordRequest request) {
-        var user = userRepository.findByName(request.getName())
+        var user = userRepository.findByName(request.name())
                 .orElseThrow(() -> new UserNotFoundException("User not found"));
 
         authenticationManager.authenticate(
-                new UsernamePasswordAuthenticationToken(request.getName(), request.getOldPassword())
+                new UsernamePasswordAuthenticationToken(request.name(), request.oldPassword())
         );
 
-        String hashedPassword = passwordEncoder.encode(request.getNewPassword());
+        String hashedPassword = passwordEncoder.encode(request.newPassword());
         user.setPassword(hashedPassword);
 
         userRepository.save(user);

@@ -23,11 +23,12 @@ public class CommandController {
     }
 
 //    @GetMapping
-//    public List<Command> getAllCommands(){
+//    public List<CommandResponse> getAllCommands(){
 //        return commandService.getAllCommands();
 //    }
+
     @GetMapping("/player/{playerId}")
-    public ResponseEntity<List<Command>> getCommandsByPlayerId(
+    public ResponseEntity<List<CommandResponse>> getCommandsByPlayerId(
             @PathVariable String playerId,
             @RequestParam(defaultValue = "0") int page,
             @RequestParam(defaultValue = "100") int size,
@@ -36,12 +37,12 @@ public class CommandController {
         if(!jwtService.checkUser(playerId, request)){
             return new ResponseEntity<>(HttpStatus.FORBIDDEN);
         }
-        List<Command> commands = commandService.getCommandsByPlayerId(playerId, page, size);
+        List<CommandResponse> commands = commandService.getCommandsByPlayerId(playerId, page, size);
         return ResponseEntity.ok(commands);
     }
 
     @GetMapping("/player/{playerId}/deleted")
-    public ResponseEntity<List<Command>> getDeletedCommandsByPlayerId(
+    public ResponseEntity<List<CommandResponse>> getDeletedCommandsByPlayerId(
             @PathVariable String playerId,
             @RequestParam(defaultValue = "0") int page,
             @RequestParam(defaultValue = "100") int size,
@@ -50,7 +51,7 @@ public class CommandController {
         if(!jwtService.checkUser(playerId, request)){
             return new ResponseEntity<>(HttpStatus.FORBIDDEN);
         }
-        List<Command> commands = commandService.getDeletedCommandsByPlayerId(playerId, page, size);
+        List<CommandResponse> commands = commandService.getDeletedCommandsByPlayerId(playerId, page, size);
         return ResponseEntity.ok(commands);
     }
 
@@ -63,7 +64,7 @@ public class CommandController {
         if(!jwtService.checkUser(playerId, request)){
             return new ResponseEntity<>(HttpStatus.FORBIDDEN);
         }
-        return commandService.softDeleteCommands(commandRequest.getCommandIds());
+        return commandService.softDeleteCommands(commandRequest.commandIds());
     }
 
     @PutMapping("/player/{playerId}")
@@ -75,6 +76,6 @@ public class CommandController {
         if(!jwtService.checkUser(playerId, request)){
             return new ResponseEntity<>(HttpStatus.FORBIDDEN);
         }
-        return commandService.restoreDeletedCommands(commandRequest.getCommandIds());
+        return commandService.restoreDeletedCommands(commandRequest.commandIds());
     }
 }
