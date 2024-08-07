@@ -1,11 +1,11 @@
 import {Table, TableBody, TableCell, TableHead, TableHeader, TableRow} from "@/components/ui/table";
-import {flexRender} from "@tanstack/react-table";
+import {flexRender, HeaderGroup, RowData} from "@tanstack/react-table";
 
 const TableContainer = ({ isLoading, error, columns, table, getRowClasses, handleClickLink }: any) => (
     <div className="rounded-md border">
         <Table>
             <TableHeader>
-                {table.getHeaderGroups().map((headerGroup) => (
+                {table.getHeaderGroups().map((headerGroup:HeaderGroup<RowData>) => (
                     <TableRow key={headerGroup.id}>
                         {headerGroup.headers.map((header) => (
                             <TableHead key={header.id}>
@@ -23,9 +23,9 @@ const TableContainer = ({ isLoading, error, columns, table, getRowClasses, handl
                         </TableCell>
                     </TableRow>
                 ) : table.getRowModel().rows?.length ? (
-                    table.getRowModel().rows.map((row) => (
+                    table.getRowModel().rows.map((row: any) => (
                         <TableRow key={row.id} data-state={row.getIsSelected() && "selected"} className={getRowClasses(row)}>
-                            {row.getVisibleCells().map((cell) => (
+                            {row.getVisibleCells().map((cell: any) => (
                                 <TableCell key={cell.id}>
                                     {flexRender(cell.column.columnDef.cell, cell.getContext())}
                                 </TableCell>
