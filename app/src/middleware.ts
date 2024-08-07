@@ -8,9 +8,13 @@ const publicRoutes = ['/login', '/register'];
 export function middleware(req: NextRequest) {
     const cookies = cookie.parse(req.headers.get('cookie') || '');
     const token = cookies.token;
-
     const isAuthenticated = token && !isExpired(token);
 
+    const { pathname } = req.nextUrl;
+
+    if (isAuthenticated && publicRoutes.includes(pathname)) {
+        return NextResponse.redirect(new URL('/', req.url));
+    }
 
     if (!isAuthenticated && !publicRoutes.includes(req.nextUrl.pathname)) {
         const absoluteURL = new URL('/login', req.nextUrl.origin);

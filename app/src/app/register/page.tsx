@@ -50,7 +50,7 @@ export default function Register() {
 
         try {
             const responseData = await registerUser(userLogin, userPassword, code, world);
-            document.cookie = `token=${responseData.token}; path=/`;
+            document.cookie = `token=${responseData.token}; path=/; max-age=21600`;
             router.push("/");
         } catch (error) {
             if (error instanceof AxiosError) {
