@@ -27,7 +27,7 @@ export default function RootLayout({
           disableTransitionOnChange
       >
           <Menu/>
-          <main className="container mx-auto p-4 min-h-min">{children}</main>
+          <main className="container mx-auto p-1 sm:p-4 min-h-min">{children}</main>
           <Footer/>
       </ThemeProvider>
       </body>

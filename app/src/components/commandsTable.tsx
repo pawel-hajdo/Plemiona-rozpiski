@@ -178,7 +178,8 @@ export function CommandsTable({deleted} :any) {
         target: "Cel",
         type: "Typ",
         commandCount: "Ilość",
-        link: "Link"
+        link: "Link",
+        world: "Świat"
     };
 
     const columns: ColumnDef<Command>[] = [
@@ -210,6 +211,7 @@ export function CommandsTable({deleted} :any) {
                 <Button
                     variant="ghost"
                     onClick={() => column.toggleSorting(column.getIsSorted() === "asc")}
+                    className="p-0"
                 >
                     {columnNames.commandNumberId}
                     <CaretSortIcon className="ml-2 h-4 w-4" />
@@ -332,6 +334,11 @@ export function CommandsTable({deleted} :any) {
                 );
             },
         },
+        {
+            accessorKey: "world",
+            header: columnNames.world,
+            cell: ({ row }) => <div>{row.getValue("world")}</div>,
+        },
     ]
 
     const table = useReactTable({
@@ -364,7 +371,7 @@ export function CommandsTable({deleted} :any) {
 
     return (
         <div className="w-full">
-            <div className="flex flex-wrap items-center py-4 gap-3">
+            <div className="flex flex-wrap items-center py-4 gap-2 sm:gap-3">
                 {deleted ? (
                     <Button
                         onClick={handleRestoreSelected}
@@ -408,7 +415,7 @@ export function CommandsTable({deleted} :any) {
                     placeholder="Filtruj po kordach lub typie rozkazu..."
                     value={globalFilter ?? ""}
                     onChange={(event) => setGlobalFilter(String(event.target.value))}
-                    className="max-w-sm"
+                    className="max-w-[60%] xs:max-w-[65%] sm:max-w-sm"
                 />
                 <DropdownMenu>
                     <DropdownMenuTrigger asChild>

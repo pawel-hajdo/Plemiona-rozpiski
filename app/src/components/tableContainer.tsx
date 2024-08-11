@@ -8,7 +8,7 @@ const TableContainer = ({ isLoading, error, columns, table, getRowClasses, handl
                 {table.getHeaderGroups().map((headerGroup:HeaderGroup<RowData>) => (
                     <TableRow key={headerGroup.id}>
                         {headerGroup.headers.map((header) => (
-                            <TableHead key={header.id}>
+                            <TableHead key={header.id} className="text-center">
                                 {header.isPlaceholder ? null : flexRender(header.column.columnDef.header, header.getContext())}
                             </TableHead>
                         ))}
@@ -26,7 +26,7 @@ const TableContainer = ({ isLoading, error, columns, table, getRowClasses, handl
                     table.getRowModel().rows.map((row: any) => (
                         <TableRow key={row.id} data-state={row.getIsSelected() && "selected"} className={getRowClasses(row)}>
                             {row.getVisibleCells().map((cell: any) => (
-                                <TableCell key={cell.id}>
+                                <TableCell key={cell.id}  className="text-center">
                                     {flexRender(cell.column.columnDef.cell, cell.getContext())}
                                 </TableCell>
                             ))}
