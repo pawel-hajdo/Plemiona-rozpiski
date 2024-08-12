@@ -123,9 +123,9 @@ export function CommandsTable({deleted} :any) {
         const maxTime = new Date(row.original.maxTime);
 
         if (currentTime > maxTime) {
-            return  'bg-red-700';
+            return 'bg-red-800 hover:bg-red-600 dark:bg-red-900 dark:hover:bg-red-700';
         } else if (currentTime < minTime) {
-            return 'bg-gray-500';
+            return 'bg-gray-500 hover:bg-gray-400 dark:bg-gray-800 dark:hover:bg-gray-600';
         }
         return '';
     };
@@ -302,7 +302,17 @@ export function CommandsTable({deleted} :any) {
                     <CaretSortIcon className="ml-2 h-4 w-4" />
                 </Button>
             ),
-            cell: ({ row }) => <div>{row.getValue("type")}</div>,
+            cell: ({ row }) => {
+                const minTime = new Date(row.original.minTime);
+                const maxTime = new Date(row.original.maxTime);
+                const isWithinOneHour = (maxTime.getTime() - minTime.getTime()) <= 3600000;
+
+                return (
+                    <div className={isWithinOneHour ? 'font-semibold text-green-500 dark:text-green-400' : ''}>
+                        {row.getValue("type")}
+                    </div>
+                );
+            },
         },
         {
             accessorKey: "commandCount",
