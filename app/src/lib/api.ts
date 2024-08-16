@@ -3,8 +3,8 @@ import {getTokenFromCookies} from "@/lib/utils";
 
 const api = axios.create({
    // baseURL: process.env.NEXT_PUBLIC_API_BASE_URL,
-    //baseURL: 'https://plemionarozpiski.pl/api'
-    baseURL: 'http://localhost:8080/api'
+    baseURL: 'https://plemionarozpiski.pl/api'
+    //baseURL: 'http://localhost:8080/api'
 });
 
 api.interceptors.request.use(
@@ -23,12 +23,12 @@ api.interceptors.request.use(
 );
 
 export const getPlayerCommands = async (playerId: string) => {
-    const response = await api.get(`/commands/player/${playerId}?page=0&size=1000`);
+    const response = await api.get(`/commands/player/${playerId}?page=0&size=2500`);
     return response.data;
 };
 
 export const getDeletedCommands = async (playerId: string) => {
-    const response = await api.get(`/commands/player/${playerId}/deleted?page=0&size=100`);
+    const response = await api.get(`/commands/player/${playerId}/deleted?page=0&size=2500`);
     return response.data;
 }
 export const softDeleteCommands = async (commandIds: any, playerId: string) => {
