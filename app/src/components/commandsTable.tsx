@@ -125,7 +125,7 @@ export function CommandsTable({deleted} :any) {
         if (currentTime > maxTime) {
             return 'bg-red-800 hover:bg-red-600 dark:bg-red-900 dark:hover:bg-red-700';
         } else if (currentTime < minTime) {
-            return 'bg-gray-500 hover:bg-gray-400 dark:bg-gray-800 dark:hover:bg-gray-600';
+            return 'bg-gray-500 hover:bg-gray-400 dark:bg-gray-900 dark:hover:bg-gray-600';
         }
         return '';
     };
