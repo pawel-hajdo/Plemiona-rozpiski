@@ -8,13 +8,16 @@ import * as React from "react";
 import {Button} from "@/components/ui/button";
 import {Accordion, AccordionContent, AccordionItem, AccordionTrigger} from "@/components/ui/accordion";
 
+type Accumulator = Record<string, number>;
+type ButtonType = 'nobles' | 'fakeNobles' | 'defNobles' | 'allNobles' | 'offs';
+
 export default function Other(){
     const [playerLinks, setPlayerLinks] = useState([]);
     const [offs, setOffs] = useState([])
-    const [nobles, setNobles] = useState([]);
-    const [fakeNobles, setFakeNobles] = useState([]);
-    const [defNobles, setDefNobles] = useState([]);
-    const [allNobles, setAllNobles] = useState([]);
+    const [nobles, setNobles] = useState<NobleData[]>([]);
+    const [fakeNobles, setFakeNobles] = useState<NobleData[]>([]);
+    const [defNobles, setDefNobles] = useState<NobleData[]>([]);
+    const [allNobles, setAllNobles] = useState<NobleData[]>([]);
     const [buttonText, setButtonText] = useState({
         nobles: "Kopiuj do schowka",
         fakeNobles: "Kopiuj do schowka",
@@ -50,7 +53,7 @@ export default function Other(){
         fetchData();
     }, []);
 
-    const formatData = (data, includeCount = true) => {
+    const formatData = (data: NobleData[], includeCount = true): string => {
         return data.map(item => {
             return includeCount
                 ? `${item.source} - ${item.count}`
@@ -58,10 +61,10 @@ export default function Other(){
         }).join('\n');
     };
 
-    const mergeAndSumData = (dataArrays) => {
+    const mergeAndSumData = (dataArrays: NobleData[]): NobleData[] => {
         const combined = dataArrays.flat();
 
-        const resultMap = combined.reduce((acc, item) => {
+        const resultMap = combined.reduce((acc: Accumulator, item) => {
             if (acc[item.source]) {
                 acc[item.source] += item.count;
             } else {
@@ -73,7 +76,7 @@ export default function Other(){
         return Object.keys(resultMap).map(key => ({ source: key, count: resultMap[key] }));
     };
 
-    const copyToClipboard = (text, type) => {
+    const copyToClipboard = (text: string, type: ButtonType) => {
         navigator.clipboard.writeText(text)
             .then(() => {
                 setButtonText(prev => ({ ...prev, [type]: "Skopiowano!" }));
@@ -115,7 +118,7 @@ export default function Other(){
                         </Button>
                     </div>
                     <Textarea
-                        rows="10"
+                        rows={10}
                         className="w-full border border-gray-300 rounded-md p-2"
                         value={formatData(nobles)}
                         readOnly
@@ -130,7 +133,7 @@ export default function Other(){
                         </Button>
                     </div>
                     <Textarea
-                        rows="10"
+                        rows={10}
                         className="w-full border border-gray-300 rounded-md p-2"
                         value={formatData(fakeNobles)}
                         readOnly
@@ -145,7 +148,7 @@ export default function Other(){
                         </Button>
                     </div>
                     <Textarea
-                        rows="10"
+                        rows={10}
                         className="w-full border border-gray-300 rounded-md p-2"
                         value={formatData(defNobles)}
                         readOnly
@@ -160,7 +163,7 @@ export default function Other(){
                         </Button>
                     </div>
                     <Textarea
-                        rows="10"
+                        rows={10}
                         className="w-full border border-gray-300 rounded-md p-2"
                         value={formatData(allNobles)}
                         readOnly
@@ -175,7 +178,7 @@ export default function Other(){
                         </Button>
                     </div>
                     <Textarea
-                        rows="10"
+                        rows={10}
                         className="w-full border border-gray-300 rounded-md p-2"
                         value={formatData(offs, false)}
                         readOnly
