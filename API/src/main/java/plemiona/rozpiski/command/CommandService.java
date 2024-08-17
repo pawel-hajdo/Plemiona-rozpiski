@@ -56,4 +56,8 @@ public class CommandService {
         commandRepository.saveAll(commands);
         return ResponseEntity.ok("Commands restored successfully");
     }
+
+    public List<SourceVillagesResponse> getSourceVillages(String playerId, String type) {
+        return commandRepository.findDistinctSourceWithCountByPlayerIdAndType(playerId, type);
+    }
 }

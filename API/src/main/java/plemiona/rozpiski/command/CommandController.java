@@ -78,4 +78,17 @@ public class CommandController {
         }
         return commandService.restoreDeletedCommands(commandRequest.commandIds());
     }
+
+    @GetMapping("/player/{playerId}/sourceVillages")
+    public ResponseEntity<List<SourceVillagesResponse>> getSourceVillages(
+            @PathVariable String playerId,
+            @RequestParam() String type,
+            HttpServletRequest request) {
+
+        if(!jwtService.checkUser(playerId, request)){
+            return new ResponseEntity<>(HttpStatus.FORBIDDEN);
+        }
+        List<SourceVillagesResponse> villages = commandService.getSourceVillages(playerId, type);
+        return ResponseEntity.ok(villages);
+    }
 }
