@@ -58,6 +58,6 @@ public class CommandService {
     }
 
     public List<SourceVillagesResponse> getSourceVillages(String playerId, String type) {
-        return commandRepository.findDistinctSourceWithCountByPlayerIdAndType(playerId, type);
+        return commandRepository.findDistinctSourceWithCountByPlayerIdAndTypeLike(playerId, type);
     }
 }

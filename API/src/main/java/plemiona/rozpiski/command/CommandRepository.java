@@ -25,11 +25,11 @@ public interface CommandRepository extends JpaRepository<Command,Long> {
     SELECT new plemiona.rozpiski.command.SourceVillagesResponse(c.source, COUNT(c))
     FROM Command c
     WHERE c.playerId = :playerId 
-      AND c.type = :type 
+      AND c.type LIKE %:type% 
     GROUP BY c.source
     ORDER BY c.source ASC
     """)
-    List<SourceVillagesResponse> findDistinctSourceWithCountByPlayerIdAndType(
+    List<SourceVillagesResponse> findDistinctSourceWithCountByPlayerIdAndTypeLike(
             @Param("playerId") String playerId,
             @Param("type") String type
     );
