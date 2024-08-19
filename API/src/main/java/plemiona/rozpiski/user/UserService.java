@@ -97,7 +97,7 @@ public class UserService {
         return profileResponse.contains(code);
     }
 
-    private Integer getPlayerId(String playerName){
+    public Integer getPlayerId(String playerName){
         Integer playerId = playerIdMap.get(playerName);
         if (playerId == null) {
             throw new PlayerDoesNotExistException("Player with name " + playerName + " does not exist.");
@@ -105,7 +105,16 @@ public class UserService {
         return playerId;
     }
 
-    private void loadPlayersFromApi(String world){
+    public String getPlayerName(Integer playerId) {
+        for (Map.Entry<String, Integer> entry : playerIdMap.entrySet()) {
+            if (entry.getValue().equals(playerId)) {
+                return entry.getKey();
+            }
+        }
+        throw new PlayerDoesNotExistException("Player with ID " + playerId + " does not exist.");
+    }
+
+    public void loadPlayersFromApi(String world){
         String apiUrl = String.format("https://%s.plemiona.pl/map/player.txt", world);
         try {
             String response = restTemplate.getForObject(new URI(apiUrl), String.class);
