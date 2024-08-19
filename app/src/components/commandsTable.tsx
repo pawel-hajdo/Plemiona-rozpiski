@@ -47,6 +47,7 @@ import {
 import {formatDate, fuzzyFilter, generateLink, getPlayerId, isButtonDisabled} from "@/lib/utils";
 import PaginationControls from "@/components/paginationControlrs";
 import TableContainer from "@/components/tableContainer";
+import { DateTime } from 'luxon';
 
 export function CommandsTable({deleted} :any) {
     const [commands, setCommands] = useState([]);
@@ -118,9 +119,10 @@ export function CommandsTable({deleted} :any) {
     };
 
     const getRowClasses = (row: any) => {
-        const currentTime = new Date();
-        const minTime = new Date(row.original.minTime);
-        const maxTime = new Date(row.original.maxTime);
+        const currentTime = DateTime.now().setZone('Europe/Warsaw');
+
+        const minTime = DateTime.fromISO(row.original.minTime, { zone: 'Europe/Warsaw' });
+        const maxTime = DateTime.fromISO(row.original.maxTime, { zone: 'Europe/Warsaw' });
 
         if (currentTime > maxTime) {
             return 'bg-red-800 hover:bg-red-600 dark:bg-red-900 dark:hover:bg-red-700';

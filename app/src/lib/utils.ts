@@ -3,6 +3,7 @@ import { twMerge } from "tailwind-merge"
 import Cookies from 'js-cookie';
 import { decodeToken  } from "react-jwt";
 import {rankItem} from "@tanstack/match-sorter-utils";
+import { DateTime } from 'luxon';
 
 export function cn(...inputs: ClassValue[]) {
   return twMerge(clsx(inputs))
@@ -50,7 +51,7 @@ export const generateLink = (row: any) => {
 export const formatDate = (date: Date) => date.toLocaleString();
 
 export const isButtonDisabled = (row: any) => {
-  const currentTime = new Date();
-  const minTime = new Date(row.original.minTime);
+  const currentTime = DateTime.now().setZone('Europe/Warsaw');
+  const minTime = DateTime.fromISO(row.original.minTime, { zone: 'Europe/Warsaw' });
   return currentTime < minTime;
 }
