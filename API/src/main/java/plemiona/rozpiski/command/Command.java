@@ -1,6 +1,5 @@
 package plemiona.rozpiski.command;
 
-import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.Setter;
@@ -48,18 +47,18 @@ public class Command {
     @Column(name = "command_player_id")
     private String playerId;
 
-    @JsonIgnore
     @Column(name = "command_player_name")
     private String playerName;
 
     @Column(name = "command_world")
     private String world;
 
-    @JsonIgnore
     @Column(name = "command_attack_time")
     private String attackTime;
 
-    @JsonIgnore
     @Column(name = "deleted")
     private boolean deleted = false;
+
+    @Column(name = "operation_name")
+    private String operation_name;
 }

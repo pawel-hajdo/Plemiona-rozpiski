@@ -23,34 +23,35 @@ public class CommandController {
     }
 
 //    @GetMapping
-//    public List<Command> getAllCommands(){
+//    public List<CommandResponse> getAllCommands(){
 //        return commandService.getAllCommands();
 //    }
+
     @GetMapping("/player/{playerId}")
-    public ResponseEntity<List<Command>> getCommandsByPlayerId(
+    public ResponseEntity<List<CommandResponse>> getCommandsByPlayerId(
             @PathVariable String playerId,
             @RequestParam(defaultValue = "0") int page,
             @RequestParam(defaultValue = "100") int size,
             HttpServletRequest request) {
 
-        if(!checkUser(playerId, request)){
+        if(!jwtService.checkUser(playerId, request)){
             return new ResponseEntity<>(HttpStatus.FORBIDDEN);
         }
-        List<Command> commands = commandService.getCommandsByPlayerId(playerId, page, size);
+        List<CommandResponse> commands = commandService.getCommandsByPlayerId(playerId, page, size);
         return ResponseEntity.ok(commands);
     }
 
     @GetMapping("/player/{playerId}/deleted")
-    public ResponseEntity<List<Command>> getDeletedCommandsByPlayerId(
+    public ResponseEntity<List<CommandResponse>> getDeletedCommandsByPlayerId(
             @PathVariable String playerId,
             @RequestParam(defaultValue = "0") int page,
             @RequestParam(defaultValue = "100") int size,
             HttpServletRequest request) {
 
-        if(!checkUser(playerId, request)){
+        if(!jwtService.checkUser(playerId, request)){
             return new ResponseEntity<>(HttpStatus.FORBIDDEN);
         }
-        List<Command> commands = commandService.getDeletedCommandsByPlayerId(playerId, page, size);
+        List<CommandResponse> commands = commandService.getDeletedCommandsByPlayerId(playerId, page, size);
         return ResponseEntity.ok(commands);
     }
 
@@ -60,10 +61,10 @@ public class CommandController {
             @PathVariable String playerId,
             HttpServletRequest request) {
 
-        if(!checkUser(playerId, request)){
+        if(!jwtService.checkUser(playerId, request)){
             return new ResponseEntity<>(HttpStatus.FORBIDDEN);
         }
-        return commandService.softDeleteCommands(commandRequest.getCommandIds());
+        return commandService.softDeleteCommands(commandRequest.commandIds());
     }
 
     @PutMapping("/player/{playerId}")
@@ -72,23 +73,22 @@ public class CommandController {
             @PathVariable String playerId,
             HttpServletRequest request) {
 
-        if(!checkUser(playerId, request)){
+        if(!jwtService.checkUser(playerId, request)){
             return new ResponseEntity<>(HttpStatus.FORBIDDEN);
         }
-        return commandService.restoreDeletedCommands(commandRequest.getCommandIds());
+        return commandService.restoreDeletedCommands(commandRequest.commandIds());
     }
 
-    private String extractTokenFromRequest(HttpServletRequest request) {
-        String bearerToken = request.getHeader("Authorization");
-        if (bearerToken != null && bearerToken.startsWith("Bearer ")) {
-            return bearerToken.substring(7);
+    @GetMapping("/player/{playerId}/sourceVillages")
+    public ResponseEntity<List<SourceVillagesResponse>> getSourceVillages(
+            @PathVariable String playerId,
+            @RequestParam() String type,
+            HttpServletRequest request) {
+
+        if(!jwtService.checkUser(playerId, request)){
+            return new ResponseEntity<>(HttpStatus.FORBIDDEN);
         }
-        return null;
-    }
-
-    private boolean checkUser(String playerId, HttpServletRequest request) {
-        String token = extractTokenFromRequest(request);
-        String tokenPlayerId = jwtService.extractPlayerId(token);
-        return playerId.equals(tokenPlayerId);
+        List<SourceVillagesResponse> villages = commandService.getSourceVillages(playerId, type);
+        return ResponseEntity.ok(villages);
     }
 }

@@ -2,6 +2,8 @@ import { type ClassValue, clsx } from "clsx"
 import { twMerge } from "tailwind-merge"
 import Cookies from 'js-cookie';
 import { decodeToken  } from "react-jwt";
+import {rankItem} from "@tanstack/match-sorter-utils";
+import { DateTime } from 'luxon';
 
 export function cn(...inputs: ClassValue[]) {
   return twMerge(clsx(inputs))
@@ -25,4 +27,31 @@ export function getPlayerId(){
     const decoded: any = decodeToken(token);
     return decoded.playerId;
   }
+}
+
+export function fuzzyFilter (row: any, columnId: any, value: any, addMeta: any) {
+  const itemRank = rankItem(row.getValue(columnId), value);
+  addMeta({ itemRank });
+  return itemRank.passed;
+}
+
+export const generateLink = (row: any) => {
+  const { sourceId, targetId, type, world } = row.original;
+  let link = `https://${world}.plemiona.pl/game.php?village=${sourceId}&screen=place&target=${targetId}`;
+
+  const catapultMatch = type.match(/Katapulty-(\d+)/);
+  if (catapultMatch) {
+    const catapultCount = catapultMatch[1];
+    link += `&catapult=${catapultCount}`;
+  }
+
+  return link;
+}
+
+export const formatDate = (date: Date) => date.toLocaleString();
+
+export const isButtonDisabled = (row: any) => {
+  const currentTime = DateTime.now().setZone('Europe/Warsaw');
+  const minTime = DateTime.fromISO(row.original.minTime, { zone: 'Europe/Warsaw' });
+  return currentTime < minTime;
 }

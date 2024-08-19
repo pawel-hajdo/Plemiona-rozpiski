@@ -10,7 +10,6 @@ import {
     ColumnFiltersState,
     SortingState,
     VisibilityState,
-    flexRender,
     getCoreRowModel,
     getFilteredRowModel,
     getPaginationRowModel,
@@ -27,14 +26,6 @@ import {
     DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu"
 import { Input } from "@/components/ui/input"
-import {
-    Table,
-    TableBody,
-    TableCell,
-    TableHead,
-    TableHeader,
-    TableRow,
-} from "@/components/ui/table"
 
 import {
     Select,
@@ -53,16 +44,10 @@ import {
     saveColumnVisibility,
     savePageSize
 } from "@/lib/localStorage";
-import {getPlayerId} from "@/lib/utils";
-import {
-    rankItem,
-} from '@tanstack/match-sorter-utils'
-
-const fuzzyFilter = (row: any, columnId: any, value: any, addMeta: any) => {
-    const itemRank = rankItem(row.getValue(columnId), value);
-    addMeta({ itemRank });
-    return itemRank.passed;
-};
+import {formatDate, fuzzyFilter, generateLink, getPlayerId, isButtonDisabled} from "@/lib/utils";
+import PaginationControls from "@/components/paginationControlrs";
+import TableContainer from "@/components/tableContainer";
+import { DateTime } from 'luxon';
 
 export function CommandsTable({deleted} :any) {
     const [commands, setCommands] = useState([]);
@@ -82,6 +67,20 @@ export function CommandsTable({deleted} :any) {
     const [isLoading, setIsLoading] = useState(true);
 
     useEffect(() => {
+        const fetchCommandsData = async () => {
+            try {
+                let data;
+                if(deleted) {
+                    data = await getDeletedCommands(playerId);
+                } else {
+                    data = await getPlayerCommands(playerId);
+                }
+                setCommands(data);
+                setIsLoading(false);
+            } catch (error) {
+                setError("Pobranie komend nie powiodło się");
+            }
+        };
         setColumnVisibility(loadColumnVisibility());
         fetchCommandsData();
         setLinkToOpenCount(loadLinksToOpenCount);
@@ -93,21 +92,6 @@ export function CommandsTable({deleted} :any) {
         }
     }, [columnVisibility]);
 
-    const fetchCommandsData = async () => {
-        try {
-            let data;
-            if(deleted) {
-                data = await getDeletedCommands(playerId);
-            } else {
-                data = await getPlayerCommands(playerId);
-            }
-            setCommands(data);
-            setIsLoading(false);
-        } catch (error) {
-            setError("Pobranie komend nie powiodło się");
-        }
-    };
-
     useEffect(() => {
         savePageSize(pagination.pageSize);
     }, [pagination.pageSize]);
@@ -117,14 +101,7 @@ export function CommandsTable({deleted} :any) {
         let openedCount = 0;
         rows.forEach((row, index) => {
             const rowId = row.id;
-            const { sourceId, targetId, type, world } = row.original;
-            let link = `https://${world}.plemiona.pl/game.php?village=${sourceId}&screen=place&target=${targetId}`;
-
-            const catapultMatch = type.match(/Katapulty-(\d+)/);
-            if (catapultMatch) {
-                const catapultCount = catapultMatch[1];
-                link += `&catapult=${catapultCount}`;
-            }
+            const link = generateLink(row);
 
             if (!clickedRows[rowId] && !isButtonDisabled(row) && openedCount < linksToOpenCount) {
                 setTimeout(() => {
@@ -141,21 +118,16 @@ export function CommandsTable({deleted} :any) {
         setClickedRows((prev: any) => ({ ...prev, [rowId]: true }));
     };
 
-    const isButtonDisabled = (row: any) => {
-        const currentTime = new Date();
-        const minTime = new Date(row.original.minTime);
-        return currentTime < minTime;
-    };
-
     const getRowClasses = (row: any) => {
-        const currentTime = new Date();
-        const minTime = new Date(row.original.minTime);
-        const maxTime = new Date(row.original.maxTime);
+        const currentTime = DateTime.now().setZone('Europe/Warsaw');
+
+        const minTime = DateTime.fromISO(row.original.minTime, { zone: 'Europe/Warsaw' });
+        const maxTime = DateTime.fromISO(row.original.maxTime, { zone: 'Europe/Warsaw' });
 
         if (currentTime > maxTime) {
-            return  'bg-red-700';
+            return 'bg-red-800 hover:bg-red-600 dark:bg-red-900 dark:hover:bg-red-700';
         } else if (currentTime < minTime) {
-            return 'bg-gray-500';
+            return 'bg-gray-500 hover:bg-gray-400 dark:bg-gray-900 dark:hover:bg-gray-600';
         }
         return '';
     };
@@ -168,7 +140,6 @@ export function CommandsTable({deleted} :any) {
             const row = table.getRow(rowId);
             return row.original.id;
         });
-
 
         try {
             await softDeleteCommands(selectedCommands, playerId);
@@ -209,7 +180,8 @@ export function CommandsTable({deleted} :any) {
         target: "Cel",
         type: "Typ",
         commandCount: "Ilość",
-        link: "Link"
+        link: "Link",
+        world: "Świat"
     };
 
     const columns: ColumnDef<Command>[] = [
@@ -241,6 +213,7 @@ export function CommandsTable({deleted} :any) {
                 <Button
                     variant="ghost"
                     onClick={() => column.toggleSorting(column.getIsSorted() === "asc")}
+                    className="p-0"
                 >
                     {columnNames.commandNumberId}
                     <CaretSortIcon className="ml-2 h-4 w-4" />
@@ -259,14 +232,7 @@ export function CommandsTable({deleted} :any) {
                     <CaretSortIcon className="ml-2 h-4 w-4" />
                 </Button>
             ),
-            cell: ({ row }) => {
-                const date = new Date(row.getValue('minTime'));
-                const formatted = date.toLocaleString();
-                return (
-                    <div>{formatted}</div>
-                )
-            }
-
+            cell: ({ row }) => <div>{formatDate(new Date(row.getValue('minTime')))}</div>,
         },
         {
             accessorKey: "maxTime",
@@ -279,13 +245,7 @@ export function CommandsTable({deleted} :any) {
                     <CaretSortIcon className="ml-2 h-4 w-4" />
                 </Button>
             ),
-            cell: ({ row }) => {
-                const date = new Date(row.getValue('maxTime'));
-                const formatted = date.toLocaleString();
-                return (
-                    <div>{formatted}</div>
-                )
-            }
+            cell: ({ row }) => <div>{formatDate(new Date(row.getValue('maxTime')))}</div>,
         },
         {
             accessorKey: "source",
@@ -344,7 +304,17 @@ export function CommandsTable({deleted} :any) {
                     <CaretSortIcon className="ml-2 h-4 w-4" />
                 </Button>
             ),
-            cell: ({ row }) => <div>{row.getValue("type")}</div>,
+            cell: ({ row }) => {
+                const minTime = new Date(row.original.minTime);
+                const maxTime = new Date(row.original.maxTime);
+                const isWithinOneHour = (maxTime.getTime() - minTime.getTime()) <= 3600000;
+
+                return (
+                    <div className={isWithinOneHour ? 'font-semibold text-green-500 dark:text-green-400' : ''}>
+                        {row.getValue("type")}
+                    </div>
+                );
+            },
         },
         {
             accessorKey: "commandCount",
@@ -355,15 +325,7 @@ export function CommandsTable({deleted} :any) {
             accessorKey: "link",
             header: columnNames.link,
             cell: ({ row }) => {
-                const { sourceId, targetId, type, world } = row.original;
-                let link = `https://${world}.plemiona.pl/game.php?village=${sourceId}&screen=place&target=${targetId}`;
-
-                const catapultMatch = type.match(/Katapulty-(\d+)/);
-                if (catapultMatch) {
-                    const catapultCount = catapultMatch[1];
-                    link += `&catapult=${catapultCount}`;
-                }
-
+                const link = generateLink(row);
                 return (
                     <a
                         href={link}
@@ -383,6 +345,11 @@ export function CommandsTable({deleted} :any) {
                     </a>
                 );
             },
+        },
+        {
+            accessorKey: "world",
+            header: columnNames.world,
+            cell: ({ row }) => <div>{row.getValue("world")}</div>,
         },
     ]
 
@@ -416,7 +383,7 @@ export function CommandsTable({deleted} :any) {
 
     return (
         <div className="w-full">
-            <div className="flex flex-wrap items-center py-4 gap-3">
+            <div className="flex flex-wrap items-center py-4 gap-2 sm:gap-3">
                 {deleted ? (
                     <Button
                         onClick={handleRestoreSelected}
@@ -425,8 +392,7 @@ export function CommandsTable({deleted} :any) {
                     >
                         Przywróć
                     </Button>
-                ) :
-                (
+                ) : (
                     <Button
                         onClick={handleDeleteSelected}
                         variant="outline"
@@ -461,7 +427,7 @@ export function CommandsTable({deleted} :any) {
                     placeholder="Filtruj po kordach lub typie rozkazu..."
                     value={globalFilter ?? ""}
                     onChange={(event) => setGlobalFilter(String(event.target.value))}
-                    className="max-w-sm"
+                    className="max-w-[60%] xs:max-w-[65%] sm:max-w-sm"
                 />
                 <DropdownMenu>
                     <DropdownMenuTrigger asChild>
@@ -491,88 +457,15 @@ export function CommandsTable({deleted} :any) {
                     </DropdownMenuContent>
                 </DropdownMenu>
             </div>
-            <div className="rounded-md border">
-                <Table>
-                    <TableHeader>
-                        {table.getHeaderGroups().map((headerGroup) => (
-                            <TableRow key={headerGroup.id}>
-                                {headerGroup.headers.map((header) => {
-                                    return (
-                                        <TableHead key={header.id}>
-                                            {header.isPlaceholder
-                                                ? null
-                                                : flexRender(
-                                                    header.column.columnDef.header,
-                                                    header.getContext()
-                                                )}
-                                        </TableHead>
-                                    )
-                                })}
-                            </TableRow>
-                        ))}
-                    </TableHeader>
-                    <TableBody>
-                        {isLoading ? (
-                            <TableRow>
-                                <TableCell colSpan={columns.length} className="h-24 text-center">
-                                    Pobieranie komend...
-                                </TableCell>
-                            </TableRow>
-                        ) : table.getRowModel().rows?.length ? (
-                            table.getRowModel().rows.map((row) => (
-                                <TableRow
-                                    key={row.id}
-                                    data-state={row.getIsSelected() && "selected"}
-                                    className={getRowClasses(row)}
-                                >
-                                    {row.getVisibleCells().map((cell) => (
-                                        <TableCell key={cell.id}>
-                                            {flexRender(
-                                                cell.column.columnDef.cell,
-                                                cell.getContext()
-                                            )}
-                                        </TableCell>
-                                    ))}
-                                </TableRow>
-                            ))
-                        ) : (
-                            <TableRow>
-                                <TableCell
-                                    colSpan={columns.length}
-                                    className="h-24 text-center"
-                                >
-                                    Brak rozkazów.
-                                    {error && <p className="text-red-500">{error}</p>}
-                                </TableCell>
-                            </TableRow>
-                        )}
-                    </TableBody>
-                </Table>
-            </div>
-            <div className="flex items-center justify-end space-x-2 py-4">
-                <div className="flex-1 text-sm text-muted-foreground">
-                    {table.getFilteredSelectedRowModel().rows.length} z{" "}
-                    {table.getFilteredRowModel().rows.length} zaznaczonych wierszy
-                </div>
-                <div className="space-x-2">
-                    <Button
-                        variant="outline"
-                        size="sm"
-                        onClick={() => table.previousPage()}
-                        disabled={!table.getCanPreviousPage()}
-                    >
-                        Poprzednia
-                    </Button>
-                    <Button
-                        variant="outline"
-                        size="sm"
-                        onClick={() => table.nextPage()}
-                        disabled={!table.getCanNextPage()}
-                    >
-                        Następna
-                    </Button>
-                </div>
-            </div>
+            <TableContainer
+                isLoading={isLoading}
+                error={error}
+                columns={columns}
+                table={table}
+                getRowClasses={getRowClasses}
+                handleClickLink={handleClickLink}
+            />
+            <PaginationControls table={table} />
         </div>
     )
 }

@@ -11,7 +11,8 @@ import {getPlayerName} from "@/lib/utils";
 const navigation = [
     { name: 'Aktualne', href: '/' },
     { name: 'Usunięte', href: '/deleted' },
-    { name: 'Ustawienia', href: '/settings' },
+    { name: 'Inne', href: '/other'},
+    { name: 'Ustawienia', href: '/settings' }
 ];
 
 const Menu = () => {

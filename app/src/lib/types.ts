@@ -20,3 +20,7 @@ type ColumnNames = {
     [K in keyof Command]?: string;
 }
 
+interface NobleData {
+    source: string;
+    count: number;
+}
