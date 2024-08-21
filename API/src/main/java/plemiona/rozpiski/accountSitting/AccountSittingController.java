@@ -12,6 +12,7 @@ import java.util.List;
 @RequestMapping(path = "/api/sittings")
 public class AccountSittingController {
 
+
     private final AccountSittingService accountSittingService;
     private final JwtService jwtService;
 
@@ -60,7 +61,6 @@ public class AccountSittingController {
         return ResponseEntity.ok(sittings);
     }
 
-
     @DeleteMapping("{sittingId}/player/{playerId}")
     public ResponseEntity<String> endSitting(
             @PathVariable Integer playerId,
@@ -72,7 +72,48 @@ public class AccountSittingController {
         }
 
         accountSittingService.endSitting(sittingId);
-        return ResponseEntity.ok("Sitting ended successfully");
+        return ResponseEntity.ok("Sitting with id " + sittingId +" ended successfully");
     }
 
+    @PutMapping("/{sittingId}/accept/sitter/{playerId}")
+    public ResponseEntity<String> acceptSittingRequest(
+            @PathVariable Long sittingId,
+            @PathVariable Integer playerId,
+            HttpServletRequest request
+    ) {
+        if (!jwtService.checkUser(playerId.toString(), request)) {
+            return new ResponseEntity<>(HttpStatus.FORBIDDEN);
+        }
+
+        accountSittingService.acceptSittingRequest(sittingId, playerId);
+        return ResponseEntity.ok("Sitting request accepted.");
+    }
+
+    @PutMapping("/{sittingId}/reject/sitter/{playerId}")
+    public ResponseEntity<String> rejectSittingRequest(
+            @PathVariable Long sittingId,
+            @PathVariable Integer playerId,
+            HttpServletRequest request
+    ) {
+        if (!jwtService.checkUser(playerId.toString(), request)) {
+            return new ResponseEntity<>(HttpStatus.FORBIDDEN);
+        }
+
+        accountSittingService.rejectSittingRequest(sittingId, playerId);
+        return ResponseEntity.ok("Sitting request rejected.");
+    }
+
+    @PutMapping("/{sittingId}/cancel/owner/{playerId}")
+    public ResponseEntity<String> cancelSittingRequest(
+            @PathVariable Long sittingId,
+            @PathVariable Integer playerId,
+            HttpServletRequest request
+    ) {
+        if (!jwtService.checkUser(playerId.toString(), request)) {
+            return new ResponseEntity<>(HttpStatus.FORBIDDEN);
+        }
+
+        accountSittingService.cancelSittingRequest(sittingId, playerId);
+        return ResponseEntity.ok("Sitting request canceled.");
+    }
 }

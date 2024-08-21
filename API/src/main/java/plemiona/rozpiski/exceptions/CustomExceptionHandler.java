@@ -57,10 +57,22 @@ public class CustomExceptionHandler {
         return new ResponseEntity<>(ex.getMessage(), HttpStatus.CONFLICT);
     }
 
+    @ExceptionHandler(InvalidPlayerForSittingException.class)
+    @ResponseStatus(HttpStatus.FORBIDDEN)
+    public ResponseEntity<String> handleInvalidPlayerForSittingException(Exception ex) {
+        return new ResponseEntity<>(ex.getMessage(), HttpStatus.FORBIDDEN);
+    }
+
     @ExceptionHandler(SittingNotFoundException.class)
     @ResponseStatus(HttpStatus.NOT_FOUND)
     public ResponseEntity<String> handleSittingNotFoundException(Exception ex) {
         return new ResponseEntity<>(ex.getMessage(), HttpStatus.NOT_FOUND);
+    }
+
+    @ExceptionHandler(IllegalSittingState.class)
+    @ResponseStatus(HttpStatus.BAD_REQUEST)
+    public ResponseEntity<String> handleIllegalSittingStateException(Exception ex) {
+        return new ResponseEntity<>(ex.getMessage(), HttpStatus.BAD_REQUEST);
     }
 
     @ExceptionHandler(Exception.class)

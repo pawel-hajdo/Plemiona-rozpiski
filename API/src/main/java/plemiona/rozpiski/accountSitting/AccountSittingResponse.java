@@ -10,6 +10,7 @@ public record AccountSittingResponse(
         String sitterName,
         String world,
         LocalDateTime startDate,
-        LocalDateTime endDate
+        LocalDateTime endDate,
+        AccountSittingStatus status
 ) {
 }

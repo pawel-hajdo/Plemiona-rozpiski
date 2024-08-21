@@ -37,4 +37,11 @@ public class AccountSitting {
 
     @Column(name = "end_date")
     private LocalDateTime endDate;
+
+    @Column(name = "status")
+    @Enumerated(EnumType.STRING)
+    private AccountSittingStatus status;
+
+    @Column(name = "status_change_date")
+    private LocalDateTime statusChangeDate;
 }
