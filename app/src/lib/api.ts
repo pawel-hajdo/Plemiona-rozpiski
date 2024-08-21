@@ -101,8 +101,23 @@ export const getAccountSitters = async (playerId: string) => {
     return response.data;
 }
 
+export const getAccountSittings = async (sitterId: string) => {
+    const response = await api.get(`/sittings/sitter/${sitterId}`);
+    return response.data;
+}
+
 export const cancelSittingRequest = async (playerId: string, sittingId: number) => {
     const response = await api.put(`/sittings/${sittingId}/cancel/owner/${playerId}`);
+    return response.data;
+}
+
+export const rejectSittingRequest = async (playerId: string, sittingId: number) => {
+    const response = await api.put(`/sittings/${sittingId}/reject/sitter/${playerId}`);
+    return response.data;
+}
+
+export const acceptSittingRequest = async (playerId: string, sittingId: number) => {
+    const response = await api.put(`/sittings/${sittingId}/accept/sitter/${playerId}`);
     return response.data;
 }
 

@@ -5,7 +5,15 @@ import { Select, SelectContent, SelectGroup, SelectItem, SelectTrigger, SelectVa
 import { Button } from "@/components/ui/button";
 import { Label } from "@/components/ui/label";
 import {FormEvent, useEffect, useState} from "react";
-import {cancelSittingRequest, endSitting, getAccountSitters, setAccountSitter} from "@/lib/api";
+import {
+    acceptSittingRequest,
+    cancelSittingRequest,
+    endSitting,
+    getAccountSitters,
+    getAccountSittings,
+    rejectSittingRequest,
+    setAccountSitter
+} from "@/lib/api";
 import {getPlayerId} from "@/lib/utils";
 import {AxiosError} from "axios";
 import {AccountSittingStatus} from "@/lib/types";
@@ -18,23 +26,24 @@ export default function Sitting() {
     const [formError, setFormError] = useState("");
     const [isSubmitting, setIsSubmitting] = useState(false);
     const [accountSitters, setAccountSitters] = useState<Sitting[]>([]);
+    const [accountSittings, setAccountSittings] = useState<Sitting[]>([]);
     const [isLoading, setIsLoading] = useState(true);
     const playerId = getPlayerId();
 
     useEffect(() => {
-        const fetchAccountSitters = async () => {
+        const fetchData = async () => {
             try {
-                const data: Sitting[] = await getAccountSitters(getPlayerId());
-                setAccountSitters(data);
-                console.log(data);
+                const accountSitterData: Sitting[] = await getAccountSitters(playerId);
+                const accountSittingsData: Sitting[] = await getAccountSittings(playerId);
+                setAccountSitters(accountSitterData);
+                setAccountSittings(accountSittingsData);
             } catch (error) {
                 setLoadingError("Wystąpił błąd podczas pobierania zastępstw");
             } finally {
                 setIsLoading(false);
             }
         }
-
-        fetchAccountSitters();
+        fetchData();
     }, []);
 
     const handleSubmitSittingRequest = async (e: FormEvent<HTMLFormElement>) => {
@@ -83,26 +92,72 @@ export default function Sitting() {
         }
     }
 
+    const handleRejectSittingRequest = async (sittingId: number) => {
+        try {
+            await rejectSittingRequest(playerId, sittingId);
+            const data: Sitting[] = await getAccountSittings(playerId);
+            setAccountSittings(data);
+        } catch {
+            setLoadingError("Nie udało się odrzucić prośby. Spróbuj ponownie później");
+        }
+    }
+
+    const handleAcceptSittingRequest  = async (sittingId: number) => {
+        try {
+            await acceptSittingRequest(playerId, sittingId);
+            const data: Sitting[] = await getAccountSittings(playerId);
+            setAccountSittings(data);
+        } catch {
+            setLoadingError("Nie udało się zaakceptować prośby. Spróbuj ponownie później");
+        }
+    }
+
     const handleEndSitting = async (sittingId: number) => {
         try {
             await endSitting(playerId, sittingId);
-            const data: Sitting[] = await getAccountSitters(playerId);
-            setAccountSitters(data);
+            const accountSitterData: Sitting[] = await getAccountSitters(playerId);
+            const accountSittingsData: Sitting[] = await getAccountSittings(playerId);
+            setAccountSitters(accountSitterData);
+            setAccountSittings(accountSittingsData);
         } catch {
             setLoadingError("Nie udało się zakończyć zastępstwa. Spróbuj ponownie później");
         }
     }
 
-    const filteredSitters = accountSitters.filter(
+    const yourRequests = accountSitters.filter(
         sitter => sitter.status === AccountSittingStatus.PENDING || sitter.status === AccountSittingStatus.ACTIVE
     );
-    const rows = filteredSitters.map(sitting => ({
+
+    const receivedRequests = accountSittings.filter(
+        sitter => sitter.status === AccountSittingStatus.PENDING || sitter.status === AccountSittingStatus.ACTIVE
+    );
+
+    const rowsYourRequests = yourRequests.map(sitting => ({
         playerName: sitting.sitterName,
         world: sitting.world,
         actions: sitting.status === AccountSittingStatus.PENDING ? (
             <Button onClick={() => handleCancelSittingRequest(sitting.id)}>
                 Anuluj zapytanie
             </Button>
+        ) : sitting.status === AccountSittingStatus.ACTIVE ? (
+            <Button onClick={() => handleEndSitting(sitting.id)}>
+                Zakończ zastępstwo
+            </Button>
+        ) : null,
+    }));
+
+    const rowsReceivedRequests = receivedRequests.map(sitting => ({
+        playerName: sitting.playerName,
+        world: sitting.world,
+        actions: sitting.status === AccountSittingStatus.PENDING ? (
+            <div className="flex gap-2">
+                <Button onClick={() => handleRejectSittingRequest(sitting.id)}>
+                    Odrzuć
+                </Button>
+                <Button onClick={() => handleAcceptSittingRequest(sitting.id)}>
+                    Akceptuj
+                </Button>
+            </div>
         ) : sitting.status === AccountSittingStatus.ACTIVE ? (
             <Button onClick={() => handleEndSitting(sitting.id)}>
                 Zakończ zastępstwo
@@ -164,8 +219,8 @@ export default function Sitting() {
                             </TableRow>
                         </TableHeader>
                         <TableBody>
-                            {rows.length > 0 ? (
-                                rows.map((row, index) => (
+                            {rowsYourRequests.length > 0 ? (
+                                rowsYourRequests.map((row, index) => (
                                     <TableRow key={index}>
                                         <TableCell>{row.playerName}</TableCell>
                                         <TableCell>{row.world}</TableCell>
@@ -181,6 +236,33 @@ export default function Sitting() {
                     </Table>
                 </>
             )}
+            <Label htmlFor="activeRequests" className="mb-2 block text-lg font-semibold">
+                Otrzymane zastępstwa
+            </Label>
+            <Table id="activeRequests" className="mb-5">
+                <TableHeader>
+                    <TableRow>
+                        <TableHead>Nick gracza</TableHead>
+                        <TableHead>Świat</TableHead>
+                        <TableHead>Akcje</TableHead>
+                    </TableRow>
+                </TableHeader>
+                <TableBody>
+                    {rowsReceivedRequests.length > 0 ? (
+                        rowsReceivedRequests.map((row, index) => (
+                            <TableRow key={index}>
+                                <TableCell>{row.playerName}</TableCell>
+                                <TableCell>{row.world}</TableCell>
+                                <TableCell>{row.actions}</TableCell>
+                            </TableRow>
+                        ))
+                    ) : (
+                        <TableRow>
+                            <TableCell colSpan={3} className="text-center">Brak zastępstw</TableCell>
+                        </TableRow>
+                    )}
+                </TableBody>
+            </Table>
         </div>
     );
 }
