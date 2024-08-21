@@ -27,7 +27,8 @@ export default function Sitting() {
     const [isSubmitting, setIsSubmitting] = useState(false);
     const [accountSitters, setAccountSitters] = useState<Sitting[]>([]);
     const [accountSittings, setAccountSittings] = useState<Sitting[]>([]);
-    const [isLoading, setIsLoading] = useState(true);
+    const [isLoadingSitters, setIsLoadingSitters] = useState(true);
+    const [isLoadingSittings, setIsLoadingSittings] = useState(true);
     const playerId = getPlayerId();
 
     useEffect(() => {
@@ -40,7 +41,8 @@ export default function Sitting() {
             } catch (error) {
                 setLoadingError("Wystąpił błąd podczas pobierania zastępstw");
             } finally {
-                setIsLoading(false);
+                setIsLoadingSitters(false);
+                setIsLoadingSittings(false);
             }
         }
         fetchData();
@@ -132,110 +134,88 @@ export default function Sitting() {
         sitter => sitter.status === AccountSittingStatus.PENDING || sitter.status === AccountSittingStatus.ACTIVE
     );
 
-    const rowsYourRequests = yourRequests.map(sitting => ({
-        playerName: sitting.sitterName,
-        world: sitting.world,
-        actions: sitting.status === AccountSittingStatus.PENDING ? (
-            <Button onClick={() => handleCancelSittingRequest(sitting.id)}>
-                Anuluj zapytanie
-            </Button>
-        ) : sitting.status === AccountSittingStatus.ACTIVE ? (
-            <Button onClick={() => handleEndSitting(sitting.id)}>
-                Zakończ zastępstwo
-            </Button>
-        ) : null,
-    }));
-
-    const rowsReceivedRequests = receivedRequests.map(sitting => ({
-        playerName: sitting.playerName,
-        world: sitting.world,
-        actions: sitting.status === AccountSittingStatus.PENDING ? (
-            <div className="flex gap-2">
-                <Button onClick={() => handleRejectSittingRequest(sitting.id)}>
-                    Odrzuć
-                </Button>
-                <Button onClick={() => handleAcceptSittingRequest(sitting.id)}>
-                    Akceptuj
-                </Button>
-            </div>
-        ) : sitting.status === AccountSittingStatus.ACTIVE ? (
-            <Button onClick={() => handleEndSitting(sitting.id)}>
-                Zakończ zastępstwo
-            </Button>
-        ) : null,
-    }));
-
     return (
         <div className="p-2 sm:p-8">
             <h1 className="text-3xl font-bold mb-6">Zastępstwa</h1>
-            {isLoading ? (
-                <p>Pobieranie danych...</p>
-            ) : loadingError ? (
-                    <p className="text-red-500">{loadingError}</p>
-            ) : (
-                <>
-                    <form onSubmit={handleSubmitSittingRequest}>
-                        <Label htmlFor="sittingPlayerName" className="mb-2 block text-lg font-semibold">
-                            Poproś o zastępstwo na koncie
-                        </Label>
-                        <div className="mb-5 flex flex-col sm:flex-row sm:items-center gap-2">
-                            <Input
-                                id="sittingPlayerName"
-                                value={sitterName}
-                                onChange={(e) => setSitterName(e.target.value)}
-                                placeholder="Wpisz nick gracza"
-                                className="w-full sm:w-60"
-                            />
-                            <Select
-                                value={world}
-                                onValueChange={(value) => setWorld(value)}
-                            >
-                                <SelectTrigger className="w-full sm:w-[100px]">
-                                    <SelectValue placeholder="Świat" />
-                                </SelectTrigger>
-                                <SelectContent>
-                                    <SelectGroup>
-                                        <SelectItem value="pl200">pl200</SelectItem>
-                                        <SelectItem value="pl199">pl199</SelectItem>
-                                        <SelectItem value="pl198">pl198</SelectItem>
-                                    </SelectGroup>
-                                </SelectContent>
-                            </Select>
-                            <Button type="submit" >
-                                {isSubmitting ? "Wysyłanie..." : "Nadaj zastępstwo"}
-                            </Button>
-                            {formError && <p className="text-red-500">{formError}</p>}
-                        </div>
-                    </form>
-                    <Label htmlFor="sittingRequests" className="mb-2 block text-lg font-semibold">
-                        Twoje prośby o zastępstwo
-                    </Label>
-                    <Table id="sittingRequests" className="mb-5">
-                        <TableHeader>
-                            <TableRow>
-                                <TableHead>Nick gracza</TableHead>
-                                <TableHead>Świat</TableHead>
-                                <TableHead>Akcje</TableHead>
+            <form onSubmit={handleSubmitSittingRequest}>
+                <Label htmlFor="sittingPlayerName" className="mb-2 block text-lg font-semibold">
+                    Poproś o zastępstwo na koncie
+                </Label>
+                <div className="mb-5 flex flex-col sm:flex-row sm:items-center gap-2">
+                    <Input
+                        id="sittingPlayerName"
+                        value={sitterName}
+                        onChange={(e) => setSitterName(e.target.value)}
+                        placeholder="Wpisz nick gracza"
+                        className="w-full sm:w-60"
+                    />
+                    <Select
+                        value={world}
+                        onValueChange={(value) => setWorld(value)}
+                    >
+                        <SelectTrigger className="w-full sm:w-[100px]">
+                            <SelectValue placeholder="Świat" />
+                        </SelectTrigger>
+                        <SelectContent>
+                            <SelectGroup>
+                                <SelectItem value="pl200">pl200</SelectItem>
+                                <SelectItem value="pl199">pl199</SelectItem>
+                                <SelectItem value="pl198">pl198</SelectItem>
+                            </SelectGroup>
+                        </SelectContent>
+                    </Select>
+                    <Button type="submit" variant="secondary">
+                        {isSubmitting ? "Wysyłanie..." : "Nadaj zastępstwo"}
+                    </Button>
+                    {formError && <p className="text-red-500">{formError}</p>}
+                </div>
+            </form>
+            <Label htmlFor="sittingRequests" className="mb-2 block text-lg font-semibold">
+                Twoje prośby o zastępstwo
+            </Label>
+            <Table id="sittingRequests" className="mb-5">
+                <TableHeader>
+                    <TableRow>
+                        <TableHead>Nick gracza</TableHead>
+                        <TableHead>Świat</TableHead>
+                        <TableHead>Akcje</TableHead>
+                    </TableRow>
+                </TableHeader>
+                <TableBody>
+                    {isLoadingSitters ? (
+                        <TableRow>
+                            <TableCell colSpan={3} className="h-24 text-center">
+                                Pobieranie danych...
+                            </TableCell>
+                        </TableRow>
+                    ) : yourRequests.length ? (
+                        yourRequests.map((sitting) => (
+                            <TableRow key={sitting.id}>
+                                <TableCell>{sitting.sitterName}</TableCell>
+                                <TableCell>{sitting.world}</TableCell>
+                                <TableCell>
+                                    {sitting.status === AccountSittingStatus.PENDING ? (
+                                        <Button onClick={() => handleCancelSittingRequest(sitting.id)} variant="destructive">
+                                            Anuluj zapytanie
+                                        </Button>
+                                    ) : sitting.status === AccountSittingStatus.ACTIVE ? (
+                                        <Button onClick={() => handleEndSitting(sitting.id)} variant="destructive">
+                                            Zakończ zastępstwo
+                                        </Button>
+                                    ) : null}
+                                </TableCell>
                             </TableRow>
-                        </TableHeader>
-                        <TableBody>
-                            {rowsYourRequests.length > 0 ? (
-                                rowsYourRequests.map((row, index) => (
-                                    <TableRow key={index}>
-                                        <TableCell>{row.playerName}</TableCell>
-                                        <TableCell>{row.world}</TableCell>
-                                        <TableCell>{row.actions}</TableCell>
-                                    </TableRow>
-                                ))
-                            ) : (
-                                <TableRow>
-                                    <TableCell colSpan={3} className="text-center">Brak próśb o zastępstwo</TableCell>
-                                </TableRow>
-                            )}
-                        </TableBody>
-                    </Table>
-                </>
-            )}
+                        ))
+                    ) : (
+                        <TableRow>
+                            <TableCell colSpan={3} className="h-24 text-center">
+                                Brak próśb o zastępstwo.
+                                {loadingError && <p className="text-red-500">{loadingError}</p>}
+                            </TableCell>
+                        </TableRow>
+                    )}
+                </TableBody>
+            </Table>
             <Label htmlFor="activeRequests" className="mb-2 block text-lg font-semibold">
                 Otrzymane zastępstwa
             </Label>
@@ -248,17 +228,41 @@ export default function Sitting() {
                     </TableRow>
                 </TableHeader>
                 <TableBody>
-                    {rowsReceivedRequests.length > 0 ? (
-                        rowsReceivedRequests.map((row, index) => (
-                            <TableRow key={index}>
-                                <TableCell>{row.playerName}</TableCell>
-                                <TableCell>{row.world}</TableCell>
-                                <TableCell>{row.actions}</TableCell>
+                    {isLoadingSittings ? (
+                        <TableRow>
+                            <TableCell colSpan={3} className="h-24 text-center">
+                                Pobieranie danych...
+                            </TableCell>
+                        </TableRow>
+                    ) : receivedRequests.length ? (
+                        receivedRequests.map((sitting) => (
+                            <TableRow key={sitting.id}>
+                                <TableCell>{sitting.playerName}</TableCell>
+                                <TableCell>{sitting.world}</TableCell>
+                                <TableCell>
+                                    {sitting.status === AccountSittingStatus.PENDING ? (
+                                        <div className="flex gap-2">
+                                            <Button onClick={() => handleRejectSittingRequest(sitting.id)} variant="destructive">
+                                                Odrzuć
+                                            </Button>
+                                            <Button onClick={() => handleAcceptSittingRequest(sitting.id)} variant="secondary">
+                                                Akceptuj
+                                            </Button>
+                                        </div>
+                                    ) : sitting.status === AccountSittingStatus.ACTIVE ? (
+                                        <Button onClick={() => handleEndSitting(sitting.id)} variant="destructive">
+                                            Zakończ zastępstwo
+                                        </Button>
+                                    ) : null}
+                                </TableCell>
                             </TableRow>
                         ))
                     ) : (
                         <TableRow>
-                            <TableCell colSpan={3} className="text-center">Brak zastępstw</TableCell>
+                            <TableCell colSpan={3} className="h-24 text-center">
+                                Brak otrzymanych zastępstw.
+                                {loadingError && <p className="text-red-500">{loadingError}</p>}
+                            </TableCell>
                         </TableRow>
                     )}
                 </TableBody>
