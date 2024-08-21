@@ -3,8 +3,8 @@ import {getTokenFromCookies} from "@/lib/utils";
 
 const api = axios.create({
    // baseURL: process.env.NEXT_PUBLIC_API_BASE_URL,
-    baseURL: 'https://plemionarozpiski.pl/api'
-    //baseURL: 'http://localhost:8080/api'
+   //  baseURL: 'https://plemionarozpiski.pl/api'
+    baseURL: 'http://localhost:8080/api'
 });
 
 api.interceptors.request.use(
@@ -85,6 +85,14 @@ export const getPlayerLinks = async (playerId: string) => {
 
 export const getSourceVillagesByType = async (playerId: string, type: string) => {
     const response = await api.get(`commands/player/${playerId}/sourceVillages?type=${type}`)
+    return response.data;
+}
+
+export const setAccountSitter = async (playerId: string, sitterName: string, world: string) => {
+    const response = await api.post(`sittings/owner/${playerId}`, {
+        "sitterName": sitterName,
+        "world": world
+    })
     return response.data;
 }
 

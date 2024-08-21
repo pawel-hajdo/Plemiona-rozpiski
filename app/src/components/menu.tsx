@@ -12,6 +12,7 @@ const navigation = [
     { name: 'Aktualne', href: '/' },
     { name: 'Usunięte', href: '/deleted' },
     { name: 'Inne', href: '/other'},
+    { name: 'Zastępstwa', href: '/sitting'},
     { name: 'Ustawienia', href: '/settings' }
 ];
 
