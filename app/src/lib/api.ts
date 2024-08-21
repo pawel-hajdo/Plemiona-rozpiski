@@ -84,15 +84,30 @@ export const getPlayerLinks = async (playerId: string) => {
 };
 
 export const getSourceVillagesByType = async (playerId: string, type: string) => {
-    const response = await api.get(`commands/player/${playerId}/sourceVillages?type=${type}`)
+    const response = await api.get(`/commands/player/${playerId}/sourceVillages?type=${type}`)
     return response.data;
 }
 
 export const setAccountSitter = async (playerId: string, sitterName: string, world: string) => {
-    const response = await api.post(`sittings/owner/${playerId}`, {
+    const response = await api.post(`/sittings/owner/${playerId}`, {
         "sitterName": sitterName,
         "world": world
     })
+    return response.data;
+}
+
+export const getAccountSitters = async (playerId: string) => {
+    const response = await api.get(`/sittings/owner/${playerId}`);
+    return response.data;
+}
+
+export const cancelSittingRequest = async (playerId: string, sittingId: number) => {
+    const response = await api.put(`/sittings/${sittingId}/cancel/owner/${playerId}`);
+    return response.data;
+}
+
+export const endSitting = async (playerId: string, sittingId: number) => {
+    const response = await api.delete(`/sittings/${sittingId}/player/${playerId}`);
     return response.data;
 }
 

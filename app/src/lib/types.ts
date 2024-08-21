@@ -24,3 +24,23 @@ interface NobleData {
     source: string;
     count: number;
 }
+
+export enum AccountSittingStatus {
+    PENDING = "PENDING",
+    ACTIVE = "ACTIVE",
+    REJECTED = "REJECTED",
+    CANCELED = "CANCELED",
+    ENDED = "ENDED"
+}
+
+interface Sitting {
+    id: number,
+    playerId: number,
+    playerName: string,
+    sitterId: number,
+    sitterName: string,
+    world: string,
+    startDate: string,
+    endDate: string,
+    status: AccountSittingStatus
+}
