@@ -14,23 +14,45 @@ public interface CommandRepository extends JpaRepository<Command,Long> {
             SELECT new plemiona.rozpiski.command.CommandResponse(c.id, c.commandNumberId, c.minTime, c.maxTime, c.source, c.sourceId, c.target, c.targetId, c.type, c.commandCount, c.playerId, c.world)
             FROM Command c WHERE c.playerId = :playerId AND c.deleted = false ORDER BY c.maxTime ASC
             """)
-    Page<CommandResponse> findByPlayerIdAndDeletedFalseOrderByMaxTimeAsc(@Param("playerId") String playerId, Pageable pageable);
+    Page<CommandResponse> findByPlayerIdAndDeletedFalseOrderByMaxTimeAsc(@Param("playerId") Integer playerId, Pageable pageable);
     @Query("""
             SELECT new plemiona.rozpiski.command.CommandResponse(c.id, c.commandNumberId, c.minTime, c.maxTime, c.source, c.sourceId, c.target, c.targetId, c.type, c.commandCount, c.playerId, c.world)
             FROM Command c WHERE c.playerId = :playerId AND c.deleted = true ORDER BY c.maxTime DESC
             """)
-    Page<CommandResponse> findByPlayerIdAndDeletedTrueOrderByMaxTimeDesc(@Param("playerId") String playerId, Pageable pageable);
+    Page<CommandResponse> findByPlayerIdAndDeletedTrueOrderByMaxTimeDesc(@Param("playerId") Integer playerId, Pageable pageable);
 
     @Query("""
     SELECT new plemiona.rozpiski.command.SourceVillagesResponse(c.source, COUNT(c))
     FROM Command c
-    WHERE c.playerId = :playerId 
-      AND c.type LIKE %:type% 
+    WHERE c.playerId = :playerId
+      AND c.type LIKE %:type%
     GROUP BY c.source
     ORDER BY c.source ASC
     """)
     List<SourceVillagesResponse> findDistinctSourceWithCountByPlayerIdAndTypeLike(
-            @Param("playerId") String playerId,
+            @Param("playerId") Integer playerId,
             @Param("type") String type
     );
+    @Query("""
+    SELECT new plemiona.rozpiski.command.CommandResponse(c.id, c.commandNumberId, c.minTime, c.maxTime, c.source, c.sourceId, c.target, c.targetId, c.type, c.commandCount, c.playerId, c.world)
+    FROM Command c
+    WHERE c.playerId = :playerId AND c.world IN :worlds AND c.deleted = false
+    ORDER BY c.maxTime ASC
+""")
+    List<CommandResponse> findCommandsByPlayerIdAndWorlds(
+            @Param("playerId") Integer playerId,
+            @Param("worlds") List<String> worlds
+    );
+
+    @Query("""
+    SELECT new plemiona.rozpiski.command.CommandResponse(c.id, c.commandNumberId, c.minTime, c.maxTime, c.source, c.sourceId, c.target, c.targetId, c.type, c.commandCount, c.playerId, c.world)
+    FROM Command c
+    WHERE c.playerId = :playerId AND c.world IN :worlds AND c.deleted = true
+    ORDER BY c.maxTime ASC
+""")
+    List<CommandResponse> findDeletedCommandsByPlayerIdAndWorlds(
+            @Param("playerId") Integer playerId,
+            @Param("worlds") List<String> worlds
+    );
+
 }
