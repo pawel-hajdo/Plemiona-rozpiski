@@ -7,6 +7,7 @@ import {Label} from "@/components/ui/label";
 import * as React from "react";
 import {Button} from "@/components/ui/button";
 import {Accordion, AccordionContent, AccordionItem, AccordionTrigger} from "@/components/ui/accordion";
+import {NobleData} from "@/lib/types";
 
 type Accumulator = Record<string, number>;
 type ButtonType = 'nobles' | 'fakeNobles' | 'defNobles' | 'allNobles' | 'offs';

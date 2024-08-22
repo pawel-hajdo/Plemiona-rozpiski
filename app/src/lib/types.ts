@@ -1,4 +1,4 @@
-interface Command {
+export interface Command {
     id: number;
     commandNumberId: number;
     minTime: string;
@@ -16,11 +16,11 @@ interface Command {
     deleted: boolean;
 }
 
-type ColumnNames = {
+export type ColumnNames = {
     [K in keyof Command]?: string;
 }
 
-interface NobleData {
+export interface NobleData {
     source: string;
     count: number;
 }
@@ -33,7 +33,7 @@ export enum AccountSittingStatus {
     ENDED = "ENDED"
 }
 
-interface Sitting {
+export interface Sitting {
     id: number,
     playerId: number,
     playerName: string,

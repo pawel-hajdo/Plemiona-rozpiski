@@ -46,7 +46,7 @@ import {useEffect, useState} from "react";
 import {
     loadColumnVisibility,
     loadLinksToOpenCount,
-    loadPageSize,
+    loadPageSize, loadSortingPreference,
     saveColumnVisibility,
     savePageSize
 } from "@/lib/localStorage";
@@ -54,10 +54,11 @@ import {formatDate, fuzzyFilter, generateLink, getPlayerId, isButtonDisabled} fr
 import PaginationControls from "@/components/paginationControlrs";
 import TableContainer from "@/components/tableContainer";
 import { DateTime } from 'luxon';
+import {ColumnNames, Command} from "@/lib/types";
 
 export function CommandsTable({deleted} :any) {
-    const [commands, setCommands] = useState([]);
-    const [sorting, setSorting] = React.useState<SortingState>([])
+    const [commands, setCommands] = useState<Command[]>([]);
+    const [sorting, setSorting] = React.useState<SortingState>([loadSortingPreference()])
     const [columnFilters, setColumnFilters] = React.useState<ColumnFiltersState>([])
     const [columnVisibility, setColumnVisibility] = React.useState<VisibilityState>({});
     const [rowSelection, setRowSelection] = React.useState({})
@@ -337,7 +338,7 @@ export function CommandsTable({deleted} :any) {
             header: columnNames.link,
             cell: ({ row }) => {
                 const commandPlayerId = row.original.playerId;
-                const buttonName = (commandPlayerId == playerId) ? columnNames.link : "ZAST";
+                const buttonName = (commandPlayerId == playerId) ? columnNames.link : "Zast";
                 const link = generateLink(row);
                 return (
                     <a

@@ -18,8 +18,9 @@ import {getPlayerId} from "@/lib/utils";
 import {AxiosError} from "axios";
 import {AccountSittingStatus} from "@/lib/types";
 import {Table, TableBody, TableCell, TableHead, TableHeader, TableRow} from "@/components/ui/table";
+import { Sitting } from "@/lib/types";
 
-export default function Sitting() {
+export default function Sittings() {
     const [sitterName, setSitterName] = useState("");
     const [world, setWorld] = useState("");
     const [loadingError, setLoadingError] = useState("")
@@ -66,16 +67,16 @@ export default function Sitting() {
             if (error instanceof AxiosError) {
                 switch (error.response?.status) {
                     case 409:
-                        setLoadingError("Użytkownik ma już ustawionego zastępce na tym świecie.");
+                        setFormError("Aktywny zastępca lub zapytanie o zastępstwo na tym świecie");
                         break;
                     case 400:
-                        setLoadingError("Nie ma takiego gracza");
+                        setFormError("Nie ma takiego gracza.");
                         break;
                     default:
-                        setLoadingError("Wystąpił błąd. Proszę spróbować ponownie.");
+                        setFormError("Wystąpił błąd. Proszę spróbować ponownie.");
                 }
             } else {
-                setError("Wystąpił nieoczekiwany błąd.");
+                setFormError("Wystąpił nieoczekiwany błąd.");
             }
         } finally {
             setIsSubmitting(false);
