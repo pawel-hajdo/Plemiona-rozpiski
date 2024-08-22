@@ -126,4 +126,14 @@ export const endSitting = async (playerId: string, sittingId: number) => {
     return response.data;
 }
 
+export const getSittingsCommands = async (playerId: string) => {
+    const response = await api.get(`/commands/sitter/${playerId}`);
+    return response.data;
+}
+
+export const getSittingsDeletedCommands = async (playerId: string) => {
+    const response = await api.get(`/commands/sitter/${playerId}/deleted`);
+    return response.data;
+}
+
 export default api;

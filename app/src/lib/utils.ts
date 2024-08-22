@@ -36,8 +36,13 @@ export function fuzzyFilter (row: any, columnId: any, value: any, addMeta: any) 
 }
 
 export const generateLink = (row: any) => {
-  const { sourceId, targetId, type, world } = row.original;
+  const { sourceId, targetId, type, world, playerId } = row.original;
+  const accountPlayerId = getPlayerId();
   let link = `https://${world}.plemiona.pl/game.php?village=${sourceId}&screen=place&target=${targetId}`;
+
+  if(accountPlayerId != playerId){
+    link += `&t=${accountPlayerId}`;
+  }
 
   const catapultMatch = type.match(/Katapulty-(\d+)/);
   if (catapultMatch) {

@@ -35,7 +35,13 @@ import {
     SelectTrigger,
     SelectValue,
 } from "@/components/ui/select"
-import {getDeletedCommands, getPlayerCommands, restoreCommands, softDeleteCommands} from "@/lib/api";
+import {
+    getDeletedCommands,
+    getPlayerCommands, getSittingsCommands,
+    getSittingsDeletedCommands,
+    restoreCommands,
+    softDeleteCommands
+} from "@/lib/api";
 import {useEffect, useState} from "react";
 import {
     loadColumnVisibility,
@@ -69,13 +75,18 @@ export function CommandsTable({deleted} :any) {
     useEffect(() => {
         const fetchCommandsData = async () => {
             try {
-                let data;
+                let playerData;
+                let sitterData;
+
                 if(deleted) {
-                    data = await getDeletedCommands(playerId);
+                    playerData = await getDeletedCommands(playerId);
+                    sitterData = await getSittingsDeletedCommands(playerId);
                 } else {
-                    data = await getPlayerCommands(playerId);
+                    playerData = await getPlayerCommands(playerId);
+                    sitterData = await getSittingsCommands(playerId);
                 }
-                setCommands(data);
+                const combinedData = [...playerData, ...sitterData];
+                setCommands(combinedData);
                 setIsLoading(false);
             } catch (error) {
                 setError("Pobranie komend nie powiodło się");
@@ -325,6 +336,8 @@ export function CommandsTable({deleted} :any) {
             accessorKey: "link",
             header: columnNames.link,
             cell: ({ row }) => {
+                const commandPlayerId = row.original.playerId;
+                const buttonName = (commandPlayerId == playerId) ? columnNames.link : "ZAST";
                 const link = generateLink(row);
                 return (
                     <a
@@ -340,7 +353,7 @@ export function CommandsTable({deleted} :any) {
                                 backgroundColor: isButtonDisabled(row) || clickedRows[row.id] ? 'gray' : 'none',
                             }}
                         >
-                            {columnNames.link}
+                            {buttonName}
                         </Button>
                     </a>
                 );
