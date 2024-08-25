@@ -41,7 +41,7 @@ export const generateLink = (row: any) => {
   let link = `https://${world}.plemiona.pl/game.php?village=${sourceId}&screen=place&target=${targetId}`;
 
   if(accountPlayerId != playerId){
-    link += `&t=${accountPlayerId}`;
+    link += `&t=${playerId}`;
   }
 
   const catapultMatch = type.match(/Katapulty-(\d+)/);
