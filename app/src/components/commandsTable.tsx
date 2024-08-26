@@ -331,7 +331,7 @@ export function CommandsTable({deleted} :any) {
         {
             accessorKey: "commandCount",
             header: columnNames.commandCount,
-            cell: ({ row }) => <div>{row.getValue("commandCount")}</div>,
+            cell: ({ row }) => <div>{row.original.attackSequenceNumber + " z " + row.original.totalCommandsFromSource}</div>,
         },
         {
             accessorKey: "link",

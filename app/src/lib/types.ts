@@ -12,8 +12,9 @@ export interface Command {
     world: string;
     link: string;
     attackTime: string | null;
-    commandCount: string
     deleted: boolean;
+    attackSequenceNumber: number;
+    totalCommandsFromSource: number;
 }
 
 export type ColumnNames = {
