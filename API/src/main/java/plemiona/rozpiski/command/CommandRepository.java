@@ -11,12 +11,12 @@ import java.util.List;
 public interface CommandRepository extends JpaRepository<Command,Long> {
     List<Command> findAllByDeletedTrueAndIdIn(List<Long> commandsIds);
     @Query("""
-            SELECT new plemiona.rozpiski.command.CommandResponse(c.id, c.commandNumberId, c.minTime, c.maxTime, c.source, c.sourceId, c.target, c.targetId, c.type, c.commandCount, c.playerId, c.world)
-            FROM Command c WHERE c.playerId = :playerId AND c.deleted = false ORDER BY c.maxTime ASC
+            SELECT new plemiona.rozpiski.command.CommandResponse(c.id, c.commandNumberId, c.minTime, c.maxTime, c.source, c.sourceId, c.target, c.targetId, c.type, c.playerId, c.world, c.attackSequenceNumber, c.totalCommandsFromSource)
+            FROM Command c WHERE c.playerId = :playerId AND c.deleted = false ORDER BY c.maxTime ASC, c.attackSequenceNumber asc
             """)
     Page<CommandResponse> findByPlayerIdAndDeletedFalseOrderByMaxTimeAsc(@Param("playerId") Integer playerId, Pageable pageable);
     @Query("""
-            SELECT new plemiona.rozpiski.command.CommandResponse(c.id, c.commandNumberId, c.minTime, c.maxTime, c.source, c.sourceId, c.target, c.targetId, c.type, c.commandCount, c.playerId, c.world)
+            SELECT new plemiona.rozpiski.command.CommandResponse(c.id, c.commandNumberId, c.minTime, c.maxTime, c.source, c.sourceId, c.target, c.targetId, c.type, c.playerId, c.world, c.attackSequenceNumber, c.totalCommandsFromSource)
             FROM Command c WHERE c.playerId = :playerId AND c.deleted = true ORDER BY c.maxTime DESC
             """)
     Page<CommandResponse> findByPlayerIdAndDeletedTrueOrderByMaxTimeDesc(@Param("playerId") Integer playerId, Pageable pageable);
@@ -34,10 +34,10 @@ public interface CommandRepository extends JpaRepository<Command,Long> {
             @Param("type") String type
     );
     @Query("""
-    SELECT new plemiona.rozpiski.command.CommandResponse(c.id, c.commandNumberId, c.minTime, c.maxTime, c.source, c.sourceId, c.target, c.targetId, c.type, c.commandCount, c.playerId, c.world)
+    SELECT new plemiona.rozpiski.command.CommandResponse(c.id, c.commandNumberId, c.minTime, c.maxTime, c.source, c.sourceId, c.target, c.targetId, c.type, c.playerId, c.world, c.attackSequenceNumber, c.totalCommandsFromSource)
     FROM Command c
     WHERE c.playerId = :playerId AND c.world IN :worlds AND c.deleted = false
-    ORDER BY c.maxTime ASC
+    ORDER BY c.maxTime ASC, c.attackSequenceNumber asc
 """)
     List<CommandResponse> findCommandsByPlayerIdAndWorlds(
             @Param("playerId") Integer playerId,
@@ -45,10 +45,10 @@ public interface CommandRepository extends JpaRepository<Command,Long> {
     );
 
     @Query("""
-    SELECT new plemiona.rozpiski.command.CommandResponse(c.id, c.commandNumberId, c.minTime, c.maxTime, c.source, c.sourceId, c.target, c.targetId, c.type, c.commandCount, c.playerId, c.world)
+    SELECT new plemiona.rozpiski.command.CommandResponse(c.id, c.commandNumberId, c.minTime, c.maxTime, c.source, c.sourceId, c.target, c.targetId, c.type, c.playerId, c.world, c.attackSequenceNumber, c.totalCommandsFromSource)
     FROM Command c
     WHERE c.playerId = :playerId AND c.world IN :worlds AND c.deleted = true
-    ORDER BY c.maxTime ASC
+    ORDER BY c.maxTime ASC, c.attackSequenceNumber asc
 """)
     List<CommandResponse> findDeletedCommandsByPlayerIdAndWorlds(
             @Param("playerId") Integer playerId,

@@ -41,9 +41,6 @@ public class Command {
     @Column(name = "command_type")
     private String type;
 
-    @Column(name = "command_count")
-    private String commandCount;
-
     @Column(name = "command_player_id")
     private String playerId;
 
@@ -61,4 +58,10 @@ public class Command {
 
     @Column(name = "operation_name")
     private String operation_name;
+
+    @Column(name = "attack_sequence_number")
+    private Integer attackSequenceNumber;
+
+    @Column(name = "total_commands_from_source")
+    private Integer totalCommandsFromSource;
 }
