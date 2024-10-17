@@ -18,7 +18,15 @@ export interface Command {
 }
 
 export type ColumnNames = {
-    [K in keyof Command]?: string;
+    commandNumberId: string,
+    minTime: string,
+    maxTime: string,
+    source: string,
+    target: string,
+    type: string,
+    commandCount: string,
+    link: string,
+    world: string,
 }
 
 export interface NobleData {

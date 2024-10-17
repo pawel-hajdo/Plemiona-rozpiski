@@ -159,9 +159,7 @@ export default function Sittings() {
                         </SelectTrigger>
                         <SelectContent>
                             <SelectGroup>
-                                <SelectItem value="pl200">pl200</SelectItem>
-                                <SelectItem value="pl199">pl199</SelectItem>
-                                <SelectItem value="pl198">pl198</SelectItem>
+                                <SelectItem value="pl206">pl206</SelectItem>
                             </SelectGroup>
                         </SelectContent>
                     </Select>
