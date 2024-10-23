@@ -28,4 +28,9 @@ public class UserController {
     public void changePassword(@RequestBody ChangePasswordRequest request){
         userService.changePassword(request);
     }
+
+    @PostMapping("/reset-password")
+    public void resetPassword(@RequestBody RegisterRequest request){
+        userService.resetPassword(request);
+    }
 }

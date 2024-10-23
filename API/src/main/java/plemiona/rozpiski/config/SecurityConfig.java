@@ -33,6 +33,7 @@ public class SecurityConfig {
                         authorize
                                 .requestMatchers(HttpMethod.POST,"/api/users").permitAll()
                                 .requestMatchers(HttpMethod.POST,"/api/users/auth").permitAll()
+                                .requestMatchers(HttpMethod.POST, "/api/users/reset-password").permitAll()
                                // .requestMatchers("/v3/api-docs/**").permitAll()
                                // .requestMatchers("/swagger-ui/**").permitAll()
                                 .anyRequest().authenticated())

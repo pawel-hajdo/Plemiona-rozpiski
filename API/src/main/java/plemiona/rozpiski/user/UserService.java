@@ -85,6 +85,38 @@ public class UserService {
         return new AuthenticationResponse(jwtToken);
     }
 
+    public void changePassword(ChangePasswordRequest request) {
+        var user = userRepository.findByName(request.name())
+                .orElseThrow(() -> new UserNotFoundException("User not found"));
+
+        authenticationManager.authenticate(
+                new UsernamePasswordAuthenticationToken(request.name(), request.oldPassword())
+        );
+
+        String hashedPassword = passwordEncoder.encode(request.newPassword());
+        user.setPassword(hashedPassword);
+
+        userRepository.save(user);
+        saveToLogs(user.getId(), LogType.USER_UPDATE);
+    }
+
+    public void resetPassword(RegisterRequest request) {
+        loadPlayersFromApi(request.world());
+        var playerId = getPlayerId(request.name());
+
+        User user = userRepository.findByPlayerId(playerId).orElseThrow(() -> new PlayerDoesNotExistException("User not found"));
+
+        if(!checkPlayer(playerId, request.code(), request.world())){
+            throw new UserCodeNotMatchingException("Provided code not matching code on user profile");
+        }
+
+        String hashedPassword = passwordEncoder.encode(request.password());
+
+        user.setPassword(hashedPassword);
+        userRepository.save(user);
+        saveToLogs(user.getId(), LogType.PASSWORD_RESET);
+    }
+
     private boolean checkPlayer(Integer playerId, String code, String world){
         String profileUrl = String.format("https://%s.plemiona.pl/guest.php?screen=info_player&id=%d", world, playerId);
         String profileResponse;
@@ -134,21 +166,6 @@ public class UserService {
         } catch (URISyntaxException e) {
             e.printStackTrace();
         }
-    }
-
-    public void changePassword(ChangePasswordRequest request) {
-        var user = userRepository.findByName(request.name())
-                .orElseThrow(() -> new UserNotFoundException("User not found"));
-
-        authenticationManager.authenticate(
-                new UsernamePasswordAuthenticationToken(request.name(), request.oldPassword())
-        );
-
-        String hashedPassword = passwordEncoder.encode(request.newPassword());
-        user.setPassword(hashedPassword);
-
-        userRepository.save(user);
-        saveToLogs(user.getId(), LogType.USER_UPDATE);
     }
 
     private void saveToLogs(Long userId, LogType logType) {
