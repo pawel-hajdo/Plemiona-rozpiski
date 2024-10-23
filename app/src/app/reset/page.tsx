@@ -4,7 +4,7 @@ import {FormEvent, useEffect, useState} from "react";
 import {Input} from "@/components/ui/input";
 import {Button} from "@/components/ui/button";
 import {Label} from "@/components/ui/label";
-import {registerUser} from "@/lib/api";
+import {resetPassword} from "@/lib/api";
 import {useRouter} from "next/navigation";
 import Link from "next/link";
 import {EyeClosedIcon, EyeOpenIcon} from "@radix-ui/react-icons";
@@ -28,6 +28,7 @@ export default function Register() {
         setCode(generatedCode);
     }, []);
 
+
     const handleSubmit = async (e: FormEvent<HTMLFormElement>) => {
         e.preventDefault();
 
@@ -40,17 +41,13 @@ export default function Register() {
         setIsSubmitting(true);
 
         try {
-            const responseData = await registerUser(userLogin, userPassword, code, world);
-            document.cookie = `token=${responseData.token}; path=/; max-age=21600`;
-            router.push("/");
+            await resetPassword(userLogin, userPassword, code, world);
+            router.push("/login");
         } catch (error) {
             if (error instanceof AxiosError) {
                 switch (error.response?.status) {
                     case 404:
                         setError("Nie ma takiego gracza")
-                        break;
-                    case 409:
-                        setError("Użytkownik już istnieje.");
                         break;
                     case 400:
                         setError("Kod na profilu jest niepoprawny lub nie ma takiego nicku.");
@@ -76,11 +73,11 @@ export default function Register() {
                 onSubmit={handleSubmit}
                 className="flex flex-col gap-4 bg-white dark:bg-gray-800 p-2 sm:p-8 rounded-lg shadow-md w-full max-w-md"
             >
-                <h1 className="text-2xl font-semibold mt-2 mb-4 dark:text-gray-200">Rejestracja</h1>
+                <h1 className="text-2xl font-semibold mt-2 mb-4 dark:text-gray-200">Resetowanie hasła</h1>
                 <div className="bg-gray-100 p-4 rounded-lg text-sm text-gray-600 mb-4">
-                    <p>Użyj swojego konta w Plemionach, aby się zarejestrować. Aby to zrobić, wklej gdziekolwiek w swoim profilu następujący kod:</p>
+                    <p>Aby zresetować hasło, tak samo jak przy rejestracji wklej gdziekolwiek w swoim profilu następujący kod:</p>
                     <p className="mt-2">{code}</p>
-                    <p className="mt-2">Gdy już się zarejestrujesz, możesz usunąć kod z profilu.</p>
+                    <p className="mt-2">Po zresetowaniu hasła możesz usunąć kod z profilu.</p>
                 </div>
                 <Label htmlFor="world" className="dark:text-gray-200">Wybierz świat</Label>
                 <Select
@@ -106,7 +103,7 @@ export default function Register() {
                     className="p-3 border border-gray-300 rounded-md"
                     autoComplete="username"
                 />
-                <Label htmlFor="password" className="dark:text-gray-200">Hasło</Label>
+                <Label htmlFor="password" className="dark:text-gray-200">Nowe hasło</Label>
                 <div className="relative">
                     <Input
                         type={showPassword ? "text" : "password"}
@@ -126,9 +123,9 @@ export default function Register() {
                     </button>
                 </div>
                 {error && <p className="text-red-500">{error}</p>}
-                <Button type="submit" disabled={isSubmitting}>{isSubmitting ? "Wysyłanie..." : "Zarejestruj się"}</Button>
+                <Button type="submit" disabled={isSubmitting}>{isSubmitting ? "Wysyłanie..." : "Zresetuj hasło"}</Button>
                 <div className="mt-4 text-center">
-                    <Label htmlFor="new" className="text-gray-600 dark:text-gray-200">Masz już konto?</Label>
+                    <Label htmlFor="new" className="text-gray-600 dark:text-gray-200">Powrót do logowania</Label>
                     <Link href="/login" className="text-blue-500 hover:underline ml-2">Zaloguj się</Link>
                 </div>
             </form>

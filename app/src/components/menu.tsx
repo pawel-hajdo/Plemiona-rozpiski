@@ -27,7 +27,7 @@ const Menu = () => {
     }, [getPlayerName()]);
 
     const pathname = usePathname();
-    const hideMenu = pathname === '/login' || pathname === '/register';
+    const hideMenu = pathname === '/login' || pathname === '/register' || pathname === '/reset';
     if (hideMenu) return null;
 
     return (

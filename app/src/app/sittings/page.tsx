@@ -66,6 +66,9 @@ export default function Sittings() {
         } catch (error) {
             if (error instanceof AxiosError) {
                 switch (error.response?.status) {
+                    case 404:
+                        setFormError("Nie ma takiego gracza")
+                        break;
                     case 409:
                         setFormError("Aktywny zastępca lub zapytanie o zastępstwo na tym świecie");
                         break;

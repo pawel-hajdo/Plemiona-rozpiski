@@ -8,6 +8,7 @@ import {authUser} from "@/lib/api";
 import {useRouter} from "next/navigation";
 import Link from "next/link";
 import {EyeClosedIcon, EyeOpenIcon} from "@radix-ui/react-icons";
+import {AxiosError} from "axios";
 
 export default function Login() {
     const [userLogin, setUserLogin] = useState("")
@@ -33,7 +34,20 @@ export default function Login() {
             document.cookie = `token=${responseData.token}; path=/; max-age=21600`;
             router.push("/");
         } catch (error) {
-            setError("Błąd logowania. \n Sprawdź dane i spróbuj ponownie.");
+            if (error instanceof AxiosError) {
+                switch (error.response?.status) {
+                    case 404:
+                        setError("Błędny login lub hasło")
+                        break;
+                    case 400:
+                        setError("Błędny login lub hasło")
+                        break;
+                    default:
+                        setError("Wystąpił błąd. Proszę spróbować ponownie.");
+                }
+            } else {
+                setError("Wystąpił nieoczekiwany błąd.");
+            }
         } finally {
             setIsSubmitting(false);
         }
@@ -82,6 +96,10 @@ export default function Login() {
                 {error && <p className="text-red-500">{error}</p>}
                 <Button type="submit" disabled={isSubmitting}>{isSubmitting ? "Wysyłanie..." : "Zaloguj się"}</Button>
                 <div className="mt-4 text-center">
+                    <Label htmlFor="reset" className="text-gray-600 dark:text-gray-200">Zapomniałeś hasła?</Label>
+                    <Link href="/reset" className="text-blue-500 hover:underline ml-2">Zresetuj hasło</Link>
+                </div>
+                <div className="text-center">
                     <Label htmlFor="new" className="text-gray-600 dark:text-gray-200">Nie masz konta?</Label>
                     <Link href="/register" className="text-blue-500 hover:underline ml-2">Zarejestruj się</Link>
                 </div>

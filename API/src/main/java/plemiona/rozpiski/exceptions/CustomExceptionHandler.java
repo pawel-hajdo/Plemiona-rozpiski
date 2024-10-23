@@ -48,7 +48,7 @@ public class CustomExceptionHandler {
     @ExceptionHandler(PlayerDoesNotExistException.class)
     @ResponseStatus(HttpStatus.BAD_REQUEST)
     public ResponseEntity<String> handlePlayerDoesNotExistException(Exception ex) {
-        return new ResponseEntity<>(ex.getMessage(), HttpStatus.BAD_REQUEST);
+        return new ResponseEntity<>(ex.getMessage(), HttpStatus.NOT_FOUND);
     }
 
     @ExceptionHandler(ActiveSittingAlreadyExistsException.class)

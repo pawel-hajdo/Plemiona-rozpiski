@@ -3,7 +3,7 @@ import type { NextRequest } from 'next/server';
 import {isExpired} from "react-jwt";
 import cookie from 'cookie'
 
-const publicRoutes = ['/login', '/register'];
+const publicRoutes = ['/login', '/register', '/reset'];
 
 export function middleware(req: NextRequest) {
     const cookies = cookie.parse(req.headers.get('cookie') || '');

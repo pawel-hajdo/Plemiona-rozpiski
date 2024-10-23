@@ -60,3 +60,13 @@ export const isButtonDisabled = (row: any) => {
   const minTime = DateTime.fromISO(row.original.minTime, { zone: 'Europe/Warsaw' });
   return currentTime < minTime;
 }
+
+export const generateRandomCode = () => {
+  const characters = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789';
+  const length = 32;
+  let result = '';
+  for (let i = 0; i < length; i++) {
+    result += characters.charAt(Math.floor(Math.random() * characters.length));
+  }
+  return result;
+};

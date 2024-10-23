@@ -155,8 +155,11 @@ export function CommandsTable({deleted} :any) {
 
         try {
             await softDeleteCommands(selectedCommands, playerId);
-            const updatedCommands = await getPlayerCommands(playerId);
-            setCommands(updatedCommands);
+
+            const playerCommands = await getPlayerCommands(playerId);
+            const sitterCommands = await getSittingsCommands(playerId);
+            const combinedData = [...playerCommands, ...sitterCommands];
+            setCommands(combinedData);
             setRowSelection({});
             setClickedRows({});
         } catch (error) {
@@ -175,8 +178,10 @@ export function CommandsTable({deleted} :any) {
 
         try {
             await restoreCommands(selectedCommands, playerId);
-            const updatedCommands = await getDeletedCommands(playerId);
-            setCommands(updatedCommands);
+            const playerDeletedCommands = await getDeletedCommands(playerId);
+            const sitterDeletedCommands = await getSittingsDeletedCommands(playerId);
+            const combinedData = [...playerDeletedCommands, ...sitterDeletedCommands];
+            setCommands(combinedData);
             setRowSelection({});
             setClickedRows({});
         } catch (error) {

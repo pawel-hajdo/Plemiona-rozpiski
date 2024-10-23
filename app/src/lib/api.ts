@@ -1,10 +1,10 @@
 import axios from 'axios';
 import {getTokenFromCookies} from "@/lib/utils";
+import {log} from "util";
 
 const api = axios.create({
-   // baseURL: process.env.NEXT_PUBLIC_API_BASE_URL,
-     baseURL: 'https://plemionarozpiski.pl/api'
-    //baseURL: 'http://localhost:8080/api'
+    baseURL: process.env.NEXT_PUBLIC_API_BASE_URL,
+    //baseURL: 'https://plemionarozpiski.pl/api'
 });
 
 api.interceptors.request.use(
@@ -77,6 +77,21 @@ export const updateUser = async (login: string, oldPassword:string, newPassword:
     });
     return response.data;
 }
+
+export const resetPassword = async (login: string, password: string, code: string, world: string) => {
+    const response = await api.post('/users/reset-password', {
+        "name": login,
+        "password": password,
+        "code": code,
+        "world": world
+    }, {
+        headers: {
+            skipAuth: true
+        }
+    });
+    return response.data;
+}
+
 
 export const getPlayerLinks = async (playerId: string) => {
     const response = await api.get(`/links/player/${playerId}`);

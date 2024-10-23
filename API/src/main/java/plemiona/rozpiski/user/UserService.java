@@ -74,10 +74,10 @@ public class UserService {
     }
 
     public AuthenticationResponse authenticateUser(AuthenticationRequest request){
+        var user = userRepository.findByName(request.name()).orElseThrow(() -> new PlayerDoesNotExistException("User not found"));
         authenticationManager.authenticate(
                 new UsernamePasswordAuthenticationToken(request.name(), request.password())
         );
-        var user = userRepository.findByName(request.name()).orElseThrow();
         Map<String, Object> claims = new HashMap<>();
         claims.put("playerId", user.getPlayerId().toString());
         var jwtToken = jwtService.generateToken(claims, user);
