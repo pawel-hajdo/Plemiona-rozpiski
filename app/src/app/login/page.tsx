@@ -9,6 +9,7 @@ import {useRouter} from "next/navigation";
 import Link from "next/link";
 import {EyeClosedIcon, EyeOpenIcon} from "@radix-ui/react-icons";
 import {AxiosError} from "axios";
+import {setCookieToken} from "@/lib/utils";
 
 export default function Login() {
     const [userLogin, setUserLogin] = useState("")
@@ -32,6 +33,7 @@ export default function Login() {
         try {
             const responseData = await authUser(userLogin, userPassword);
             document.cookie = `token=${responseData.token}; path=/; max-age=21600`;
+            setCookieToken(responseData.token);
             router.push("/");
         } catch (error) {
             if (error instanceof AxiosError) {

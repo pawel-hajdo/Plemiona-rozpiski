@@ -70,3 +70,16 @@ export const generateRandomCode = () => {
   }
   return result;
 };
+
+export const setCookieToken = (token) => {
+  const decodedToken = decodeToken(token);
+
+  const currentTime = Math.floor(Date.now() / 1000);
+  const tokenExpiry = decodedToken.exp;
+  const maxAge = tokenExpiry - currentTime;
+
+  if (maxAge > 0) {
+    document.cookie = `token=${token}; path=/; max-age=${maxAge}`;
+  }
+}
+

@@ -11,7 +11,7 @@ import {EyeClosedIcon, EyeOpenIcon} from "@radix-ui/react-icons";
 import {AxiosError} from "axios";
 import {Select, SelectContent, SelectGroup, SelectItem, SelectTrigger, SelectValue} from "@/components/ui/select";
 import * as React from "react";
-import {generateRandomCode} from "@/lib/utils";
+import {generateRandomCode, setCookieToken} from "@/lib/utils";
 
 export default function Register() {
     const [userLogin, setUserLogin] = useState("")
@@ -41,7 +41,7 @@ export default function Register() {
 
         try {
             const responseData = await registerUser(userLogin, userPassword, code, world);
-            document.cookie = `token=${responseData.token}; path=/; max-age=21600`;
+            setCookieToken(responseData.token);
             router.push("/");
         } catch (error) {
             if (error instanceof AxiosError) {
