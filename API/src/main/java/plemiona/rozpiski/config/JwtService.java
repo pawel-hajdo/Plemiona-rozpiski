@@ -10,6 +10,8 @@ import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Service;
 
 import java.security.Key;
+import java.time.LocalDateTime;
+import java.time.ZoneId;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
@@ -41,7 +43,7 @@ public class JwtService {
                 .setClaims(extraClaims)
                 .setSubject(userDetails.getUsername())
                 .setIssuedAt(new Date(System.currentTimeMillis()))
-                .setExpiration(new Date(System.currentTimeMillis() + 1000 * 60 * 60 * 6)) //6 hours
+                .setExpiration(calculateExpirationDate())
                 .signWith(getSignInKey(), SignatureAlgorithm.HS256)
                 .compact();
     }
@@ -49,6 +51,19 @@ public class JwtService {
     public boolean isTokenValid(String token, UserDetails userDetails){
         final String username = extractUsername(token);
         return (username.equals(userDetails.getUsername())) && !isTokenExpired(token);
+    }
+
+    private Date calculateExpirationDate() {
+        LocalDateTime now = LocalDateTime.now();
+        LocalDateTime expirationTime;
+
+        if (now.getHour() < 4) {
+            expirationTime = LocalDateTime.of(now.getYear(), now.getMonth(), now.getDayOfMonth(), 4, 0);
+        } else {
+            expirationTime = LocalDateTime.of(now.getYear(), now.getMonth(), now.getDayOfMonth() + 1, 4, 0);
+        }
+
+        return Date.from(expirationTime.atZone(ZoneId.systemDefault()).toInstant());
     }
 
     private boolean isTokenExpired(String token) {

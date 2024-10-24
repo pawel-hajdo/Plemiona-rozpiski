@@ -10,6 +10,7 @@ import plemiona.rozpiski.accountSitting.AccountSittingRepository;
 import plemiona.rozpiski.accountSitting.AccountSittingStatus;
 import plemiona.rozpiski.exceptions.CommandNotFoundException;
 
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
@@ -33,11 +34,11 @@ public class CommandService {
 
     public List<CommandResponse> getCommandsByPlayerId(Integer playerId, int page, int size){
         Pageable pageable = PageRequest.of(page, size);
-        return commandRepository.findByPlayerIdAndDeletedFalseOrderByMaxTimeAsc(playerId, pageable).getContent();
+        return commandRepository.findByPlayerIdAndDeletedNullOrderByMaxTimeAsc(playerId, pageable).getContent();
     }
     public List<CommandResponse> getDeletedCommandsByPlayerId(Integer playerId, int page, int size) {
         Pageable pageable = PageRequest.of(page, size);
-        return commandRepository.findByPlayerIdAndDeletedTrueOrderByMaxTimeDesc(playerId, pageable).getContent();
+        return commandRepository.findByPlayerIdAndDeletedNotNullOrderByMaxTimeDesc(playerId, pageable).getContent();
     }
 
     public ResponseEntity<String> softDeleteCommands(List<Long> commandIds) {
@@ -47,20 +48,20 @@ public class CommandService {
             throw new CommandNotFoundException("Commands not found for given IDs");
         }
         for(Command command : commands){
-            command.setDeleted(true);
+            command.setDeleted(LocalDateTime.now());
         }
         commandRepository.saveAll(commands);
         return ResponseEntity.ok("Commands deleted successfully");
     }
 
     public ResponseEntity<String> restoreDeletedCommands(List<Long> commandIds) {
-        List<Command> commands = commandRepository.findAllByDeletedTrueAndIdIn(commandIds);
+        List<Command> commands = commandRepository.findAllByDeletedIsNotNullAndIdIn(commandIds);
 
         if (commands.isEmpty()) {
             throw new CommandNotFoundException("Commands not found for given IDs");
         }
         for(Command command : commands){
-            command.setDeleted(false);
+            command.setDeleted(null);
         }
         commandRepository.saveAll(commands);
         return ResponseEntity.ok("Commands restored successfully");

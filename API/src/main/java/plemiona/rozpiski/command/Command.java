@@ -54,7 +54,7 @@ public class Command {
     private String attackTime;
 
     @Column(name = "deleted")
-    private boolean deleted = false;
+    private LocalDateTime deleted;
 
     @Column(name = "operation_name")
     private String operation_name;
