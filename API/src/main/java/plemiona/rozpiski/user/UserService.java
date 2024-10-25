@@ -4,6 +4,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.crypto.password.PasswordEncoder;
+import org.springframework.security.core.GrantedAuthority;
 import org.springframework.stereotype.Service;
 import org.springframework.web.client.RestTemplate;
 import plemiona.rozpiski.config.JwtService;
@@ -22,6 +23,7 @@ import java.nio.charset.StandardCharsets;
 import java.time.LocalDateTime;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.stream.Collectors;
 
 @Service
 public class UserService {
@@ -62,12 +64,16 @@ public class UserService {
         newUser.setName(request.name());
         newUser.setPassword(hashedPassword);
         newUser.setPlayerId(playerId);
+        newUser.addRole(Role.USER);
 
         userRepository.save(newUser);
         saveToLogs(newUser.getId(), LogType.USER_REGISTER);
 
         Map<String, Object> claims = new HashMap<>();
         claims.put("playerId", playerId.toString());
+        claims.put("roles", newUser.getAuthorities().stream()
+                .map(GrantedAuthority::getAuthority)
+                .collect(Collectors.toList()));
 
         var jwtToken = jwtService.generateToken(claims, newUser);
         return new AuthenticationResponse(jwtToken);
@@ -80,6 +86,9 @@ public class UserService {
         );
         Map<String, Object> claims = new HashMap<>();
         claims.put("playerId", user.getPlayerId().toString());
+        claims.put("roles", user.getAuthorities().stream()
+                .map(GrantedAuthority::getAuthority)
+                .collect(Collectors.toList()));
         var jwtToken = jwtService.generateToken(claims, user);
         saveToLogs(user.getId(), LogType.USER_LOGIN_SUCCESSFUL);
         return new AuthenticationResponse(jwtToken);
