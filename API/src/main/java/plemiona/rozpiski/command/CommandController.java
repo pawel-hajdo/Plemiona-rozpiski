@@ -4,6 +4,7 @@ import jakarta.servlet.http.HttpServletRequest;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 import plemiona.rozpiski.config.JwtService;
 
@@ -116,5 +117,12 @@ public class CommandController {
 
         List<CommandResponse> commands = commandService.getDeletedCommandsForActiveSittings(playerId);
         return ResponseEntity.ok(commands);
+    }
+
+    @GetMapping("/admin/statistics")
+    @PreAuthorize("hasRole('ADMIN')")
+    public ResponseEntity<List<CommandStatisticsResponse>> getCommandStatistics() {
+        List<CommandStatisticsResponse> statistics = commandService.getCommandStatistics();
+        return ResponseEntity.ok(statistics);
     }
 }

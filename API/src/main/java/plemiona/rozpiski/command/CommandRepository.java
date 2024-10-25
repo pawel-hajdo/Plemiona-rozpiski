@@ -55,4 +55,17 @@ public interface CommandRepository extends JpaRepository<Command,Long> {
             @Param("worlds") List<String> worlds
     );
 
+    @Query("""
+    SELECT new plemiona.rozpiski.command.CommandStatisticsResponse(
+        c.playerName,
+        COUNT(CASE WHEN c.maxTime > c.deleted THEN 1 END),
+        COUNT(CASE WHEN c.minTime < c.deleted THEN 1 END),
+        COUNT(CASE WHEN c.minTime <= c.deleted AND c.maxTime >= c.deleted THEN 1 END),
+        COUNT(CASE WHEN c.maxTime < CURRENT_TIMESTAMP AND c.deleted IS NULL THEN 1 END),
+        COUNT(c)
+    )
+    FROM Command c
+    GROUP BY c.playerName
+    """)
+    List<CommandStatisticsResponse> getCommandStatistics();
 }

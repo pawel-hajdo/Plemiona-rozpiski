@@ -107,4 +107,7 @@ public class CommandService {
         return commands;
     }
 
+    public List<CommandStatisticsResponse> getCommandStatistics() {
+        return commandRepository.getCommandStatistics();
+    }
 }
