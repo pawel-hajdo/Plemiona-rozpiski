@@ -3,6 +3,7 @@ package plemiona.rozpiski.command;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 
@@ -75,5 +76,27 @@ public interface CommandRepository extends JpaRepository<Command,Long> {
     ORDER BY c.playerName ASC
     """)
     List<CommandPlayerInfoResponse> findDistinctCommandPlayers();
+
+    Page<Command> findByPlayerIdOrderByMaxTimeAsc(String playerId, Pageable pageable);
+
+    void deleteByTargetIn(List<String> targets);
+
+    @Modifying
+    @Query(value = """
+    UPDATE plemiona.command_list AS cl
+    SET 
+        total_commands_from_source = subquery.total_commands_from_source,
+        attack_sequence_number = subquery.attack_sequence_number
+    FROM (
+        SELECT 
+            id,
+            COUNT(*) OVER (PARTITION BY command_source_id, command_world) AS total_commands_from_source,
+            ROW_NUMBER() OVER (PARTITION BY command_source_id, command_world ORDER BY command_min_time) AS attack_sequence_number
+        FROM plemiona.command_list
+    ) AS subquery
+    WHERE cl.id = subquery.id
+    """, nativeQuery = true)
+    void recalculateCommandStatistics();
+
 
 }

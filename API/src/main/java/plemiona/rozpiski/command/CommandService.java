@@ -5,6 +5,7 @@ import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 import plemiona.rozpiski.accountSitting.AccountSitting;
 import plemiona.rozpiski.accountSitting.AccountSittingRepository;
 import plemiona.rozpiski.accountSitting.AccountSittingStatus;
@@ -113,5 +114,17 @@ public class CommandService {
 
     public List<CommandPlayerInfoResponse> getDistinctPlayersWithCommands() {
         return commandRepository.findDistinctCommandPlayers();
+    }
+
+    public List<Command> getCommandsByPlayerIdAdmin(String playerId, int page, int size){
+        Pageable pageable = PageRequest.of(page, size);
+        return commandRepository.findByPlayerIdOrderByMaxTimeAsc(playerId, pageable).getContent();
+    }
+
+    @Transactional
+    public ResponseEntity<String> deleteTargetVillages(List<String> targetVillages) {
+        commandRepository.deleteByTargetIn(targetVillages);
+        commandRepository.recalculateCommandStatistics();
+        return ResponseEntity.ok("Commands deleted and statistics recalculated successfully");
     }
 }

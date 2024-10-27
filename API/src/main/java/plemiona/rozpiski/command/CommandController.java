@@ -132,4 +132,24 @@ public class CommandController {
         List<CommandPlayerInfoResponse> players = commandService.getDistinctPlayersWithCommands();
         return ResponseEntity.ok(players);
     }
+
+    @GetMapping("/admin/player/{playerId}")
+    @PreAuthorize("hasRole('ADMIN')")
+    public ResponseEntity<List<Command>> getPlayerCommandsAdmin(
+            @PathVariable String playerId,
+            @RequestParam(defaultValue = "0") int page,
+            @RequestParam(defaultValue = "100") int size
+    ) {
+        List<Command> commands = commandService.getCommandsByPlayerIdAdmin(playerId, page, size);
+        return ResponseEntity.ok(commands);
+    }
+
+    @DeleteMapping("/admin/villages")
+    @PreAuthorize("hasRole('ADMIN')")
+    public ResponseEntity<String> deleteVillagesAdmin(
+            @RequestBody CommandTargetRequest commandTargetRequest
+        ) {
+
+        return commandService.deleteTargetVillages(commandTargetRequest.targetVillages());
+    }
 }
