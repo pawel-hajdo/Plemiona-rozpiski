@@ -110,4 +110,8 @@ public class CommandService {
     public List<CommandStatisticsResponse> getCommandStatistics() {
         return commandRepository.getCommandStatistics();
     }
+
+    public List<CommandPlayerInfoResponse> getDistinctPlayersWithCommands() {
+        return commandRepository.findDistinctCommandPlayers();
+    }
 }

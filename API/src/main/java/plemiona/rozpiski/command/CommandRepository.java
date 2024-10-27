@@ -68,4 +68,12 @@ public interface CommandRepository extends JpaRepository<Command,Long> {
     GROUP BY c.playerName
     """)
     List<CommandStatisticsResponse> getCommandStatistics();
+
+    @Query("""
+    SELECT DISTINCT new plemiona.rozpiski.command.CommandPlayerInfoResponse(c.playerName, c.playerId)
+    FROM Command c
+    ORDER BY c.playerName ASC
+    """)
+    List<CommandPlayerInfoResponse> findDistinctCommandPlayers();
+
 }

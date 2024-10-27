@@ -125,4 +125,11 @@ public class CommandController {
         List<CommandStatisticsResponse> statistics = commandService.getCommandStatistics();
         return ResponseEntity.ok(statistics);
     }
+
+    @GetMapping("/admin/players")
+    @PreAuthorize("hasRole('ADMIN')")
+    public ResponseEntity<List<CommandPlayerInfoResponse>> getDistinctPlayersWithCommands() {
+        List<CommandPlayerInfoResponse> players = commandService.getDistinctPlayersWithCommands();
+        return ResponseEntity.ok(players);
+    }
 }
