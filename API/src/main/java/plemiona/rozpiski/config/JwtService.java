@@ -60,7 +60,7 @@ public class JwtService {
         if (now.getHour() < 4) {
             expirationTime = LocalDateTime.of(now.getYear(), now.getMonth(), now.getDayOfMonth(), 4, 0);
         } else {
-            expirationTime = LocalDateTime.of(now.getYear(), now.getMonth(), now.getDayOfMonth() + 1, 4, 0);
+            expirationTime = now.plusDays(1).withHour(4).withMinute(0).withSecond(0).withNano(0);
         }
 
         return Date.from(expirationTime.atZone(ZoneId.systemDefault()).toInstant());
