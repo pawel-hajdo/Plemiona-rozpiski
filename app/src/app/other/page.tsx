@@ -13,16 +13,9 @@ type Accumulator = Record<string, number>;
 type ButtonType = 'nobles' | 'fakeNobles' | 'defNobles' | 'allNobles' | 'offs';
 
 export default function Other(){
-    const [playerLinks, setPlayerLinks] = useState([]);
     const [offs, setOffs] = useState([])
-    const [nobles, setNobles] = useState<NobleData[]>([]);
-    const [fakeNobles, setFakeNobles] = useState<NobleData[]>([]);
-    const [defNobles, setDefNobles] = useState<NobleData[]>([]);
     const [allNobles, setAllNobles] = useState<NobleData[]>([]);
     const [buttonText, setButtonText] = useState({
-        nobles: "Kopiuj do schowka",
-        fakeNobles: "Kopiuj do schowka",
-        defNobles: "Kopiuj do schowka",
         allNobles: "Kopiuj do schowka",
         offs: "Kopiuj do schowka"
     });
@@ -31,20 +24,15 @@ export default function Other(){
     useEffect(() => {
         const fetchData = async () => {
             try {
-                const [playerLinksData, noblesData, fakeNoblesData, defNoblesData, offsData] = await Promise.all([
-                    getPlayerLinks(playerId),
+                const [noblesData1, noblesData2, offsData] = await Promise.all([
                     getSourceVillagesByType(playerId, 'SZLACHCIC'),
-                    getSourceVillagesByType(playerId, 'fejk szlachcic'),
-                    getSourceVillagesByType(playerId, 'DEFFOSZLACHTA'),
+                    getSourceVillagesByType(playerId, 'Gruby'),
                     getSourceVillagesByType(playerId, 'OFF')
                 ]);
-                setPlayerLinks(playerLinksData.links);
-                setNobles(noblesData);
-                setFakeNobles(fakeNoblesData);
-                setDefNobles(defNoblesData);
                 setOffs(offsData);
-
-                const mergedNobles = mergeAndSumData([noblesData, fakeNoblesData, defNoblesData]);
+                console.log(noblesData1);
+                console.log(noblesData2);
+                const mergedNobles = mergeAndSumData([noblesData1, noblesData2]);
                 setAllNobles(mergedNobles);
             } catch (error) {
                 console.error("Błąd podczas pobierania danych:", error);
@@ -103,59 +91,8 @@ export default function Other(){
                         (Do zaznaczania na mapie nie trzeba nic usuwać, można skopiować kordy razem z ilością i zadziała)
                     </AccordionContent>
                 </AccordionItem>
-                <AccordionItem value="item-2">
-                    <AccordionTrigger>Klasyczna rozpiska</AccordionTrigger>
-                    <AccordionContent>
-                        Jeśli potrzebujesz klasycznej rozpiski, poniżej znajdziesz odpowiednie linki.
-                    </AccordionContent>
-                </AccordionItem>
             </Accordion>
             <div className="grid grid-cols-1 gap-4 md:grid-cols-2 lg:grid-cols-3 mt-4">
-                <div>
-                    <div className="flex items-center mb-2">
-                        <Label htmlFor="nobles" className="text-lg font-medium mr-2">Szlachcice</Label>
-                        <Button onClick={() => copyToClipboard(formatData(nobles), 'nobles')} variant="outline">
-                            {buttonText.nobles}
-                        </Button>
-                    </div>
-                    <Textarea
-                        rows={10}
-                        className="w-full border border-gray-300 rounded-md p-2"
-                        value={formatData(nobles)}
-                        readOnly
-                        id="nobles"
-                    />
-                </div>
-                <div>
-                    <div className="flex items-center mb-2">
-                        <Label htmlFor="fakeNobles" className="text-lg font-medium mr-2">Fejk szlachcice</Label>
-                        <Button onClick={() => copyToClipboard(formatData(fakeNobles), 'fakeNobles')} variant="outline">
-                            {buttonText.fakeNobles}
-                        </Button>
-                    </div>
-                    <Textarea
-                        rows={10}
-                        className="w-full border border-gray-300 rounded-md p-2"
-                        value={formatData(fakeNobles)}
-                        readOnly
-                        id="fakeNobles"
-                    />
-                </div>
-                <div>
-                    <div className="flex items-center mb-2">
-                        <Label htmlFor="deffNobles" className="text-lg font-medium mr-2">Deffoszlachty</Label>
-                        <Button onClick={() => copyToClipboard(formatData(defNobles), 'defNobles')} variant="outline">
-                            {buttonText.defNobles}
-                        </Button>
-                    </div>
-                    <Textarea
-                        rows={10}
-                        className="w-full border border-gray-300 rounded-md p-2"
-                        value={formatData(defNobles)}
-                        readOnly
-                        id="deffNobles"
-                    />
-                </div>
                 <div>
                     <div className="flex items-center mb-2">
                         <Label htmlFor="allNobles" className="text-lg font-medium mr-2">Wszystkie Szlachcice</Label>
@@ -186,18 +123,6 @@ export default function Other(){
                         id="offs"
                     />
                 </div>
-            </div>
-            <div className="mt-6">
-                <Label htmlFor="playerLinks" className="block text-lg font-medium mb-2">Linki gracza</Label>
-                <ul className="list-disc pl-5">
-                    {playerLinks.map((link, index) => (
-                        <li key={index} className="mb-2">
-                            <a href={link} target="_blank" rel="noopener noreferrer" className="text-blue-600 hover:underline break-words">
-                                {link}
-                            </a>
-                        </li>
-                    ))}
-                </ul>
             </div>
         </div>
     )

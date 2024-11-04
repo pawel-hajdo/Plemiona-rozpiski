@@ -71,8 +71,8 @@ export const generateRandomCode = () => {
   return result;
 };
 
-export const setCookieToken = (token) => {
-  const decodedToken = decodeToken(token);
+export const setCookieToken = (token: string) => {
+  const decodedToken = decodeToken(token) as DecodedToken;
 
   const currentTime = Math.floor(Date.now() / 1000);
   const tokenExpiry = decodedToken.exp;
@@ -81,5 +81,9 @@ export const setCookieToken = (token) => {
   if (maxAge > 0) {
     document.cookie = `token=${token}; path=/; max-age=${maxAge}`;
   }
+}
+
+interface DecodedToken {
+  exp: number;
 }
 
