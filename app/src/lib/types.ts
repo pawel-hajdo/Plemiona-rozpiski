@@ -21,6 +21,7 @@ export type ColumnNames = {
     commandNumberId: string,
     minTime: string,
     maxTime: string,
+    attackTime: string,
     source: string,
     target: string,
     type: string,

@@ -193,6 +193,7 @@ export function CommandsTable({deleted} :any) {
         commandNumberId: "ID",
         minTime: "Min time",
         maxTime: "Max time",
+        attackTime: "Czas wejścia",
         source: "Źródło",
         target: "Cel",
         type: "Typ",
@@ -265,6 +266,35 @@ export function CommandsTable({deleted} :any) {
             cell: ({ row }) => <div>{formatDate(new Date(row.getValue('maxTime')))}</div>,
         },
         {
+            accessorKey: "attackTime",
+            header: ({ column }) => (
+                <Button
+                    variant="ghost"
+                    onClick={() => column.toggleSorting(column.getIsSorted() === "asc")}
+                >
+                    {columnNames.attackTime}
+                    <CaretSortIcon className="ml-2 h-4 w-4" />
+                </Button>
+            ),
+            cell: ({ row }) => {
+                const attackTime = row.getValue('attackTime') as string;
+
+                if (!attackTime) {
+                    return <div>Brak danych</div>;
+                }
+
+                const [date, time] = attackTime.split(' ');
+                const formattedDate = formatDate(new Date(date.replace(/-/g, '/')));
+
+                return (
+                    <div>
+                        <div>{formattedDate.split(",")[0]}</div>
+                        <div>{time}</div>
+                    </div>
+                );
+            },
+        },
+        {
             accessorKey: "source",
             header: ({ column }) => (
                 <Button
@@ -322,12 +352,14 @@ export function CommandsTable({deleted} :any) {
                 </Button>
             ),
             cell: ({ row }) => {
-                const minTime = new Date(row.original.minTime);
-                const maxTime = new Date(row.original.maxTime);
-                const isWithinOneHour = (maxTime.getTime() - minTime.getTime()) <= 3600000;
+                // const minTime = new Date(row.original.minTime);
+                // const maxTime = new Date(row.original.maxTime);
+                // const isWithinOneHour = (maxTime.getTime() - minTime.getTime()) <= 3600000;
 
                 return (
-                    <div className={isWithinOneHour ? 'font-semibold text-green-500 dark:text-green-400' : ''}>
+                    <div
+                        // className={isWithinOneHour ? 'font-semibold text-green-500 dark:text-green-400' : ''}
+                    >
                         {row.getValue("type")}
                     </div>
                 );

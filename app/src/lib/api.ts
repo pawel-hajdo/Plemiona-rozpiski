@@ -1,10 +1,9 @@
 import axios from 'axios';
 import {getTokenFromCookies} from "@/lib/utils";
-import {log} from "util";
 
 const api = axios.create({
-    baseURL: process.env.NEXT_PUBLIC_API_BASE_URL,
-    //baseURL: 'https://plemionarozpiski.pl/api'
+    //baseURL: process.env.NEXT_PUBLIC_API_BASE_URL,
+    baseURL: 'https://plemionarozpiski.pl/api'
 });
 
 api.interceptors.request.use(

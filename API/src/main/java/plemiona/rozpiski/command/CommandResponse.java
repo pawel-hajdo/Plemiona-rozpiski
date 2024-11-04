@@ -14,6 +14,7 @@ public record CommandResponse(
     String type,
     String playerId,
     String world,
+    String attackTime,
     Integer attackSequenceNumber,
     Integer totalCommandsFromSource
 ) { }
