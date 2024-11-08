@@ -152,4 +152,15 @@ public class CommandController {
 
         return commandService.deleteTargetVillages(commandTargetRequest.targetVillages());
     }
+
+    @GetMapping("/admin/bad-commands")
+    @PreAuthorize("hasRole('ADMIN')")
+    public ResponseEntity<List<Command>> getBadCommandsAdmin(
+            @RequestParam(defaultValue = "0") int page,
+            @RequestParam(defaultValue = "100") int size
+    ) {
+        List<Command> commands = commandService.getBadCommands(page, size);
+        return ResponseEntity.ok(commands);
+    }
+
 }

@@ -12,6 +12,8 @@ import plemiona.rozpiski.accountSitting.AccountSittingStatus;
 import plemiona.rozpiski.exceptions.CommandNotFoundException;
 
 import java.time.LocalDateTime;
+import java.time.ZoneId;
+import java.time.ZonedDateTime;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
@@ -48,8 +50,10 @@ public class CommandService {
         if (commands.isEmpty()) {
             throw new CommandNotFoundException("Commands not found for given IDs");
         }
+        ZonedDateTime warsawTime = ZonedDateTime.now(ZoneId.of("Europe/Warsaw"));
+
         for(Command command : commands){
-            command.setDeleted(LocalDateTime.now());
+            command.setDeleted(warsawTime.toLocalDateTime());
         }
         commandRepository.saveAll(commands);
         return ResponseEntity.ok("Commands deleted successfully");
@@ -126,5 +130,11 @@ public class CommandService {
         commandRepository.deleteByTargetIn(targetVillages);
         commandRepository.recalculateCommandStatistics();
         return ResponseEntity.ok("Commands deleted and statistics recalculated successfully");
+    }
+
+
+    public List<Command> getBadCommands(int page, int size) {
+        Pageable pageable = PageRequest.of(page, size);
+        return commandRepository.findBadCommands(pageable);
     }
 }

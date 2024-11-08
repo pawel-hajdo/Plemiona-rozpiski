@@ -21,6 +21,8 @@ import java.net.URISyntaxException;
 import java.net.URLDecoder;
 import java.nio.charset.StandardCharsets;
 import java.time.LocalDateTime;
+import java.time.ZoneId;
+import java.time.ZonedDateTime;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.stream.Collectors;
@@ -181,7 +183,8 @@ public class UserService {
         Log log = new Log();
         log.setUserId(userId);
         log.setType(logType);
-        log.setDate(LocalDateTime.now());
+        ZonedDateTime warsawTime = ZonedDateTime.now(ZoneId.of("Europe/Warsaw"));
+        log.setDate(warsawTime.toLocalDateTime());
         logRepository.save(log);
     }
 }
