@@ -157,9 +157,10 @@ public class CommandController {
     @PreAuthorize("hasRole('ADMIN')")
     public ResponseEntity<List<Command>> getBadCommandsAdmin(
             @RequestParam(defaultValue = "0") int page,
-            @RequestParam(defaultValue = "100") int size
+            @RequestParam(defaultValue = "100") int size,
+            @RequestParam(required = false, defaultValue = "all") String filter
     ) {
-        List<Command> commands = commandService.getBadCommands(page, size);
+        List<Command> commands = commandService.getBadCommands(page, size, filter);
         return ResponseEntity.ok(commands);
     }
 

@@ -101,8 +101,17 @@ public interface CommandRepository extends JpaRepository<Command,Long> {
     @Query("""
     SELECT c FROM Command c
     WHERE (c.maxTime < c.deleted OR (c.maxTime < CURRENT_TIMESTAMP AND c.deleted IS NULL))
+    ORDER BY c.maxTime asc
     """)
     List<Command> findBadCommands(Pageable pageable);
+
+    @Query("""
+    SELECT c FROM Command c
+    WHERE (c.maxTime < c.deleted OR (c.maxTime < CURRENT_TIMESTAMP AND c.deleted IS NULL))
+    AND (c.type LIKE 'SZLACHCIC%' OR c.type LIKE '%OFF%')
+    ORDER BY c.maxTime asc
+    """)
+    List<Command> findBadCommandsImportant(Pageable pageable);
 
     List<Command> findByTargetInOrderByMinTimeAsc(List<String> targets);
 

@@ -135,9 +135,15 @@ public class CommandService {
     }
 
 
-    public List<Command> getBadCommands(int page, int size) {
+    public List<Command> getBadCommands(int page, int size, String filter) {
         Pageable pageable = PageRequest.of(page, size);
-        return commandRepository.findBadCommands(pageable);
+        switch (filter.toLowerCase()) {
+            case "important":
+                return commandRepository.findBadCommandsImportant(pageable);
+            case "all":
+            default:
+                return commandRepository.findBadCommands(pageable);
+        }
     }
 
     public List<Command> getCommandsForTargetVillages(List<String> targetVillages, String filter) {
