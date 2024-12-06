@@ -163,4 +163,17 @@ public class CommandController {
         return ResponseEntity.ok(commands);
     }
 
+    @GetMapping("/admin/villages")
+    @PreAuthorize("hasRole('ADMIN')")
+    public ResponseEntity<List<Command>> getCommandsForTargetVillages(
+            @RequestBody CommandTargetRequest commandTargetRequest,
+            @RequestParam(required = false, defaultValue = "all") String filter
+    ) {
+        List<Command> commands = commandService.getCommandsForTargetVillages(
+                commandTargetRequest.targetVillages(),
+                filter
+        );
+        return ResponseEntity.ok(commands);
+    }
+
 }

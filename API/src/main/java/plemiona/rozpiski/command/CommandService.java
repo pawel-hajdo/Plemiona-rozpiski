@@ -137,4 +137,14 @@ public class CommandService {
         Pageable pageable = PageRequest.of(page, size);
         return commandRepository.findBadCommands(pageable);
     }
+
+    public List<Command> getCommandsForTargetVillages(List<String> targetVillages, String filter) {
+        switch (filter.toLowerCase()) {
+            case "important":
+                return commandRepository.findByTargetInAndTypeLikeImportant(targetVillages);
+            case "all":
+            default:
+                return commandRepository.findByTargetInOrderByMinTimeAsc(targetVillages);
+        }
+    }
 }

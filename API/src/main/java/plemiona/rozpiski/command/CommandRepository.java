@@ -104,5 +104,15 @@ public interface CommandRepository extends JpaRepository<Command,Long> {
     """)
     List<Command> findBadCommands(Pageable pageable);
 
+    List<Command> findByTargetInOrderByMinTimeAsc(List<String> targets);
 
+    @Query("""
+    SELECT c FROM Command c 
+    WHERE c.target IN :targets 
+    AND (c.type LIKE 'SZLACHCIC%' OR c.type LIKE '%OFF%')
+    ORDER BY c.minTime asc
+    """)
+    List<Command> findByTargetInAndTypeLikeImportant(
+            @Param("targets") List<String> targets
+    );
 }
