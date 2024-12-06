@@ -115,4 +115,8 @@ public interface CommandRepository extends JpaRepository<Command,Long> {
     List<Command> findByTargetInAndTypeLikeImportant(
             @Param("targets") List<String> targets
     );
+
+    List<Command> findByTarget(String target);
+
+    List<Command> findByTargetAndDeletedNull(String target);
 }

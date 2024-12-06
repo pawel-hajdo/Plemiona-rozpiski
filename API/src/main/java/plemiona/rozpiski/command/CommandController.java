@@ -176,4 +176,17 @@ public class CommandController {
         return ResponseEntity.ok(commands);
     }
 
+    @PostMapping("/admin/shift-commands")
+    @PreAuthorize("hasRole('ADMIN')")
+    public ResponseEntity<String> shiftCommandTimes(
+            @RequestBody CommandShiftRequest shiftRequest,
+            @RequestParam(required = false, defaultValue = "all") String filter
+    ) {
+        commandService.shiftCommandTimes(
+                shiftRequest.targetVillage(),
+                shiftRequest.shiftMinutes(),
+                filter
+        );
+        return ResponseEntity.ok("Commands shifted successfully");
+    }
 }

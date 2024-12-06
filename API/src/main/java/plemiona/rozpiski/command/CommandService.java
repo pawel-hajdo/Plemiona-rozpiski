@@ -14,6 +14,8 @@ import plemiona.rozpiski.exceptions.CommandNotFoundException;
 import java.time.LocalDateTime;
 import java.time.ZoneId;
 import java.time.ZonedDateTime;
+import java.time.format.DateTimeFormatter;
+import java.time.format.DateTimeParseException;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
@@ -146,5 +148,50 @@ public class CommandService {
             default:
                 return commandRepository.findByTargetInOrderByMinTimeAsc(targetVillages);
         }
+    }
+
+    @Transactional
+    public void shiftCommandTimes(String targetVillage, int shiftMinutes, String filter) {
+        List<Command> commands;
+
+        if ("notSent".equalsIgnoreCase(filter)) {
+            commands = commandRepository.findByTargetAndDeletedNull(targetVillage);
+        } else if ("all".equalsIgnoreCase(filter)) {
+            commands = commandRepository.findByTarget(targetVillage);
+        } else {
+            throw new IllegalArgumentException("Invalid filter value. Allowed values are 'all' or 'notSent'.");
+        }
+
+        commands.forEach(command -> {
+            if (command.getMinTime() != null) {
+                command.setMinTime(command.getMinTime().plusMinutes(shiftMinutes));
+            }
+            if (command.getMaxTime() != null) {
+                command.setMaxTime(command.getMaxTime().plusMinutes(shiftMinutes));
+            }
+
+            if (command.getAttackTime() != null && !command.getAttackTime().isEmpty()) {
+                command.setAttackTime(shiftAttackTimeString(command.getAttackTime(), shiftMinutes));
+            }
+        });
+
+        commandRepository.saveAll(commands);
+    }
+
+    private String shiftAttackTimeString(String attackTime, int shiftMinutes) {
+        String[] timeParts = attackTime.split(" ");
+        String date = timeParts[0];
+        String[] timeRanges = timeParts[1].split("-");
+
+        DateTimeFormatter timeFormatter = DateTimeFormatter.ofPattern("yyyy-M-d HH:mm:ss");
+        LocalDateTime startTime = LocalDateTime.parse(date + " " + timeRanges[0], timeFormatter);
+        LocalDateTime endTime = LocalDateTime.parse(date + " " + timeRanges[1], timeFormatter);
+
+        LocalDateTime shiftedStartTime = startTime.plusMinutes(shiftMinutes);
+        LocalDateTime shiftedEndTime = endTime.plusMinutes(shiftMinutes);
+
+        return shiftedStartTime.format(timeFormatter) +
+                "-" +
+                shiftedEndTime.format(DateTimeFormatter.ofPattern("HH:mm:ss"));
     }
 }
