@@ -2,8 +2,8 @@ import axios from 'axios';
 import {getTokenFromCookies} from "@/lib/utils";
 
 const api = axios.create({
-    //baseURL: process.env.NEXT_PUBLIC_API_BASE_URL,
-    baseURL: 'https://plemionarozpiski.pl/api'
+    baseURL: process.env.NEXT_PUBLIC_API_BASE_URL,
+    // baseURL: 'https://plemionarozpiski.pl/api'
 });
 
 api.interceptors.request.use(
@@ -149,5 +149,12 @@ export const getSittingsDeletedCommands = async (playerId: string) => {
     const response = await api.get(`/commands/sitter/${playerId}/deleted`);
     return response.data;
 }
+
+export const sendReports = async (playerId: string, reports: string[]) => {
+    const response = await api.post(`/reports/${playerId}`, {
+        "reportIds": reports
+    });
+    return response.data;
+};
 
 export default api;
