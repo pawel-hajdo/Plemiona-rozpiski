@@ -11,6 +11,7 @@ import {getPlayerId} from "@/lib/utils";
 export default function ReportsPage(){
     const [reports, setReports] = useState<string>("");
     const [error, setError] = useState("")
+    const [success, setSuccess] = useState<string | null>(null);
     const [isSubmitting, setIsSubmitting] = useState(false);
 
     const extractReportIds = (input: string) => {
@@ -35,6 +36,12 @@ export default function ReportsPage(){
         try {
             const responseData = await sendReports(getPlayerId(),reportIds)
             setReports("");
+            await new Promise(resolve => setTimeout(resolve, 300));
+            setSuccess(`Pomyślnie dodano ${responseData.addedReportsCount} ${
+                responseData.addedReportsCount === 1 ? 'raport' :
+                    responseData.addedReportsCount > 0 && responseData.addedReportsCount < 5 ? 'raporty' :
+                        'raportów'
+            }`);
         } catch (error) {
             setError("Wystąpił błąd podczas przesyłania raportów.");
         } finally {
@@ -48,8 +55,30 @@ export default function ReportsPage(){
             <Accordion type="single" collapsible className="w-full mb-6">
                 <AccordionItem value="item-1">
                     <AccordionTrigger>Instrukcja</AccordionTrigger>
-                    <AccordionContent>
-                        Coś tu będzie
+                    <AccordionContent className="space-y-4">
+                        <p className="font-medium text-lg">Aby przesłać nowe raporty do bazy:</p>
+                        <ol className="list-decimal space-y-3 ml-5">
+                            <li className="pl-2">
+                    <span className="text-slate-800 dark:text-slate-200">
+                        Przejdź do ekranu z raportami i zaznacz raporty do opublikowania
+                    </span>
+                            </li>
+                            <li className="pl-2">
+                    <span className="text-slate-800 dark:text-slate-200">
+                        Kliknij <span className="font-medium">Opublikuj</span>, a następnie <span className="font-medium">Prześlij</span>
+                    </span>
+                            </li>
+                            <li className="pl-2">
+                    <span className="text-slate-800 dark:text-slate-200">
+                        Skopiuj wygenerowaną przez grę listę opublikowanych raportów
+                    </span>
+                            </li>
+                            <li className="pl-2">
+                    <span className="text-slate-800 dark:text-slate-200">
+                        Wklej skopiowaną listę w polu poniżej
+                    </span>
+                            </li>
+                        </ol>
                     </AccordionContent>
                 </AccordionItem>
             </Accordion>
@@ -67,6 +96,7 @@ export default function ReportsPage(){
                     />
                 </div>
                 {error && <p className="text-red-500">{error}</p>}
+                {success && <p className="text-green-500">{success}</p>}
                 <Button type="submit" disabled={isSubmitting}>
                     {isSubmitting ? "Wysyłanie..." : "Prześlij raporty"}
                 </Button>

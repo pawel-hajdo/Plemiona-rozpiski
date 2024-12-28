@@ -17,7 +17,7 @@ public class ReportService {
         this.reportRepository = reportRepository;
     }
 
-    public void saveReports(Long playerId, List<String> reportIds){
+    public int saveReports(Long playerId, List<String> reportIds){
         Set<String> existingReportIds = reportRepository.findAllByPlayerId(playerId).stream()
                 .map(Report::getReportId)
                 .collect(Collectors.toSet());
@@ -39,5 +39,6 @@ public class ReportService {
         if (!newReports.isEmpty()) {
             reportRepository.saveAll(newReports);
         }
+        return newReports.size();
     }
 }

@@ -19,7 +19,7 @@ public class ReportController {
     }
 
     @PostMapping("/{playerId}")
-    public ResponseEntity<String> addNewReports(
+    public ResponseEntity<AddReportResponse> addNewReports(
             @PathVariable Long playerId,
             @RequestBody ReportRequest reportRequest,
             HttpServletRequest request
@@ -27,8 +27,7 @@ public class ReportController {
         if(!jwtService.checkUser(playerId.toString(), request)){
             return new ResponseEntity<>(HttpStatus.FORBIDDEN);
         }
-        reportService.saveReports(playerId, reportRequest.reportIds());
-
-        return ResponseEntity.ok("Reports added successfully");
+        int addedCount = reportService.saveReports(playerId, reportRequest.reportIds());
+        return ResponseEntity.ok(new AddReportResponse("Reports added successfully", addedCount));
     }
 }
