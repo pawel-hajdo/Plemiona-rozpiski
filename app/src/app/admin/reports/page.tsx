@@ -3,14 +3,15 @@ import * as React from "react";
 import {getLatestReports, getPlayersWithReports} from "@/lib/api";
 import {PaginatedReportsResponse, Player} from "@/lib/types";
 import {useEffect, useState} from "react";
-import {Table, TableBody, TableCaption, TableCell, TableHead, TableHeader, TableRow} from "@/components/ui/table";
-import PaginationControls from "@/components/paginationControlrs";
+import {Table, TableBody, TableCell, TableHead, TableHeader, TableRow} from "@/components/ui/table";
 import {Button} from "@/components/ui/button";
+import {Select, SelectContent, SelectGroup, SelectItem, SelectTrigger, SelectValue} from "@/components/ui/select";
+import {Label} from "@/components/ui/label";
 
 export default function ReportsPage(){
     const [reports, setReports] = useState<Report[]>([]);
     const [players, setPlayers] = useState<Player[]>([]);
-    const [selectedPlayerId, setSelectedPlayerId] = useState<string | null>(null);
+    const [selectedPlayerId, setSelectedPlayerId] = useState<string | null>("all");
     const [page, setPage] = useState(0);
     const [totalPages, setTotalPages] = useState(1);
     const [totalReports, setTotalReports] = useState(0);
@@ -27,7 +28,7 @@ export default function ReportsPage(){
     useEffect(() => {
         const fetchReportsData = async () => {
             try {
-                const response: PaginatedReportsResponse = await getLatestReports(page, 100, 'createdAt', false, selectedPlayerId);
+                const response: PaginatedReportsResponse = await getLatestReports(page, 50, 'createdAt', false, selectedPlayerId === "all" ? null : selectedPlayerId);
                 setReports(response.content);
                 setTotalPages(response.totalPages);
                 setTotalReports(response.totalElements);
@@ -39,30 +40,30 @@ export default function ReportsPage(){
         fetchReportsData();
     }, [selectedPlayerId, page]);
 
-    const handlePlayerChange = (event: React.ChangeEvent<HTMLSelectElement>) => {
-        setSelectedPlayerId(event.target.value);
-    };
-
-    const handlePageChange = (newPage: number) => {
-        setPage(newPage);
+    const handlePlayerChange = (value: string) => {
+        setSelectedPlayerId(value);
     };
 
     return (
         <div className="p-2 sm:p-8">
             <h1 className="text-3xl font-bold mb-6">Raporty admin</h1>
 
-            <select
-                value={selectedPlayerId || ""}
-                onChange={handlePlayerChange}
-                className="mb-4 p-2 border border-gray-300 rounded"
-            >
-                <option value="">Wybierz gracza</option>
-                {players.map((player) => (
-                    <option key={player.playerId} value={player.playerId}>
-                        {player.playerName}
-                    </option>
-                ))}
-            </select>
+            <Label className="text-md">Pokaż raporty gracza:</Label>
+            <Select value={selectedPlayerId || ""} onValueChange={handlePlayerChange}>
+                <SelectTrigger className="mb-4 p-2 border border-gray-300 rounded max-w-xs sm:max-w-[300px]">
+                    <SelectValue placeholder="Wybierz gracza" />
+                </SelectTrigger>
+                <SelectContent>
+                    <SelectGroup>
+                        <SelectItem value="all">Wybierz gracza</SelectItem>
+                        {players.map((player) => (
+                            <SelectItem key={player.playerId} value={player.playerId}>
+                                {player.playerName}
+                            </SelectItem>
+                        ))}
+                    </SelectGroup>
+                </SelectContent>
+            </Select>
 
             <Table>
                 <TableHeader>
