@@ -178,12 +178,19 @@ export const getPlayersWithReports = async () => {
 export const downloadReports = async (date = null) => {
     const params = date ? { date } : {};
     const response = await api.get('/reports/download', { params, responseType: 'blob' });
+
+    const contentDisposition = response.headers['content-disposition'];
+
+    const fileNameMatch = contentDisposition && contentDisposition.match(/filename="(.+)"/);
+    const fileName = fileNameMatch && fileNameMatch[1] ? fileNameMatch[1] : 'reports.txt';
+
     const file = new Blob([response.data], { type: 'text/plain' });
     const link = document.createElement('a');
     link.href = URL.createObjectURL(file);
-    link.download = 'reports.txt';
+    link.download = fileName;
     link.click();
 };
+
 
 
 export default api;

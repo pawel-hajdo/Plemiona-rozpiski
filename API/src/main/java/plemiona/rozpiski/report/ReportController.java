@@ -5,6 +5,7 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
+import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
@@ -13,6 +14,7 @@ import plemiona.rozpiski.config.JwtService;
 import plemiona.rozpiski.config.PageDto;
 
 import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
 import java.time.format.DateTimeParseException;
 import java.util.List;
 
@@ -65,8 +67,11 @@ public class ReportController {
                     .append("[/report]\n");
         }
 
+        String formattedDate = (parsedDate != null) ? parsedDate.format(DateTimeFormatter.ofPattern("yyyy-MM-dd'T'HHmmss")) : "all_reports";
+        String fileName = "reports_" + formattedDate + ".txt";
+
         return ResponseEntity.ok()
-                .header("Content-Disposition", "attachment; filename=reports.txt")
+                .header(HttpHeaders.CONTENT_DISPOSITION, "attachment; filename=\"" + fileName + "\"")
                 .body(fileContent.toString());
     }
 

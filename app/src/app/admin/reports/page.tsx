@@ -1,12 +1,13 @@
 "use client"
 import * as React from "react";
-import {getLatestReports, getPlayersWithReports} from "@/lib/api";
+import {downloadReports, getLatestReports, getPlayersWithReports} from "@/lib/api";
 import {PaginatedReportsResponse, Player} from "@/lib/types";
 import {useEffect, useState} from "react";
 import {Table, TableBody, TableCell, TableHead, TableHeader, TableRow} from "@/components/ui/table";
 import {Button} from "@/components/ui/button";
 import {Select, SelectContent, SelectGroup, SelectItem, SelectTrigger, SelectValue} from "@/components/ui/select";
 import {Label} from "@/components/ui/label";
+import {DateTimePicker} from "@/components/ui/datetime-picker";
 
 export default function ReportsPage(){
     const [reports, setReports] = useState<Report[]>([]);
@@ -15,6 +16,7 @@ export default function ReportsPage(){
     const [page, setPage] = useState(0);
     const [totalPages, setTotalPages] = useState(1);
     const [totalReports, setTotalReports] = useState(0);
+    const [selectedDate, setSelectedDate] = useState<string | null>(null);
 
     useEffect(() => {
         const fetchPlayers = async () => {
@@ -44,9 +46,41 @@ export default function ReportsPage(){
         setSelectedPlayerId(value);
     };
 
+    const handleDateChange = (value: string) => {
+        setSelectedDate(value);
+    };
+
+    const handleDownloadReports = async () => {
+        if (selectedDate) {
+            if (isNaN(selectedDate.getTime())) {
+                alert("Wpisana data jest niepoprawna. Proszę wybierz prawidłową datę.");
+                return;
+            }
+
+            const localDate = new Date(selectedDate);
+            localDate.setMinutes(localDate.getMinutes() - localDate.getTimezoneOffset());
+
+            const formattedDate = localDate.toISOString().slice(0, 19);
+            await downloadReports(formattedDate);
+        } else {
+            await downloadReports();
+        }
+    };
+
     return (
         <div className="p-2 sm:p-8">
             <h1 className="text-3xl font-bold mb-6">Raporty admin</h1>
+            <Label className="text-md">Wybierz datę i godzinę od kiedy chcesz pobrać raporty (opcjonalne):</Label>
+            <div className="w-full max-w-xl flex gap-4 items-center mb-6 mt-2">
+                <div className="flex-grow">
+                    <DateTimePicker
+                        value={selectedDate}
+                        onChange={setSelectedDate}
+                        className="w-[280px]"
+                    />
+                </div>
+                <Button onClick={handleDownloadReports} className="ml-4">Pobierz raporty</Button>
+            </div>
 
             <Label className="text-md">Pokaż raporty gracza:</Label>
             <Select value={selectedPlayerId || ""} onValueChange={handlePlayerChange}>
