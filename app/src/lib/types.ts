@@ -54,3 +54,25 @@ export interface Sitting {
     endDate: string,
     status: AccountSittingStatus
 }
+
+export interface Report {
+    id: number;
+    playerId: number;
+    reportId: string;
+    createdAt: string;
+}
+
+export interface PaginatedReportsResponse {
+    pageNumber: number;
+    pageSize: number;
+    totalElements: number;
+    totalPages: number;
+    content: Report[];
+}
+
+export interface Player {
+    playerId: string;
+    playerName: string;
+}
+
+

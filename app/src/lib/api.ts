@@ -157,7 +157,7 @@ export const sendReports = async (playerId: string, reports: string[]) => {
     return response.data;
 };
 
-export const getLatestReports = async (page = 0, size = 1000, sortBy = 'createdAt', ascending = false, playerId = null) => {
+export const getLatestReports = async (page = 0, size = 100, sortBy = 'createdAt', ascending = false, playerId = null) => {
     const params = {
         page,
         size,
