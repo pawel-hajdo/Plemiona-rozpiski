@@ -1,11 +1,16 @@
 package plemiona.rozpiski.report;
 
 import jakarta.servlet.http.HttpServletRequest;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 import plemiona.rozpiski.config.JwtService;
+import plemiona.rozpiski.config.PageDto;
 
 import java.time.LocalDateTime;
 import java.time.format.DateTimeParseException;
@@ -63,5 +68,27 @@ public class ReportController {
         return ResponseEntity.ok()
                 .header("Content-Disposition", "attachment; filename=reports.txt")
                 .body(fileContent.toString());
+    }
+
+    @GetMapping("")
+    @PreAuthorize("hasRole('ADMIN')")
+    public PageDto<Report> getLatestReports(
+            @RequestParam(defaultValue = "0") int page,
+            @RequestParam(defaultValue = "1000") int size,
+            @RequestParam(defaultValue = "createdAt") String sortBy,
+            @RequestParam(defaultValue = "false") boolean ascending
+    ) {
+
+        Sort sort = ascending ? Sort.by(sortBy).ascending() : Sort.by(sortBy).descending();
+        Pageable pageable = PageRequest.of(page, size, sort);
+        Page<Report> reports = reportService.findAll(pageable);
+
+        return new PageDto<>(
+                reports.getNumber(),
+                reports.getSize(),
+                reports.getTotalElements(),
+                reports.getTotalPages(),
+                reports.getContent()
+        );
     }
 }

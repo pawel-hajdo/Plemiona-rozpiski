@@ -1,5 +1,8 @@
 package plemiona.rozpiski.report;
 
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
@@ -49,6 +52,10 @@ public class ReportService {
 
     public List<Report> getAllReports() {
         return reportRepository.findAll();
+    }
+
+    public Page<Report> findAll(Pageable pageable) {
+        return reportRepository.findAll(pageable);
     }
 
 
