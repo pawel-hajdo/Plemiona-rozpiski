@@ -157,4 +157,33 @@ export const sendReports = async (playerId: string, reports: string[]) => {
     return response.data;
 };
 
+export const getLatestReports = async (page = 0, size = 1000, sortBy = 'createdAt', ascending = false, playerId = null) => {
+    const params = {
+        page,
+        size,
+        sortBy,
+        ascending,
+        playerId,
+    };
+
+    const response = await api.get('/reports', { params });
+    return response.data;
+};
+
+export const getPlayersWithReports = async () => {
+    const response = await api.get('/reports/players');
+    return response.data;
+}
+
+export const downloadReports = async (date = null) => {
+    const params = date ? { date } : {};
+    const response = await api.get('/reports/download', { params, responseType: 'blob' });
+    const file = new Blob([response.data], { type: 'text/plain' });
+    const link = document.createElement('a');
+    link.href = URL.createObjectURL(file);
+    link.download = 'reports.txt';
+    link.click();
+};
+
+
 export default api;
