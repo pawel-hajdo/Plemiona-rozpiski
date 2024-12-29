@@ -76,12 +76,18 @@ public class ReportController {
             @RequestParam(defaultValue = "0") int page,
             @RequestParam(defaultValue = "1000") int size,
             @RequestParam(defaultValue = "createdAt") String sortBy,
-            @RequestParam(defaultValue = "false") boolean ascending
+            @RequestParam(defaultValue = "false") boolean ascending,
+            @RequestParam(required = false) Long playerId
     ) {
 
         Sort sort = ascending ? Sort.by(sortBy).ascending() : Sort.by(sortBy).descending();
         Pageable pageable = PageRequest.of(page, size, sort);
-        Page<Report> reports = reportService.findAll(pageable);
+        Page<Report> reports;
+        if (playerId != null) {
+            reports = reportService.findByPlayerId(playerId, pageable);
+        } else {
+            reports = reportService.findAll(pageable);
+        }
 
         return new PageDto<>(
                 reports.getNumber(),
@@ -90,5 +96,12 @@ public class ReportController {
                 reports.getTotalPages(),
                 reports.getContent()
         );
+    }
+
+    @GetMapping("/players")
+    @PreAuthorize("hasRole('ADMIN')")
+    public ResponseEntity<List<PlayerReportsResponse>> getPlayersWithReports() {
+        List<PlayerReportsResponse> players = reportService.getPlayersWithReports();
+        return ResponseEntity.ok(players);
     }
 }

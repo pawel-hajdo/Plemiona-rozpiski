@@ -58,5 +58,12 @@ public class ReportService {
         return reportRepository.findAll(pageable);
     }
 
+    public Page<Report> findByPlayerId(Long playerId, Pageable pageable) {
+        return reportRepository.findByPlayerId(playerId, pageable);
+    }
+
+    public List<PlayerReportsResponse> getPlayersWithReports() {
+        return reportRepository.findPlayersWithReports();
+    }
 
 }
