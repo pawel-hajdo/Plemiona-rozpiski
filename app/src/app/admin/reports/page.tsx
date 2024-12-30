@@ -1,7 +1,7 @@
 "use client"
 import * as React from "react";
 import {downloadReports, getLatestReports, getPlayersWithReports} from "@/lib/api";
-import {PaginatedReportsResponse, Player} from "@/lib/types";
+import {PaginatedReportsResponse, Player, Report} from "@/lib/types";
 import {useEffect, useState} from "react";
 import {Table, TableBody, TableCell, TableHead, TableHeader, TableRow} from "@/components/ui/table";
 import {Button} from "@/components/ui/button";
@@ -16,7 +16,7 @@ export default function ReportsPage(){
     const [page, setPage] = useState(0);
     const [totalPages, setTotalPages] = useState(1);
     const [totalReports, setTotalReports] = useState(0);
-    const [selectedDate, setSelectedDate] = useState<string | null>(null);
+    const [selectedDate, setSelectedDate] = useState<Date | undefined>(undefined);
 
     useEffect(() => {
         const fetchPlayers = async () => {
@@ -46,18 +46,15 @@ export default function ReportsPage(){
         setSelectedPlayerId(value);
     };
 
-    const handleDateChange = (value: string) => {
-        setSelectedDate(value);
-    };
 
     const handleDownloadReports = async () => {
         if (selectedDate) {
-            if (isNaN(selectedDate.getTime())) {
+            const localDate = new Date(selectedDate);
+            if (isNaN(localDate.getTime())) {
                 alert("Wpisana data jest niepoprawna. Proszę wybierz prawidłową datę.");
                 return;
             }
 
-            const localDate = new Date(selectedDate);
             localDate.setMinutes(localDate.getMinutes() - localDate.getTimezoneOffset());
 
             const formattedDate = localDate.toISOString().slice(0, 19);
@@ -75,7 +72,7 @@ export default function ReportsPage(){
                 <div className="flex-grow">
                     <DateTimePicker
                         value={selectedDate}
-                        onChange={setSelectedDate}
+                        onChange={(date) => setSelectedDate(date)}
                         className="w-[280px]"
                     />
                 </div>

@@ -2,8 +2,8 @@ import axios from 'axios';
 import {getTokenFromCookies} from "@/lib/utils";
 
 const api = axios.create({
-    baseURL: process.env.NEXT_PUBLIC_API_BASE_URL,
-    // baseURL: 'https://plemionarozpiski.pl/api'
+    // baseURL: process.env.NEXT_PUBLIC_API_BASE_URL,
+    baseURL: 'https://plemionarozpiski.pl/api'
 });
 
 api.interceptors.request.use(
@@ -157,7 +157,7 @@ export const sendReports = async (playerId: string, reports: string[]) => {
     return response.data;
 };
 
-export const getLatestReports = async (page = 0, size = 100, sortBy = 'createdAt', ascending = false, playerId = null) => {
+export const getLatestReports = async (page = 0, size = 100, sortBy = 'createdAt', ascending = false, playerId: string | null = null) => {
     const params = {
         page,
         size,
@@ -175,7 +175,7 @@ export const getPlayersWithReports = async () => {
     return response.data;
 }
 
-export const downloadReports = async (date = null) => {
+export const downloadReports = async (date: string | null = null) => {
     const params = date ? { date } : {};
     const response = await api.get('/reports/download', { params, responseType: 'blob' });
 
