@@ -2,7 +2,7 @@ import axios from 'axios';
 import {getTokenFromCookies} from "@/lib/utils";
 
 const api = axios.create({
-    //baseURL: process.env.NEXT_PUBLIC_API_BASE_URL,
+    // baseURL: process.env.NEXT_PUBLIC_API_BASE_URL,
     baseURL: 'https://plemionarozpiski.pl/api'
 });
 
@@ -149,5 +149,48 @@ export const getSittingsDeletedCommands = async (playerId: string) => {
     const response = await api.get(`/commands/sitter/${playerId}/deleted`);
     return response.data;
 }
+
+export const sendReports = async (playerId: string, reports: string[]) => {
+    const response = await api.post(`/reports/${playerId}`, {
+        "reportIds": reports
+    });
+    return response.data;
+};
+
+export const getLatestReports = async (page = 0, size = 100, sortBy = 'createdAt', ascending = false, playerId: string | null = null) => {
+    const params = {
+        page,
+        size,
+        sortBy,
+        ascending,
+        playerId,
+    };
+
+    const response = await api.get('/reports', { params });
+    return response.data;
+};
+
+export const getPlayersWithReports = async () => {
+    const response = await api.get('/reports/players');
+    return response.data;
+}
+
+export const downloadReports = async (date: string | null = null) => {
+    const params = date ? { date } : {};
+    const response = await api.get('/reports/download', { params, responseType: 'blob' });
+
+    const contentDisposition = response.headers['content-disposition'];
+
+    const fileNameMatch = contentDisposition && contentDisposition.match(/filename="(.+)"/);
+    const fileName = fileNameMatch && fileNameMatch[1] ? fileNameMatch[1] : 'reports.txt';
+
+    const file = new Blob([response.data], { type: 'text/plain' });
+    const link = document.createElement('a');
+    link.href = URL.createObjectURL(file);
+    link.download = fileName;
+    link.click();
+};
+
+
 
 export default api;

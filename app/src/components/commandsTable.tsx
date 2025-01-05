@@ -3,7 +3,7 @@
 import * as React from "react"
 import {
     CaretSortIcon,
-    ChevronDownIcon,
+    ChevronDownIcon, CrossCircledIcon,
 } from "@radix-ui/react-icons"
 import {
     ColumnDef,
@@ -139,7 +139,7 @@ export function CommandsTable({deleted} :any) {
         if (currentTime > maxTime) {
             return 'bg-red-800 hover:bg-red-600 dark:bg-red-900 dark:hover:bg-red-700';
         } else if (currentTime < minTime) {
-            return 'bg-gray-500 hover:bg-gray-400 dark:bg-gray-900 dark:hover:bg-gray-600';
+            return 'bg-gray-500 hover:bg-gray-400 dark:bg-zinc-950 dark:hover:bg-zinc-800';
         }
         return '';
     };
@@ -388,7 +388,8 @@ export function CommandsTable({deleted} :any) {
                             variant="outline"
                             onClick={() => handleClickLink(row.id)}
                             style={{
-                                backgroundColor: isButtonDisabled(row) || clickedRows[row.id] ? 'gray' : 'none',
+                                backgroundColor: isButtonDisabled(row) || clickedRows[row.id] ? '#374151' : 'none',
+                                borderColor: isButtonDisabled(row) || clickedRows[row.id] ? '#374151' : 'none',
                             }}
                         >
                             {buttonName}
@@ -474,12 +475,23 @@ export function CommandsTable({deleted} :any) {
                 >
                     Otwórz {linksToOpenCount}
                 </Button>
-                <Input
-                    placeholder="Filtruj po kordach lub typie rozkazu..."
-                    value={globalFilter ?? ""}
-                    onChange={(event) => setGlobalFilter(String(event.target.value))}
-                    className="max-w-[60%] xs:max-w-[65%] sm:max-w-sm"
-                />
+                <div className="relative w-[60%] xs:max-w-[65%] sm:max-w-sm">
+                    <Input
+                        placeholder="Filtruj po kordach lub typie rozkazu..."
+                        value={globalFilter ?? ""}
+                        onChange={(event) => setGlobalFilter(String(event.target.value))}
+                        className="w-full pr-8"
+                    />
+                    {globalFilter && (
+                        <button
+                            onClick={() => setGlobalFilter("")}
+                            className="absolute right-2 top-1/2 -translate-y-1/2 text-gray-500 hover:text-gray-700"
+                            type="button"
+                        >
+                            <CrossCircledIcon className="h-5 w-5"/>
+                        </button>
+                    )}
+                </div>
                 <DropdownMenu>
                     <DropdownMenuTrigger asChild>
                         <Button variant="outline" className="ml-auto">

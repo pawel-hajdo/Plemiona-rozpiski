@@ -36,8 +36,8 @@ public class SecurityConfig {
                                 .requestMatchers(HttpMethod.POST,"/api/users").permitAll()
                                 .requestMatchers(HttpMethod.POST,"/api/users/auth").permitAll()
                                 .requestMatchers(HttpMethod.POST, "/api/users/reset-password").permitAll()
-                               // .requestMatchers("/v3/api-docs/**").permitAll()
-                               // .requestMatchers("/swagger-ui/**").permitAll()
+//                                .requestMatchers("/v3/api-docs/**").permitAll()
+//                                .requestMatchers("/swagger-ui/**").permitAll()
                                 .anyRequest().authenticated())
                 .sessionManagement((session)->session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
                 .authenticationProvider(authenticationProvider)
@@ -51,6 +51,7 @@ public class SecurityConfig {
         configuration.setAllowedOrigins(Arrays.asList("*"));
         configuration.setAllowedMethods(Arrays.asList("*"));
         configuration.setAllowedHeaders(Arrays.asList("*"));
+        configuration.setExposedHeaders(Arrays.asList("Content-Disposition"));
         UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();
         source.registerCorsConfiguration("/**", configuration);
         return source;

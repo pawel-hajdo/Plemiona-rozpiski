@@ -59,10 +59,10 @@ public interface CommandRepository extends JpaRepository<Command,Long> {
     @Query("""
     SELECT new plemiona.rozpiski.command.CommandStatisticsResponse(
         c.playerName,
-        COUNT(CASE WHEN c.maxTime > c.deleted THEN 1 END),
-        COUNT(CASE WHEN c.minTime < c.deleted THEN 1 END),
+        COUNT(CASE WHEN c.maxTime > c.deleted AND NOT (c.minTime <= c.deleted AND c.maxTime >= c.deleted) THEN 1 END),
         COUNT(CASE WHEN c.minTime <= c.deleted AND c.maxTime >= c.deleted THEN 1 END),
-        COUNT(CASE WHEN c.maxTime < CURRENT_TIMESTAMP AND c.deleted IS NULL THEN 1 END),
+        COUNT(CASE WHEN c.maxTime <= c.deleted then 1 end),
+        COUNT(CASE WHEN c.deleted is null then 1 end),
         COUNT(c)
     )
     FROM Command c
@@ -98,5 +98,34 @@ public interface CommandRepository extends JpaRepository<Command,Long> {
     """, nativeQuery = true)
     void recalculateCommandStatistics();
 
+    @Query("""
+    SELECT c FROM Command c
+    WHERE (c.maxTime < c.deleted OR (c.maxTime < CURRENT_TIMESTAMP AND c.deleted IS NULL))
+    ORDER BY c.maxTime asc
+    """)
+    List<Command> findBadCommands(Pageable pageable);
 
+    @Query("""
+    SELECT c FROM Command c
+    WHERE (c.maxTime < c.deleted OR (c.maxTime < CURRENT_TIMESTAMP AND c.deleted IS NULL))
+    AND (c.type LIKE 'SZLACHCIC%' OR c.type LIKE '%OFF%')
+    ORDER BY c.maxTime asc
+    """)
+    List<Command> findBadCommandsImportant(Pageable pageable);
+
+    List<Command> findByTargetInOrderByMinTimeAsc(List<String> targets);
+
+    @Query("""
+    SELECT c FROM Command c 
+    WHERE c.target IN :targets 
+    AND (c.type LIKE 'SZLACHCIC%' OR c.type LIKE '%OFF%')
+    ORDER BY c.minTime asc
+    """)
+    List<Command> findByTargetInAndTypeLikeImportant(
+            @Param("targets") List<String> targets
+    );
+
+    List<Command> findByTarget(String target);
+
+    List<Command> findByTargetAndDeletedNull(String target);
 }

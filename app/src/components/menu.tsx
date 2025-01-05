@@ -7,13 +7,16 @@ import * as React from "react";
 import {Disclosure} from "@headlessui/react";
 import {useEffect, useState} from "react";
 import {getPlayerName} from "@/lib/utils";
+import {decodeToken} from "react-jwt";
+import {JwtPayload} from "@/middleware";
 
 const navigation = [
     { name: 'Aktualne', href: '/' },
     { name: 'Usunięte', href: '/deleted' },
     { name: 'Inne', href: '/other'},
     { name: 'Zastępstwa', href: '/sittings'},
-    { name: 'Ustawienia', href: '/settings' }
+    { name: 'Ustawienia', href: '/settings' },
+    { name: 'Raporty', href: '/reports'}
 ];
 
 const Menu = () => {
@@ -22,8 +25,18 @@ const Menu = () => {
         window.location.reload();
     };
     const [playerName, setPlayerName] = useState("");
+    const [isAdmin, setIsAdmin] = useState(false);
     useEffect(() => {
         setPlayerName(getPlayerName());
+        const token = Cookies.get('token');
+        if (token) {
+            try {
+                const decoded = decodeToken(token) as JwtPayload;
+                setIsAdmin(decoded?.roles.includes('ROLE_ADMIN'));
+            } catch (error) {
+                console.error('Error while decoding token:', error);
+            }
+        }
     }, [getPlayerName()]);
 
     const pathname = usePathname();
@@ -47,6 +60,11 @@ const Menu = () => {
                                     {item.name}
                             </Link>
                         ))}
+                        {isAdmin && (
+                            <Link href="/admin/reports" className="text-gray-300 hover:bg-gray-700 hover:text-white px-3 py-2 rounded-md text-sm font-medium">
+                                Admin
+                            </Link>
+                        )}
                     </div>
                     <div className="absolute inset-y-0 right-0 flex items-center pr-2 sm:static sm:inset-auto sm:ml-6 sm:pr-0">
                         <span className="text-gray-300 pr-4">{playerName}</span>
@@ -65,6 +83,11 @@ const Menu = () => {
                                 {item.name}
                         </Link>
                     ))}
+                    {isAdmin && (
+                        <Link href="/admin/reports" className="text-gray-300 hover:bg-gray-700 hover:text-white block px-3 py-2 rounded-md text-base font-medium">
+                            Admin
+                        </Link>
+                    )}
                 </div>
             </Disclosure.Panel>
         </Disclosure>

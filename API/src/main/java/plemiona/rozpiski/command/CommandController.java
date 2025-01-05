@@ -152,4 +152,42 @@ public class CommandController {
 
         return commandService.deleteTargetVillages(commandTargetRequest.targetVillages());
     }
+
+    @GetMapping("/admin/bad-commands")
+    @PreAuthorize("hasRole('ADMIN')")
+    public ResponseEntity<List<Command>> getBadCommandsAdmin(
+            @RequestParam(defaultValue = "0") int page,
+            @RequestParam(defaultValue = "100") int size,
+            @RequestParam(required = false, defaultValue = "all") String filter
+    ) {
+        List<Command> commands = commandService.getBadCommands(page, size, filter);
+        return ResponseEntity.ok(commands);
+    }
+
+    @GetMapping("/admin/villages")
+    @PreAuthorize("hasRole('ADMIN')")
+    public ResponseEntity<List<Command>> getCommandsForTargetVillages(
+            @RequestBody CommandTargetRequest commandTargetRequest,
+            @RequestParam(required = false, defaultValue = "all") String filter
+    ) {
+        List<Command> commands = commandService.getCommandsForTargetVillages(
+                commandTargetRequest.targetVillages(),
+                filter
+        );
+        return ResponseEntity.ok(commands);
+    }
+
+    @PostMapping("/admin/shift-commands")
+    @PreAuthorize("hasRole('ADMIN')")
+    public ResponseEntity<String> shiftCommandTimes(
+            @RequestBody CommandShiftRequest shiftRequest,
+            @RequestParam(required = false, defaultValue = "all") String filter
+    ) {
+        commandService.shiftCommandTimes(
+                shiftRequest.targetVillage(),
+                shiftRequest.shiftMinutes(),
+                filter
+        );
+        return ResponseEntity.ok("Commands shifted successfully");
+    }
 }
