@@ -68,7 +68,7 @@ export default function ReportsPage(){
         <div className="p-2 sm:p-8">
             <h1 className="text-3xl font-bold mb-6">Raporty admin</h1>
             <Label className="text-md">Wybierz datę i godzinę od kiedy chcesz pobrać raporty (opcjonalne):</Label>
-            <div className="w-full max-w-xl flex gap-4 items-center mb-6 mt-2">
+            <div className="w-full max-w-xl flex flex-col sm:flex-row gap-4 items-center mb-6 mt-2">
                 <div className="flex-grow">
                     <DateTimePicker
                         value={selectedDate}
