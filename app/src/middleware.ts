@@ -7,7 +7,7 @@ import { decodeToken } from "react-jwt";
 const publicRoutes = ['/login', '/register', '/reset'];
 const adminRoutes = ['/admin'];
 
-interface JwtPayload {
+export interface JwtPayload {
     roles: string[];
 }
 
@@ -30,7 +30,7 @@ export function middleware(req: NextRequest) {
     if (isAuthenticated && adminRoutes.some(route => pathname.startsWith(route))) {
         try {
             const decoded = decodeToken(token) as JwtPayload;
-            const hasAdminRole = decoded.roles.includes('ROLE_ADMIN');
+            const hasAdminRole = decoded?.roles.includes('ROLE_ADMIN');
 
             if (!hasAdminRole) {
                 return NextResponse.redirect(new URL('/', req.url));

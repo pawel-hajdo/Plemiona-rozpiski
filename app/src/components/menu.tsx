@@ -8,6 +8,7 @@ import {Disclosure} from "@headlessui/react";
 import {useEffect, useState} from "react";
 import {getPlayerName} from "@/lib/utils";
 import {decodeToken} from "react-jwt";
+import {JwtPayload} from "@/middleware";
 
 const navigation = [
     { name: 'Aktualne', href: '/' },
@@ -30,7 +31,7 @@ const Menu = () => {
         const token = Cookies.get('token');
         if (token) {
             try {
-                const decoded = decodeToken(token);
+                const decoded = decodeToken(token) as JwtPayload;
                 setIsAdmin(decoded?.roles.includes('ROLE_ADMIN'));
             } catch (error) {
                 console.error('Error while decoding token:', error);
