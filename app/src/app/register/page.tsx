@@ -93,6 +93,7 @@ export default function Register() {
                     <SelectContent>
                         <SelectGroup>
                             <SelectItem value="pl206">pl206</SelectItem>
+                            <SelectItem value="pl208">pl208</SelectItem>
                         </SelectGroup>
                     </SelectContent>
                 </Select>
