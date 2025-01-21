@@ -77,9 +77,11 @@ public interface CommandRepository extends JpaRepository<Command,Long> {
     """)
     List<CommandPlayerInfoResponse> findDistinctCommandPlayers();
 
-    Page<Command> findByPlayerIdOrderByMaxTimeAsc(String playerId, Pageable pageable);
+    Page<Command> findByPlayerIdAndWorldOrderByMaxTimeAsc(String playerId, String world, Pageable pageable);
 
-    void deleteByTargetIn(List<String> targets);
+    @Modifying
+    @Query("DELETE FROM Command c WHERE c.target IN :targets AND c.world = :world")
+    void deleteByTargetInAndWorld(@Param("targets") List<String> targets, @Param("world") String world);
 
     @Modifying
     @Query(value = """
@@ -101,31 +103,44 @@ public interface CommandRepository extends JpaRepository<Command,Long> {
     @Query("""
     SELECT c FROM Command c
     WHERE (c.maxTime < c.deleted OR (c.maxTime < CURRENT_TIMESTAMP AND c.deleted IS NULL))
+    AND c.world = :world
     ORDER BY c.maxTime asc
     """)
-    List<Command> findBadCommands(Pageable pageable);
+    List<Command> findBadCommands(@Param("world") String world, Pageable pageable);
 
     @Query("""
     SELECT c FROM Command c
     WHERE (c.maxTime < c.deleted OR (c.maxTime < CURRENT_TIMESTAMP AND c.deleted IS NULL))
     AND (c.type LIKE 'SZLACHCIC%' OR c.type LIKE '%OFF%')
+    AND c.world = :world
     ORDER BY c.maxTime asc
     """)
-    List<Command> findBadCommandsImportant(Pageable pageable);
+    List<Command> findBadCommandsImportant(@Param("world") String world, Pageable pageable);
 
-    List<Command> findByTargetInOrderByMinTimeAsc(List<String> targets);
+    @Query("""
+    SELECT c FROM Command c 
+    WHERE c.target IN :targets 
+    AND c.world = :world
+    ORDER BY c.minTime ASC
+    """)
+    List<Command> findByTargetInOrderByMinTimeAsc(
+            @Param("targets") List<String> targets,
+            @Param("world") String world
+    );
 
     @Query("""
     SELECT c FROM Command c 
     WHERE c.target IN :targets 
     AND (c.type LIKE 'SZLACHCIC%' OR c.type LIKE '%OFF%')
+    AND c.world = :world
     ORDER BY c.minTime asc
     """)
     List<Command> findByTargetInAndTypeLikeImportant(
-            @Param("targets") List<String> targets
+            @Param("targets") List<String> targets,
+            @Param("world") String world
     );
 
-    List<Command> findByTarget(String target);
+    List<Command> findByTargetAndWorld(String target, String world);
 
-    List<Command> findByTargetAndDeletedNull(String target);
+    List<Command> findByTargetAndWorldAndDeletedNull(String target, String world);
 }
