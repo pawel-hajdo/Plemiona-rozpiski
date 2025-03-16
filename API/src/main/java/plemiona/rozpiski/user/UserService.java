@@ -37,6 +37,7 @@ public class UserService {
     private final AuthenticationManager authenticationManager;
     private final RestTemplate restTemplate;
     private Map<String, Integer> playerIdMap = new HashMap<>();
+    private LocalDateTime lastMapUpdate;
 
     @Autowired
     public UserService(UserRepository userRepository, LogRepository logRepository, PasswordEncoder passwordEncoder, JwtService jwtService, AuthenticationManager authenticationManager, RestTemplate restTemplate) {
@@ -67,6 +68,7 @@ public class UserService {
         newUser.setPassword(hashedPassword);
         newUser.setPlayerId(playerId);
         newUser.addRole(Role.USER);
+        newUser.setRegisterWorld(request.world());
 
         userRepository.save(newUser);
         saveToLogs(newUser.getId(), LogType.USER_REGISTER);
