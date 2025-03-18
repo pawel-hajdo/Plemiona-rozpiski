@@ -58,6 +58,7 @@ import {ColumnNames, Command} from "@/lib/types";
 
 export function CommandsTable({deleted} :any) {
     const [commands, setCommands] = useState<Command[]>([]);
+    const [filteredCommands, setFilteredCommands] = useState<Command[]>([]);
     const [sorting, setSorting] = React.useState<SortingState>([loadSortingPreference()])
     const [columnFilters, setColumnFilters] = React.useState<ColumnFiltersState>([])
     const [columnVisibility, setColumnVisibility] = React.useState<VisibilityState>({});
@@ -72,6 +73,14 @@ export function CommandsTable({deleted} :any) {
     const [error, setError] = useState("")
     const [globalFilter, setGlobalFilter] = React.useState("");
     const [isLoading, setIsLoading] = useState(true);
+
+    const availableWorlds = ["pl206", "pl208", "pl210"];
+    const [worldFilters, setWorldFilters] = useState<Record<string, boolean>>({
+        pl206: true,
+        pl208: true,
+        pl210: true
+    });
+    const [showWorldFilters, setShowWorldFilters] = useState(false);
 
     useEffect(() => {
         const fetchCommandsData = async () => {
@@ -107,6 +116,20 @@ export function CommandsTable({deleted} :any) {
     useEffect(() => {
         savePageSize(pagination.pageSize);
     }, [pagination.pageSize]);
+
+    useEffect(() => {
+        const filteredData = commands.filter(command => worldFilters[command.world]);
+        setFilteredCommands(filteredData);
+        // Reset to first page when filters change
+        setPagination(prev => ({ ...prev, pageIndex: 0 }));
+    }, [commands, worldFilters]);
+
+    const handleWorldFilterChange = (world: string, checked: boolean) => {
+        setWorldFilters(prev => ({
+            ...prev,
+            [world]: checked
+        }));
+    };
 
     const openLinksInTabs = () => {
         const rows = table.getRowModel().rows;
@@ -406,9 +429,9 @@ export function CommandsTable({deleted} :any) {
     ]
 
     const table = useReactTable({
-        data: commands,
+        data: filteredCommands,
         columns,
-        pageCount: Math.ceil(commands.length / pagination.pageSize),
+        pageCount: Math.ceil(filteredCommands.length / pagination.pageSize),
         onSortingChange: setSorting,
         onColumnFiltersChange: setColumnFilters,
         getCoreRowModel: getCoreRowModel(),
@@ -475,7 +498,7 @@ export function CommandsTable({deleted} :any) {
                 >
                     Otwórz {linksToOpenCount}
                 </Button>
-                <div className="relative w-[60%] xs:max-w-[65%] sm:max-w-sm">
+                <div className="relative w-[30%] xs:max-w-[65%] sm:max-w-sm">
                     <Input
                         placeholder="Filtruj po kordach lub typie rozkazu..."
                         value={globalFilter ?? ""}
@@ -492,6 +515,35 @@ export function CommandsTable({deleted} :any) {
                         </button>
                     )}
                 </div>
+
+                <DropdownMenu open={showWorldFilters} onOpenChange={setShowWorldFilters}>
+                    <DropdownMenuTrigger asChild>
+                        <Button variant="outline">
+                            Światy
+                            <ChevronDownIcon className="ml-2 h-4 w-4" />
+                        </Button>
+                    </DropdownMenuTrigger>
+                    <DropdownMenuContent align="start" className="w-40">
+                         <div className="px-2 py-1">
+                            {availableWorlds.map(world => (
+                                <div key={world} className="flex items-center space-x-2 py-1">
+                                    <Checkbox
+                                        id={`world-${world}`}
+                                        checked={worldFilters[world] || false}
+                                        onCheckedChange={(checked) => handleWorldFilterChange(world, !!checked)}
+                                    />
+                                    <label
+                                        htmlFor={`world-${world}`}
+                                        className="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70"
+                                    >
+                                        {world}
+                                    </label>
+                                </div>
+                            ))}
+                        </div>
+                    </DropdownMenuContent>
+                </DropdownMenu>
+
                 <DropdownMenu>
                     <DropdownMenuTrigger asChild>
                         <Button variant="outline" className="ml-auto">
