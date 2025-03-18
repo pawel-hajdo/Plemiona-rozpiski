@@ -33,6 +33,7 @@ export type ColumnNames = {
 export interface VillageData {
     source: string;
     count: number;
+    world: string;
 }
 
 export enum AccountSittingStatus {
