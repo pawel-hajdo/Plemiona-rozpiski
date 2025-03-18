@@ -30,7 +30,7 @@ export type ColumnNames = {
     world: string,
 }
 
-export interface NobleData {
+export interface VillageData {
     source: string;
     count: number;
 }

@@ -1,24 +1,20 @@
 "use client"
-import {useEffect, useState} from "react";
-import {getPlayerId} from "@/lib/utils";
-import {getPlayerLinks, getSourceVillagesByType} from "@/lib/api";
-import {Textarea} from "@/components/ui/textarea";
-import {Label} from "@/components/ui/label";
+import { useEffect, useState } from "react";
+import { getPlayerId } from "@/lib/utils";
+import { getPlayerLinks, getSourceVillagesByType } from "@/lib/api";
+import { Textarea } from "@/components/ui/textarea";
+import { Label } from "@/components/ui/label";
 import * as React from "react";
-import {Button} from "@/components/ui/button";
-import {Accordion, AccordionContent, AccordionItem, AccordionTrigger} from "@/components/ui/accordion";
-import {NobleData} from "@/lib/types";
+import { Button } from "@/components/ui/button";
+import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from "@/components/ui/accordion";
+import {VillageData} from "@/lib/types";
 
-type Accumulator = Record<string, number>;
-type ButtonType = 'nobles' | 'fakeNobles' | 'defNobles' | 'allNobles' | 'offs';
+type GroupedData = Record<string, { allNobles: VillageData[], offs: VillageData[] }>;
+type ButtonTextState = Record<string, string>;
 
-export default function Other(){
-    const [offs, setOffs] = useState([])
-    const [allNobles, setAllNobles] = useState<NobleData[]>([]);
-    const [buttonText, setButtonText] = useState({
-        allNobles: "Kopiuj do schowka",
-        offs: "Kopiuj do schowka"
-    });
+export default function Other() {
+    const [groupedData, setGroupedData] = useState<GroupedData>({});
+    const [buttonText, setButtonText] = useState<ButtonTextState>({});
     const playerId = getPlayerId();
 
     useEffect(() => {
@@ -29,53 +25,72 @@ export default function Other(){
                     getSourceVillagesByType(playerId, 'Gruby'),
                     getSourceVillagesByType(playerId, 'OFF')
                 ]);
-                setOffs(offsData);
-                console.log(noblesData1);
-                console.log(noblesData2);
-                const mergedNobles = mergeAndSumData([noblesData1, noblesData2]);
-                setAllNobles(mergedNobles);
+
+                const mergedNobles = mergeAndSumData([...noblesData1, ...noblesData2]);
+                const grouped = groupDataByWorld(mergedNobles, offsData);
+                setGroupedData(grouped);
+
+                const initialButtonText: ButtonTextState = {};
+                Object.keys(grouped).forEach(world => {
+                    initialButtonText[`allNobles-${world}`] = "Kopiuj do schowka";
+                    initialButtonText[`offs-${world}`] = "Kopiuj do schowka";
+                });
+                setButtonText(initialButtonText);
+
             } catch (error) {
                 console.error("Błąd podczas pobierania danych:", error);
             }
-        }
+        };
 
         fetchData();
     }, []);
 
-    const formatData = (data: NobleData[], includeCount = true): string => {
-        return data.map(item => {
-            return includeCount
-                ? `${item.source} - ${item.count}`
-                : item.source;
-        }).join('\n');
+    const groupDataByWorld = (nobles: VillageData[], offs: VillageData[]): GroupedData => {
+        const grouped: GroupedData = {};
+
+        [...nobles, ...offs].forEach(item => {
+            const { world } = item;
+            if (!grouped[world]) {
+                grouped[world] = { allNobles: [], offs: [] };
+            }
+            if (nobles.includes(item)) {
+                grouped[world].allNobles.push(item);
+            } else {
+                grouped[world].offs.push(item);
+            }
+        });
+
+        return grouped;
     };
 
-    const mergeAndSumData = (dataArrays: NobleData[]): NobleData[] => {
-        const combined = dataArrays.flat();
+    const formatData = (data: VillageData[], includeCount = true): string => {
+        return data.map(item =>
+            includeCount ? `${item.source} - ${item.count}` : item.source
+        ).join('\n');
+    };
 
-        const resultMap = combined.reduce((acc: Accumulator, item) => {
+    const mergeAndSumData = (data: VillageData[]): VillageData[] => {
+        const resultMap = data.reduce((acc: Record<string, VillageData>, item) => {
             if (acc[item.source]) {
-                acc[item.source] += item.count;
+                acc[item.source].count += item.count;
             } else {
-                acc[item.source] = item.count;
+                acc[item.source] = { ...item };
             }
             return acc;
         }, {});
 
-        return Object.keys(resultMap).map(key => ({ source: key, count: resultMap[key] }));
+        return Object.values(resultMap);
     };
 
-    const copyToClipboard = (text: string, type: ButtonType) => {
+    const copyToClipboard = (text: string, type: string) => {
         navigator.clipboard.writeText(text)
             .then(() => {
                 setButtonText(prev => ({ ...prev, [type]: "Skopiowano!" }));
                 setTimeout(() => {
                     setButtonText(prev => ({ ...prev, [type]: "Kopiuj do schowka" }));
-                }, 2000); // Reset after 2s
+                }, 2000);
             })
-            .catch(err => {
-                console.error("Błąd podczas kopiowania tekstu: ", err);
-            });
+            .catch(err => console.error("Błąd podczas kopiowania tekstu: ", err));
     };
 
     return (
@@ -86,44 +101,51 @@ export default function Other(){
                     <AccordionTrigger>A po co to?</AccordionTrigger>
                     <AccordionContent>
                         Poniżej znajduje się lista kordów (Twoich wiosek) z których są rozpisane ataki danego typu (offy, grube itd).<br /><br />
-                        Możesz ją wykorzystać np. do wklejenia na mapie w plemionach gdy potrzebujesz sprawdzić czy masz jakieś nierozpisane offy
-                        albo żeby sprawdzić ile grubych masz do wysłania z danej wioski, bo np. broniłeś konta i Ci padły, i nie wiesz gdzie je stawiać.<br /><br />
+                        Możesz ją wykorzystać np. do wklejenia na mapie w plemionach, gdy potrzebujesz sprawdzić czy masz jakieś nierozpisane offy
+                        albo żeby sprawdzić ile grubych masz do wysłania z danej wioski.<br /><br />
                         (Do zaznaczania na mapie nie trzeba nic usuwać, można skopiować kordy razem z ilością i zadziała)
                     </AccordionContent>
                 </AccordionItem>
             </Accordion>
-            <div className="grid grid-cols-1 gap-4 md:grid-cols-2 lg:grid-cols-3 mt-4">
-                <div>
-                    <div className="flex items-center mb-2">
-                        <Label htmlFor="allNobles" className="text-lg font-medium mr-2">Wszystkie Szlachcice</Label>
-                        <Button onClick={() => copyToClipboard(formatData(allNobles), 'allNobles')} variant="outline">
-                            {buttonText.allNobles}
-                        </Button>
+
+            {Object.entries(groupedData).map(([world, { allNobles, offs }]) => (
+                <div key={world} className="mt-6">
+                    <h2 className="text-xl font-semibold">Świat {world}</h2>
+
+                    <div className="grid grid-cols-1 gap-4 md:grid-cols-2 lg:grid-cols-3 mt-4">
+                        <div>
+                            <div className="flex items-center mb-2">
+                                <Label htmlFor={`allNobles-${world}`} className="text-lg font-medium mr-2">Wszystkie Szlachcice</Label>
+                                <Button onClick={() => copyToClipboard(formatData(allNobles), `allNobles-${world}`)} variant="outline">
+                                    {buttonText[`allNobles-${world}`]}
+                                </Button>
+                            </div>
+                            <Textarea
+                                rows={10}
+                                className="w-full border border-gray-300 rounded-md p-2"
+                                value={formatData(allNobles)}
+                                readOnly
+                                id={`allNobles-${world}`}
+                            />
+                        </div>
+                        <div>
+                            <div className="flex items-center mb-2">
+                                <Label htmlFor={`offs-${world}`} className="text-lg font-medium mr-2">Offy</Label>
+                                <Button onClick={() => copyToClipboard(formatData(offs, false), `offs-${world}`)} variant="outline">
+                                    {buttonText[`offs-${world}`]}
+                                </Button>
+                            </div>
+                            <Textarea
+                                rows={10}
+                                className="w-full border border-gray-300 rounded-md p-2"
+                                value={formatData(offs, false)}
+                                readOnly
+                                id={`offs-${world}`}
+                            />
+                        </div>
                     </div>
-                    <Textarea
-                        rows={10}
-                        className="w-full border border-gray-300 rounded-md p-2"
-                        value={formatData(allNobles)}
-                        readOnly
-                        id="allNobles"
-                    />
                 </div>
-                <div>
-                    <div className="flex items-center mb-2">
-                        <Label htmlFor="offs" className="text-lg font-medium mr-2">Offy</Label>
-                        <Button onClick={() => copyToClipboard(formatData(offs, false), 'offs')} variant="outline">
-                            {buttonText.offs}
-                        </Button>
-                    </div>
-                    <Textarea
-                        rows={10}
-                        className="w-full border border-gray-300 rounded-md p-2"
-                        value={formatData(offs, false)}
-                        readOnly
-                        id="offs"
-                    />
-                </div>
-            </div>
+            ))}
         </div>
-    )
+    );
 }

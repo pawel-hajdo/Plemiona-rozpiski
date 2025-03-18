@@ -23,12 +23,12 @@ public interface CommandRepository extends JpaRepository<Command,Long> {
     Page<CommandResponse> findByPlayerIdAndDeletedNotNullOrderByMaxTimeDesc(@Param("playerId") Integer playerId, Pageable pageable);
 
     @Query("""
-    SELECT new plemiona.rozpiski.command.SourceVillagesResponse(c.source, COUNT(c))
+    SELECT new plemiona.rozpiski.command.SourceVillagesResponse(c.source, COUNT(c), c.world)
     FROM Command c
     WHERE c.playerId = :playerId
       AND c.type LIKE %:type%
-    GROUP BY c.source
-    ORDER BY c.source ASC
+    GROUP BY c.source, c.world
+    ORDER BY COUNT(c) DESC
     """)
     List<SourceVillagesResponse> findDistinctSourceWithCountByPlayerIdAndTypeLike(
             @Param("playerId") Integer playerId,
