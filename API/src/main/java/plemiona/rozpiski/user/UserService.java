@@ -69,6 +69,7 @@ public class UserService {
         newUser.setPlayerId(playerId);
         newUser.addRole(Role.USER);
         newUser.setRegisterWorld(request.world());
+        newUser.setReportsAccess(false);
 
         userRepository.save(newUser);
         saveToLogs(newUser.getId(), LogType.USER_REGISTER);
@@ -78,6 +79,7 @@ public class UserService {
         claims.put("roles", newUser.getAuthorities().stream()
                 .map(GrantedAuthority::getAuthority)
                 .collect(Collectors.toList()));
+        claims.put("reportsAccess", newUser.getReportsAccess());
 
         var jwtToken = jwtService.generateToken(claims, newUser);
         return new AuthenticationResponse(jwtToken);
@@ -93,6 +95,7 @@ public class UserService {
         claims.put("roles", user.getAuthorities().stream()
                 .map(GrantedAuthority::getAuthority)
                 .collect(Collectors.toList()));
+        claims.put("reportsAccess", user.getReportsAccess());
         var jwtToken = jwtService.generateToken(claims, user);
         saveToLogs(user.getId(), LogType.USER_LOGIN_SUCCESSFUL);
         return new AuthenticationResponse(jwtToken);

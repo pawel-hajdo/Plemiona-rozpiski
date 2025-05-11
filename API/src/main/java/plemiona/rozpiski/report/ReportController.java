@@ -36,7 +36,7 @@ public class ReportController {
             @RequestBody ReportRequest reportRequest,
             HttpServletRequest request
     ){
-        if(!jwtService.checkUser(playerId.toString(), request)){
+        if (!jwtService.checkAccessToReports(playerId.toString(), request)) {
             return new ResponseEntity<>(HttpStatus.FORBIDDEN);
         }
         int addedCount = reportService.saveReports(playerId, reportRequest.reportIds());
