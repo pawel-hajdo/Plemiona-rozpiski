@@ -46,9 +46,9 @@ import {useEffect, useState} from "react";
 import {
     loadColumnVisibility,
     loadLinksToOpenCount,
-    loadPageSize, loadSortingPreference,
+    loadPageSize, loadSortingPreference, loadWorldFilters,
     saveColumnVisibility,
-    savePageSize
+    savePageSize, saveWorldFilters
 } from "@/lib/localStorage";
 import {formatDate, fuzzyFilter, generateLink, getPlayerId, isButtonDisabled} from "@/lib/utils";
 import PaginationControls from "@/components/paginationControlrs";
@@ -75,11 +75,7 @@ export function CommandsTable({deleted} :any) {
     const [isLoading, setIsLoading] = useState(true);
 
     const availableWorlds = ["pl206", "pl208", "pl210"];
-    const [worldFilters, setWorldFilters] = useState<Record<string, boolean>>({
-        pl206: true,
-        pl208: true,
-        pl210: true
-    });
+    const [worldFilters, setWorldFilters] = useState<Record<string, boolean>>({});
     const [showWorldFilters, setShowWorldFilters] = useState(false);
 
     useEffect(() => {
@@ -105,6 +101,7 @@ export function CommandsTable({deleted} :any) {
         setColumnVisibility(loadColumnVisibility());
         fetchCommandsData();
         setLinkToOpenCount(loadLinksToOpenCount);
+        setWorldFilters(loadWorldFilters(availableWorlds))
     }, []);
 
     useEffect(() => {
@@ -123,6 +120,12 @@ export function CommandsTable({deleted} :any) {
         // Reset to first page when filters change
         setPagination(prev => ({ ...prev, pageIndex: 0 }));
     }, [commands, worldFilters]);
+
+    useEffect(() => {
+        if (Object.keys(worldFilters).length > 0) {
+            saveWorldFilters(worldFilters);
+        }
+    }, [worldFilters]);
 
     const handleWorldFilterChange = (world: string, checked: boolean) => {
         setWorldFilters(prev => ({
