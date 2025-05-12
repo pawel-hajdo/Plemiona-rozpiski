@@ -16,7 +16,6 @@ const navigation = [
     { name: 'Inne', href: '/other'},
     { name: 'Zastępstwa', href: '/sittings'},
     { name: 'Ustawienia', href: '/settings' },
-    { name: 'Raporty', href: '/reports'}
 ];
 
 const Menu = () => {
@@ -26,6 +25,8 @@ const Menu = () => {
     };
     const [playerName, setPlayerName] = useState("");
     const [isAdmin, setIsAdmin] = useState(false);
+    const [hasReportsAccess, setHasReportsAccess] = useState(false);
+
     useEffect(() => {
         setPlayerName(getPlayerName());
         const token = Cookies.get('token');
@@ -33,6 +34,7 @@ const Menu = () => {
             try {
                 const decoded = decodeToken(token) as JwtPayload;
                 setIsAdmin(decoded?.roles.includes('ROLE_ADMIN'));
+                setHasReportsAccess(decoded?.reportsAccess);
             } catch (error) {
                 console.error('Error while decoding token:', error);
             }
@@ -60,6 +62,11 @@ const Menu = () => {
                                     {item.name}
                             </Link>
                         ))}
+                        {hasReportsAccess && (
+                            <Link href="/reports" className="text-gray-300 hover:bg-gray-700 hover:text-white px-3 py-2 rounded-md text-sm font-medium">
+                                Raporty
+                            </Link>
+                        )}
                         {isAdmin && (
                             <Link href="/admin/reports" className="text-gray-300 hover:bg-gray-700 hover:text-white px-3 py-2 rounded-md text-sm font-medium">
                                 Admin
@@ -83,6 +90,11 @@ const Menu = () => {
                                 {item.name}
                         </Link>
                     ))}
+                    {hasReportsAccess && (
+                        <Link href="/reports" className="text-gray-300 hover:bg-gray-700 hover:text-white block px-3 py-2 rounded-md text-base font-medium">
+                            Raporty
+                        </Link>
+                    )}
                     {isAdmin && (
                         <Link href="/admin/reports" className="text-gray-300 hover:bg-gray-700 hover:text-white block px-3 py-2 rounded-md text-base font-medium">
                             Admin
