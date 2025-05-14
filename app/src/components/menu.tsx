@@ -33,8 +33,8 @@ const Menu = () => {
         if (token) {
             try {
                 const decoded = decodeToken(token) as JwtPayload;
-                setIsAdmin(decoded?.roles.includes('ROLE_ADMIN'));
-                setHasReportsAccess(decoded?.reportsAccess);
+                setIsAdmin(decoded?.roles?.includes('ROLE_ADMIN') || false);
+                setHasReportsAccess(decoded?.reportsAccess || false);
             } catch (error) {
                 console.error('Error while decoding token:', error);
             }
