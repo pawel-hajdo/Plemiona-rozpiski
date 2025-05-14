@@ -101,21 +101,70 @@ public interface CommandRepository extends JpaRepository<Command,Long> {
     void recalculateCommandStatistics();
 
     @Query("""
-    SELECT c FROM Command c
+    SELECT new plemiona.rozpiski.command.AdminCommandResponse(
+        c.id,
+        c.commandNumberId,
+        c.minTime,
+        c.maxTime,
+        c.source,
+        c.sourceId,
+        c.target,
+        c.targetId,
+        c.type,
+        c.playerId,
+        c.playerName,
+        c.world,
+        c.attackTime,
+        c.deleted,
+        c.operationName,
+        c.attackSequenceNumber,
+        c.totalCommandsFromSource,
+        CASE
+            WHEN c.deleted IS NOT NULL
+            THEN CAST(FUNCTION('TIMESTAMPDIFF', MINUTE, c.maxTime, c.deleted) AS java.lang.Long)
+            ELSE NULL
+        END
+    )
+    FROM Command c
     WHERE (c.maxTime < c.deleted OR (c.maxTime < CURRENT_TIMESTAMP AND c.deleted IS NULL))
     AND c.world = :world
-    ORDER BY c.maxTime asc
-    """)
-    List<Command> findBadCommands(@Param("world") String world, Pageable pageable);
+    ORDER BY c.maxTime ASC
+""")
+    List<AdminCommandResponse> findBadCommands(@Param("world") String world, Pageable pageable);
+
 
     @Query("""
-    SELECT c FROM Command c
+    SELECT new plemiona.rozpiski.command.AdminCommandResponse(
+        c.id,
+        c.commandNumberId,
+        c.minTime,
+        c.maxTime,
+        c.source,
+        c.sourceId,
+        c.target,
+        c.targetId,
+        c.type,
+        c.playerId,
+        c.playerName,
+        c.world,
+        c.attackTime,
+        c.deleted,
+        c.operationName,
+        c.attackSequenceNumber,
+        c.totalCommandsFromSource,
+        CASE
+            WHEN c.deleted IS NOT NULL
+            THEN CAST(FUNCTION('TIMESTAMPDIFF', MINUTE, c.maxTime, c.deleted) AS java.lang.Long)
+            ELSE NULL
+        END
+    )
+    FROM Command c
     WHERE (c.maxTime < c.deleted OR (c.maxTime < CURRENT_TIMESTAMP AND c.deleted IS NULL))
     AND (c.type LIKE 'SZLACHCIC%' OR c.type LIKE '%OFF%')
     AND c.world = :world
-    ORDER BY c.maxTime asc
-    """)
-    List<Command> findBadCommandsImportant(@Param("world") String world, Pageable pageable);
+    ORDER BY c.maxTime ASC
+""")
+    List<AdminCommandResponse> findBadCommandsImportant(@Param("world") String world, Pageable pageable);
 
     @Query("""
     SELECT c FROM Command c 

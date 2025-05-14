@@ -157,12 +157,12 @@ public class CommandController {
 
     @GetMapping("/admin/bad-commands")
     @PreAuthorize("hasRole('ADMIN')")
-    public ResponseEntity<List<Command>> getBadCommandsAdmin(
+    public ResponseEntity<List<AdminCommandResponse>> getBadCommandsAdmin(
             @RequestParam(defaultValue = "0") int page,
             @RequestParam(defaultValue = "100") int size,
             @RequestParam(required = false, defaultValue = "all") String filter
     ) {
-        List<Command> commands = commandService.getBadCommands(page, size, filter, world);
+        List<AdminCommandResponse> commands = commandService.getBadCommands(page, size, filter, world);
         return ResponseEntity.ok(commands);
     }
 

@@ -23,5 +23,5 @@ public class Link {
     private String url;
 
     @Column(name = "operation_name")
-    private String operation_name;
+    private String operationName;
 }

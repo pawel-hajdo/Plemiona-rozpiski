@@ -135,7 +135,7 @@ public class CommandService {
     }
 
 
-    public List<Command> getBadCommands(int page, int size, String filter, String world) {
+    public List<AdminCommandResponse> getBadCommands(int page, int size, String filter, String world) {
         Pageable pageable = PageRequest.of(page, size);
         switch (filter.toLowerCase()) {
             case "important":
