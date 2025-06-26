@@ -32,8 +32,14 @@ public class User implements UserDetails {
     @Column(name = "player_id")
     private Integer playerId;
 
+    @Column(name = "register_world")
+    private String registerWorld;
+
     @OneToMany(mappedBy = "user", cascade = CascadeType.ALL, fetch = FetchType.EAGER)
     private Set<UserRole> roles = new HashSet<>();
+
+    @Column(name = "reports_access")
+    private Boolean reportsAccess;
 
     @Override
     public Collection<? extends GrantedAuthority> getAuthorities() {

@@ -6,9 +6,11 @@ import { decodeToken } from "react-jwt";
 
 const publicRoutes = ['/login', '/register', '/reset'];
 const adminRoutes = ['/admin'];
+const reportsRoutes = ['/reports'];
 
 export interface JwtPayload {
     roles: string[];
+    reportsAccess?: boolean;
 }
 
 export function middleware(req: NextRequest) {
@@ -27,19 +29,30 @@ export function middleware(req: NextRequest) {
         return NextResponse.redirect(absoluteURL.toString());
     }
 
-    if (isAuthenticated && adminRoutes.some(route => pathname.startsWith(route))) {
+    if (isAuthenticated) {
         try {
             const decoded = decodeToken(token) as JwtPayload;
-            const hasAdminRole = decoded?.roles.includes('ROLE_ADMIN');
 
-            if (!hasAdminRole) {
-                return NextResponse.redirect(new URL('/', req.url));
+            // Admin check
+            if (adminRoutes.some(route => pathname.startsWith(route))) {
+                if (!decoded?.roles.includes('ROLE_ADMIN')) {
+                    return NextResponse.redirect(new URL('/', req.url));
+                }
             }
+
+            // Reports access check
+            if (reportsRoutes.some(route => pathname.startsWith(route))) {
+                if (!decoded?.reportsAccess) {
+                    return NextResponse.redirect(new URL('/', req.url));
+                }
+            }
+
         } catch (error) {
-            console.error(error)
+            console.error(error);
             return NextResponse.redirect(new URL('/', req.url));
         }
     }
+
     return NextResponse.next();
 }
 

@@ -57,7 +57,7 @@ public class Command {
     private LocalDateTime deleted;
 
     @Column(name = "operation_name")
-    private String operation_name;
+    private String operationName;
 
     @Column(name = "attack_sequence_number")
     private Integer attackSequenceNumber;

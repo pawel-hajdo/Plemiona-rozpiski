@@ -8,6 +8,7 @@ import io.jsonwebtoken.security.Keys;
 import jakarta.servlet.http.HttpServletRequest;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Service;
+import plemiona.rozpiski.user.UserRepository;
 
 import java.security.Key;
 import java.time.LocalDateTime;
@@ -21,6 +22,12 @@ import java.util.function.Function;
 public class JwtService {
 
     private static String SECRET_KEY = System.getenv("JWT_SECRET_KEY");
+    private final UserRepository userRepository;
+
+    public JwtService(UserRepository userRepository) {
+        this.userRepository = userRepository;
+    }
+
     public String extractUsername(String token) {
         return extractClaim(token, Claims::getSubject);
     }
@@ -101,4 +108,16 @@ public class JwtService {
         String tokenPlayerId = extractPlayerId(token);
         return playerId.equals(tokenPlayerId);
     }
+
+    public boolean checkAccessToReports(String playerId, HttpServletRequest request) {
+        String token = extractTokenFromRequest(request);
+        if (token == null) return false;
+
+        String tokenPlayerId = extractPlayerId(token);
+        if (!playerId.equals(tokenPlayerId)) return false;
+
+        Boolean hasAccess = extractClaim(token, claims -> claims.get("reportsAccess", Boolean.class));
+        return Boolean.TRUE.equals(hasAccess);
+    }
+
 }

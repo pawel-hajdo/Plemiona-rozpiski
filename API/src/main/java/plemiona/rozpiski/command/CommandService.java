@@ -122,48 +122,48 @@ public class CommandService {
         return commandRepository.findDistinctCommandPlayers();
     }
 
-    public List<Command> getCommandsByPlayerIdAdmin(String playerId, int page, int size){
+    public List<Command> getCommandsByPlayerIdAdmin(String playerId, String world, int page, int size){
         Pageable pageable = PageRequest.of(page, size);
-        return commandRepository.findByPlayerIdOrderByMaxTimeAsc(playerId, pageable).getContent();
+        return commandRepository.findByPlayerIdAndWorldOrderByMaxTimeAsc(playerId, world, pageable).getContent();
     }
 
     @Transactional
-    public ResponseEntity<String> deleteTargetVillages(List<String> targetVillages) {
-        commandRepository.deleteByTargetIn(targetVillages);
+    public ResponseEntity<String> deleteTargetVillages(List<String> targetVillages, String world) {
+        commandRepository.deleteByTargetInAndWorld(targetVillages, world);
         commandRepository.recalculateCommandStatistics();
         return ResponseEntity.ok("Commands deleted and statistics recalculated successfully");
     }
 
 
-    public List<Command> getBadCommands(int page, int size, String filter) {
+    public List<AdminCommandResponse> getBadCommands(int page, int size, String filter, String world) {
         Pageable pageable = PageRequest.of(page, size);
         switch (filter.toLowerCase()) {
             case "important":
-                return commandRepository.findBadCommandsImportant(pageable);
+                return commandRepository.findBadCommandsImportant(world, pageable);
             case "all":
             default:
-                return commandRepository.findBadCommands(pageable);
+                return commandRepository.findBadCommands(world, pageable);
         }
     }
 
-    public List<Command> getCommandsForTargetVillages(List<String> targetVillages, String filter) {
+    public List<Command> getCommandsForTargetVillages(List<String> targetVillages, String filter, String world) {
         switch (filter.toLowerCase()) {
             case "important":
-                return commandRepository.findByTargetInAndTypeLikeImportant(targetVillages);
+                return commandRepository.findByTargetInAndTypeLikeImportant(targetVillages, world);
             case "all":
             default:
-                return commandRepository.findByTargetInOrderByMinTimeAsc(targetVillages);
+                return commandRepository.findByTargetInOrderByMinTimeAsc(targetVillages, world);
         }
     }
 
     @Transactional
-    public void shiftCommandTimes(String targetVillage, int shiftMinutes, String filter) {
+    public void shiftCommandTimes(String targetVillage, int shiftMinutes, String filter, String world) {
         List<Command> commands;
 
         if ("notSent".equalsIgnoreCase(filter)) {
-            commands = commandRepository.findByTargetAndDeletedNull(targetVillage);
+            commands = commandRepository.findByTargetAndWorldAndDeletedNull(targetVillage, world);
         } else if ("all".equalsIgnoreCase(filter)) {
-            commands = commandRepository.findByTarget(targetVillage);
+            commands = commandRepository.findByTargetAndWorld(targetVillage, world);
         } else {
             throw new IllegalArgumentException("Invalid filter value. Allowed values are 'all' or 'notSent'.");
         }

@@ -16,11 +16,13 @@ public class CommandController {
 
     private final CommandService commandService;
     private final JwtService jwtService;
+    private final String world;
 
     @Autowired
     public CommandController(CommandService commandService, JwtService jwtService) {
         this.commandService = commandService;
         this.jwtService = jwtService;
+        this.world = "pl206";
     }
 
 //    @GetMapping
@@ -140,7 +142,7 @@ public class CommandController {
             @RequestParam(defaultValue = "0") int page,
             @RequestParam(defaultValue = "100") int size
     ) {
-        List<Command> commands = commandService.getCommandsByPlayerIdAdmin(playerId, page, size);
+        List<Command> commands = commandService.getCommandsByPlayerIdAdmin(playerId, world, page, size);
         return ResponseEntity.ok(commands);
     }
 
@@ -150,17 +152,17 @@ public class CommandController {
             @RequestBody CommandTargetRequest commandTargetRequest
         ) {
 
-        return commandService.deleteTargetVillages(commandTargetRequest.targetVillages());
+        return commandService.deleteTargetVillages(commandTargetRequest.targetVillages(), world);
     }
 
     @GetMapping("/admin/bad-commands")
     @PreAuthorize("hasRole('ADMIN')")
-    public ResponseEntity<List<Command>> getBadCommandsAdmin(
+    public ResponseEntity<List<AdminCommandResponse>> getBadCommandsAdmin(
             @RequestParam(defaultValue = "0") int page,
             @RequestParam(defaultValue = "100") int size,
             @RequestParam(required = false, defaultValue = "all") String filter
     ) {
-        List<Command> commands = commandService.getBadCommands(page, size, filter);
+        List<AdminCommandResponse> commands = commandService.getBadCommands(page, size, filter, world);
         return ResponseEntity.ok(commands);
     }
 
@@ -172,7 +174,8 @@ public class CommandController {
     ) {
         List<Command> commands = commandService.getCommandsForTargetVillages(
                 commandTargetRequest.targetVillages(),
-                filter
+                filter,
+                world
         );
         return ResponseEntity.ok(commands);
     }
@@ -186,7 +189,8 @@ public class CommandController {
         commandService.shiftCommandTimes(
                 shiftRequest.targetVillage(),
                 shiftRequest.shiftMinutes(),
-                filter
+                filter,
+                world
         );
         return ResponseEntity.ok("Commands shifted successfully");
     }

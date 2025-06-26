@@ -22,12 +22,12 @@ api.interceptors.request.use(
 );
 
 export const getPlayerCommands = async (playerId: string) => {
-    const response = await api.get(`/commands/player/${playerId}?page=0&size=2500`);
+    const response = await api.get(`/commands/player/${playerId}?page=0&size=5000`);
     return response.data;
 };
 
 export const getDeletedCommands = async (playerId: string) => {
-    const response = await api.get(`/commands/player/${playerId}/deleted?page=0&size=2500`);
+    const response = await api.get(`/commands/player/${playerId}/deleted?page=0&size=5000`);
     return response.data;
 }
 export const softDeleteCommands = async (commandIds: any, playerId: string) => {

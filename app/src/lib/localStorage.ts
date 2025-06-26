@@ -47,3 +47,17 @@ export const loadColumnVisibility = (): VisibilityState => {
     }
     return  {};
 };
+
+export const loadWorldFilters = (availableWorlds: string[]): Record<string, boolean> => {
+    const defaultFilters = Object.fromEntries(availableWorlds.map(w => [w, true]));
+    if (typeof window !== 'undefined') {
+        const worlds = localStorage.getItem('selectedWorldFilters');
+
+        return worlds ? JSON.parse(worlds) : defaultFilters;
+    }
+    return defaultFilters
+};
+
+export const saveWorldFilters = (worlds: Record<string, boolean>) => {
+    localStorage.setItem('selectedWorldFilters', JSON.stringify(worlds));
+};
