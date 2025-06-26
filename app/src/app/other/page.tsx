@@ -20,13 +20,19 @@ export default function Other() {
     useEffect(() => {
         const fetchData = async () => {
             try {
-                const [noblesData1, noblesData2, offsData] = await Promise.all([
+                const [noblesData1, noblesData2, nobleTrainData, offsData] = await Promise.all([
                     getSourceVillagesByType(playerId, 'SZLACHCIC'),
                     getSourceVillagesByType(playerId, 'Gruby'),
+                    getSourceVillagesByType(playerId, 'Kareta'),
                     getSourceVillagesByType(playerId, 'OFF')
                 ]);
 
-                const mergedNobles = mergeAndSumData([...noblesData1, ...noblesData2]);
+                const multipliedNobleTrainData = nobleTrainData.map(item => ({
+                    ...item,
+                    count: item.count * 4
+                }));
+
+                const mergedNobles = mergeAndSumData([...noblesData1, ...noblesData2, ...multipliedNobleTrainData]);
                 const grouped = groupDataByWorld(mergedNobles, offsData);
                 setGroupedData(grouped);
 

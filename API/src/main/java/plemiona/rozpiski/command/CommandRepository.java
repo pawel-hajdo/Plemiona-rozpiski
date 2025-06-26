@@ -160,7 +160,7 @@ public interface CommandRepository extends JpaRepository<Command,Long> {
     )
     FROM Command c
     WHERE (c.maxTime < c.deleted OR (c.maxTime < CURRENT_TIMESTAMP AND c.deleted IS NULL))
-    AND (c.type LIKE 'SZLACHCIC%' OR c.type LIKE '%OFF%')
+    AND (c.type LIKE 'SZLACHCIC%' OR c.type LIKE '%OFF%' OR c.type LIKE 'Gruby%')
     AND c.world = :world
     ORDER BY c.maxTime ASC
 """)
