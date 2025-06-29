@@ -186,4 +186,5 @@ public class UserService {
         log.setDate(warsawTime.toLocalDateTime());
         logRepository.save(log);
     }
+
 }

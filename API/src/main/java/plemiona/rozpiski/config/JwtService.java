@@ -123,4 +123,13 @@ public class JwtService {
         Boolean hasAccess = extractClaim(token, claims -> claims.get("reportsAccess", Boolean.class));
         return Boolean.TRUE.equals(hasAccess);
     }
+
+    public boolean checkWorldAdmin(String world, HttpServletRequest request) {
+        String token = extractTokenFromRequest(request);
+        if (token == null) return false;
+
+        Set<String> adminWorlds = extractAdminWorlds(token);
+        return adminWorlds.contains(world);
+    }
+
 }

@@ -66,18 +66,18 @@ public interface CommandRepository extends JpaRepository<Command,Long> {
         COUNT(c)
     )
     FROM Command c
+    WHERE c.world = :world
     GROUP BY c.playerName
     """)
-    List<CommandStatisticsResponse> getCommandStatistics();
+    List<CommandStatisticsResponse> getCommandStatistics(@Param("world") String world);
 
     @Query("""
     SELECT DISTINCT new plemiona.rozpiski.command.CommandPlayerInfoResponse(c.playerName, c.playerId)
     FROM Command c
+    where c.world = :world
     ORDER BY c.playerName ASC
     """)
-    List<CommandPlayerInfoResponse> findDistinctCommandPlayers();
-
-    Page<Command> findByPlayerIdAndWorldOrderByMaxTimeAsc(String playerId, String world, Pageable pageable);
+    List<CommandPlayerInfoResponse> findDistinctCommandPlayersByWorld(@Param("world") String world);
 
     @Modifying
     @Query("DELETE FROM Command c WHERE c.target IN :targets AND c.world = :world")
@@ -167,29 +167,71 @@ public interface CommandRepository extends JpaRepository<Command,Long> {
     List<AdminCommandResponse> findBadCommandsImportant(@Param("world") String world, Pageable pageable);
 
     @Query("""
-    SELECT c FROM Command c 
-    WHERE c.target IN :targets 
+    SELECT new plemiona.rozpiski.command.AdminCommandResponse(
+        c.id,
+        c.commandNumberId,
+        c.minTime,
+        c.maxTime,
+        c.source,
+        c.sourceId,
+        c.target,
+        c.targetId,
+        c.type,
+        c.playerId,
+        c.playerName,
+        c.world,
+        c.attackTime,
+        c.deleted,
+        c.operationName,
+        c.attackSequenceNumber,
+        c.totalCommandsFromSource,
+        CASE
+            WHEN c.deleted IS NOT NULL
+            THEN CAST(FUNCTION('TIMESTAMPDIFF', MINUTE, c.maxTime, c.deleted) AS java.lang.Long)
+            ELSE NULL
+        END
+    )
+    FROM Command c
+    WHERE 
+    c.target = :target
     AND c.world = :world
     ORDER BY c.minTime ASC
-    """)
-    List<Command> findByTargetInOrderByMinTimeAsc(
-            @Param("targets") List<String> targets,
+""")
+    List<AdminCommandResponse> findByTargetInOrderByMinTimeAsc(
+            @Param("target") String target,
             @Param("world") String world
     );
 
     @Query("""
-    SELECT c FROM Command c 
-    WHERE c.target IN :targets 
-    AND (c.type LIKE 'SZLACHCIC%' OR c.type LIKE '%OFF%')
+    SELECT new plemiona.rozpiski.command.AdminCommandResponse(
+        c.id,
+        c.commandNumberId,
+        c.minTime,
+        c.maxTime,
+        c.source,
+        c.sourceId,
+        c.target,
+        c.targetId,
+        c.type,
+        c.playerId,
+        c.playerName,
+        c.world,
+        c.attackTime,
+        c.deleted,
+        c.operationName,
+        c.attackSequenceNumber,
+        c.totalCommandsFromSource,
+        CASE
+            WHEN c.deleted IS NOT NULL
+            THEN CAST(FUNCTION('TIMESTAMPDIFF', MINUTE, c.maxTime, c.deleted) AS java.lang.Long)
+            ELSE NULL
+        END
+    )
+    FROM Command c
+    WHERE 
+    c.playerId = :playerId
     AND c.world = :world
-    ORDER BY c.minTime asc
-    """)
-    List<Command> findByTargetInAndTypeLikeImportant(
-            @Param("targets") List<String> targets,
-            @Param("world") String world
-    );
-
-    List<Command> findByTargetAndWorld(String target, String world);
-
-    List<Command> findByTargetAndWorldAndDeletedNull(String target, String world);
+    ORDER BY c.maxTime ASC
+""")
+    List<AdminCommandResponse> findCommandsByPlayerIdAdmin(@Param("playerId") Integer playerId, @Param("world") String world, Pageable pageable);
 }

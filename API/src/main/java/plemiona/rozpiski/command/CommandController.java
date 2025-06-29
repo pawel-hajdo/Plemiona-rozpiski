@@ -4,7 +4,6 @@ import jakarta.servlet.http.HttpServletRequest;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 import plemiona.rozpiski.config.JwtService;
 
@@ -16,13 +15,11 @@ public class CommandController {
 
     private final CommandService commandService;
     private final JwtService jwtService;
-    private final String world;
 
     @Autowired
     public CommandController(CommandService commandService, JwtService jwtService) {
         this.commandService = commandService;
         this.jwtService = jwtService;
-        this.world = "pl206";
     }
 
 //    @GetMapping
@@ -122,75 +119,103 @@ public class CommandController {
     }
 
     @GetMapping("/admin/statistics")
-    @PreAuthorize("hasRole('ADMIN')")
-    public ResponseEntity<List<CommandStatisticsResponse>> getCommandStatistics() {
-        List<CommandStatisticsResponse> statistics = commandService.getCommandStatistics();
+    public ResponseEntity<List<CommandStatisticsResponse>> getCommandStatistics(
+            @RequestParam String world,
+            HttpServletRequest request
+    ) {
+        if (!jwtService.checkWorldAdmin(world, request)) {
+            return new ResponseEntity<>(HttpStatus.FORBIDDEN);
+        }
+
+        List<CommandStatisticsResponse> statistics = commandService.getCommandStatistics(world);
         return ResponseEntity.ok(statistics);
     }
 
     @GetMapping("/admin/players")
-    @PreAuthorize("hasRole('ADMIN')")
-    public ResponseEntity<List<CommandPlayerInfoResponse>> getDistinctPlayersWithCommands() {
-        List<CommandPlayerInfoResponse> players = commandService.getDistinctPlayersWithCommands();
+    public ResponseEntity<List<CommandPlayerInfoResponse>> getDistinctPlayersWithCommands(
+            @RequestParam String world,
+            HttpServletRequest request
+    ) {
+        if (!jwtService.checkWorldAdmin(world, request)) {
+            return new ResponseEntity<>(HttpStatus.FORBIDDEN);
+        }
+
+        List<CommandPlayerInfoResponse> players = commandService.getDistinctPlayersWithCommands(world);
         return ResponseEntity.ok(players);
     }
 
     @GetMapping("/admin/player/{playerId}")
-    @PreAuthorize("hasRole('ADMIN')")
-    public ResponseEntity<List<Command>> getPlayerCommandsAdmin(
-            @PathVariable String playerId,
+    public ResponseEntity<List<AdminCommandResponse>> getPlayerCommandsAdmin(
+            @PathVariable Integer playerId,
             @RequestParam(defaultValue = "0") int page,
-            @RequestParam(defaultValue = "100") int size
+            @RequestParam(defaultValue = "100") int size,
+            @RequestParam String world,
+            HttpServletRequest request
     ) {
-        List<Command> commands = commandService.getCommandsByPlayerIdAdmin(playerId, world, page, size);
+        if (!jwtService.checkWorldAdmin(world, request)) {
+            return new ResponseEntity<>(HttpStatus.FORBIDDEN);
+        }
+
+        List<AdminCommandResponse> commands = commandService.getCommandsByPlayerIdAdmin(playerId, world, page, size);
         return ResponseEntity.ok(commands);
     }
 
     @DeleteMapping("/admin/villages")
-    @PreAuthorize("hasRole('ADMIN')")
     public ResponseEntity<String> deleteVillagesAdmin(
-            @RequestBody CommandTargetRequest commandTargetRequest
+            @RequestBody CommandDeletedVillagesRequest villagesToDelete,
+            HttpServletRequest request
         ) {
-
-        return commandService.deleteTargetVillages(commandTargetRequest.targetVillages(), world);
+        if (!jwtService.checkWorldAdmin(villagesToDelete.world(), request)) {
+            return new ResponseEntity<>(HttpStatus.FORBIDDEN);
+        }
+        return commandService.deleteTargetVillages(villagesToDelete.targetVillages(), villagesToDelete.world());
     }
 
     @GetMapping("/admin/bad-commands")
-    @PreAuthorize("hasRole('ADMIN')")
     public ResponseEntity<List<AdminCommandResponse>> getBadCommandsAdmin(
             @RequestParam(defaultValue = "0") int page,
             @RequestParam(defaultValue = "100") int size,
-            @RequestParam(required = false, defaultValue = "all") String filter
+            @RequestParam(required = false, defaultValue = "all") String filter,
+            @RequestParam String world,
+            HttpServletRequest request
     ) {
+        if (!jwtService.checkWorldAdmin(world, request)) {
+            return new ResponseEntity<>(HttpStatus.FORBIDDEN);
+        }
+
         List<AdminCommandResponse> commands = commandService.getBadCommands(page, size, filter, world);
         return ResponseEntity.ok(commands);
     }
 
     @GetMapping("/admin/villages")
-    @PreAuthorize("hasRole('ADMIN')")
-    public ResponseEntity<List<Command>> getCommandsForTargetVillages(
+    public ResponseEntity<List<AdminCommandResponse>> getCommandsForTargetVillage(
             @RequestBody CommandTargetRequest commandTargetRequest,
-            @RequestParam(required = false, defaultValue = "all") String filter
+            HttpServletRequest request
     ) {
-        List<Command> commands = commandService.getCommandsForTargetVillages(
-                commandTargetRequest.targetVillages(),
-                filter,
-                world
+        if (!jwtService.checkWorldAdmin(commandTargetRequest.world(), request)) {
+            return new ResponseEntity<>(HttpStatus.FORBIDDEN);
+        }
+
+        List<AdminCommandResponse> commands = commandService.getCommandsForTargetVillage(
+                commandTargetRequest.targetVillage(),
+                commandTargetRequest.world()
         );
         return ResponseEntity.ok(commands);
     }
 
     @PostMapping("/admin/shift-commands")
-    @PreAuthorize("hasRole('ADMIN')")
     public ResponseEntity<String> shiftCommandTimes(
             @RequestBody CommandShiftRequest shiftRequest,
-            @RequestParam(required = false, defaultValue = "all") String filter
+            HttpServletRequest request
     ) {
+        if (!jwtService.checkWorldAdmin(shiftRequest.world(), request)) {
+            return new ResponseEntity<>(HttpStatus.FORBIDDEN);
+        }
+
         commandService.shiftCommandTimes(
-                shiftRequest.targetVillage(),
+                shiftRequest.commandIds(),
                 shiftRequest.shiftMinutes(),
-                filter,
-                world
+                shiftRequest.world()
         );
         return ResponseEntity.ok("Commands shifted successfully");
     }
