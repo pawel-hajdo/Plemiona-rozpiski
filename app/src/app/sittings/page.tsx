@@ -164,7 +164,8 @@ export default function Sittings() {
                             <SelectGroup>
                                 <SelectItem value="pl206">pl206</SelectItem>
                                 <SelectItem value="pl208">pl208</SelectItem>
-                                <SelectItem value="pl210">pl210</SelectItem>
+                                <SelectItem value="pl211">pl211</SelectItem>
+                                <SelectItem value="pl212">pl212</SelectItem>
                             </SelectGroup>
                         </SelectContent>
                     </Select>

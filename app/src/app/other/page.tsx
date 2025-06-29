@@ -20,7 +20,12 @@ export default function Other() {
     useEffect(() => {
         const fetchData = async () => {
             try {
-                const [noblesData1, noblesData2, nobleTrainData, offsData] = await Promise.all([
+                const [
+                    noblesData1,
+                    noblesData2,
+                    nobleTrainData,
+                    offsData
+                ]: [VillageData[], VillageData[], VillageData[], VillageData[]] = await Promise.all([
                     getSourceVillagesByType(playerId, 'SZLACHCIC'),
                     getSourceVillagesByType(playerId, 'Gruby'),
                     getSourceVillagesByType(playerId, 'Kareta'),

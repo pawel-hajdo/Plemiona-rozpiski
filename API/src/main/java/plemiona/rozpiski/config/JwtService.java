@@ -13,9 +13,7 @@ import plemiona.rozpiski.user.UserRepository;
 import java.security.Key;
 import java.time.LocalDateTime;
 import java.time.ZoneId;
-import java.util.Date;
-import java.util.HashMap;
-import java.util.Map;
+import java.util.*;
 import java.util.function.Function;
 
 @Service
@@ -34,6 +32,12 @@ public class JwtService {
 
     public String extractPlayerId(String token) {
         return extractClaim(token, claims -> claims.get("playerId", String.class));
+    }
+
+    @SuppressWarnings("unchecked")
+    public Set<String> extractAdminWorlds(String token) {
+        List<String> adminWorldsList = extractClaim(token, claims -> claims.get("adminWorlds", List.class));
+        return adminWorldsList != null ? new HashSet<>(adminWorldsList) : new HashSet<>();
     }
     public <T> T extractClaim(String token, Function<Claims, T> claimsResolver) {
         final Claims claims = extractAllClaims(token);
@@ -119,5 +123,4 @@ public class JwtService {
         Boolean hasAccess = extractClaim(token, claims -> claims.get("reportsAccess", Boolean.class));
         return Boolean.TRUE.equals(hasAccess);
     }
-
 }

@@ -4,7 +4,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.crypto.password.PasswordEncoder;
-import org.springframework.security.core.GrantedAuthority;
 import org.springframework.stereotype.Service;
 import org.springframework.web.client.RestTemplate;
 import plemiona.rozpiski.config.JwtService;
@@ -25,7 +24,6 @@ import java.time.ZoneId;
 import java.time.ZonedDateTime;
 import java.util.HashMap;
 import java.util.Map;
-import java.util.stream.Collectors;
 
 @Service
 public class UserService {
@@ -67,7 +65,6 @@ public class UserService {
         newUser.setName(request.name());
         newUser.setPassword(hashedPassword);
         newUser.setPlayerId(playerId);
-        newUser.addRole(Role.USER);
         newUser.setRegisterWorld(request.world());
         newUser.setReportsAccess(false);
 
@@ -76,10 +73,8 @@ public class UserService {
 
         Map<String, Object> claims = new HashMap<>();
         claims.put("playerId", playerId.toString());
-        claims.put("roles", newUser.getAuthorities().stream()
-                .map(GrantedAuthority::getAuthority)
-                .collect(Collectors.toList()));
         claims.put("reportsAccess", newUser.getReportsAccess());
+        claims.put("adminWorlds", newUser.getAdminWorlds());
 
         var jwtToken = jwtService.generateToken(claims, newUser);
         return new AuthenticationResponse(jwtToken);
@@ -92,10 +87,9 @@ public class UserService {
         );
         Map<String, Object> claims = new HashMap<>();
         claims.put("playerId", user.getPlayerId().toString());
-        claims.put("roles", user.getAuthorities().stream()
-                .map(GrantedAuthority::getAuthority)
-                .collect(Collectors.toList()));
         claims.put("reportsAccess", user.getReportsAccess());
+        claims.put("adminWorlds", user.getAdminWorlds());
+
         var jwtToken = jwtService.generateToken(claims, user);
         saveToLogs(user.getId(), LogType.USER_LOGIN_SUCCESSFUL);
         return new AuthenticationResponse(jwtToken);
