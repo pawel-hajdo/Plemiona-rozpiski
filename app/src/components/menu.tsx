@@ -24,7 +24,7 @@ const Menu = () => {
         window.location.reload();
     };
     const [playerName, setPlayerName] = useState("");
-    const [isAdmin, setIsAdmin] = useState(false);
+    const [adminWorlds, setAdminWorlds] = useState<string[]>([]);
     const [hasReportsAccess, setHasReportsAccess] = useState(false);
 
     useEffect(() => {
@@ -33,7 +33,7 @@ const Menu = () => {
         if (token) {
             try {
                 const decoded = decodeToken(token) as JwtPayload;
-                setIsAdmin(decoded?.roles?.includes('ROLE_ADMIN') || false);
+                setAdminWorlds(decoded?.adminWorlds || []);
                 setHasReportsAccess(decoded?.reportsAccess || false);
             } catch (error) {
                 console.error('Error while decoding token:', error);
@@ -67,10 +67,19 @@ const Menu = () => {
                                 Raporty
                             </Link>
                         )}
-                        {isAdmin && (
-                            <Link href="/admin/reports" className="text-gray-300 hover:bg-gray-700 hover:text-white px-3 py-2 rounded-md text-sm font-medium">
-                                Admin
-                            </Link>
+                        {adminWorlds.length > 0 && (
+                            <div className="relative group">
+                                <button className="text-gray-300 hover:bg-gray-700 hover:text-white px-3 py-2 rounded-md text-sm font-medium">
+                                    Admin
+                                </button>
+                                <div className="absolute hidden group-hover:block bg-gray-700 rounded-md shadow-lg z-10">
+                                    {adminWorlds.map((world) => (
+                                        <Link key={world} href={`/admin/${world}`} className="block px-4 py-2 text-sm text-white hover:bg-gray-600">
+                                            {world}
+                                        </Link>
+                                    ))}
+                                </div>
+                            </div>
                         )}
                     </div>
                     <div className="absolute inset-y-0 right-0 flex items-center pr-2 sm:static sm:inset-auto sm:ml-6 sm:pr-0">
@@ -95,10 +104,15 @@ const Menu = () => {
                             Raporty
                         </Link>
                     )}
-                    {isAdmin && (
-                        <Link href="/admin/reports" className="text-gray-300 hover:bg-gray-700 hover:text-white block px-3 py-2 rounded-md text-base font-medium">
-                            Admin
-                        </Link>
+                    {adminWorlds.length > 0 && (
+                        <>
+                            <span className="block px-3 py-2 text-gray-400 text-sm">Admin</span>
+                            {adminWorlds.map((world) => (
+                                <Link key={world} href={`/admin/${world}`} className="text-gray-300 hover:bg-gray-700 hover:text-white block px-3 py-2 rounded-md text-base font-medium">
+                                    {world}
+                                </Link>
+                            ))}
+                        </>
                     )}
                 </div>
             </Disclosure.Panel>

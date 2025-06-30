@@ -9,7 +9,7 @@ const adminRoutes = ['/admin'];
 const reportsRoutes = ['/reports'];
 
 export interface JwtPayload {
-    roles: string[];
+    adminWorlds?: string[];
     reportsAccess?: boolean;
 }
 
@@ -35,7 +35,8 @@ export function middleware(req: NextRequest) {
 
             // Admin check
             if (adminRoutes.some(route => pathname.startsWith(route))) {
-                if (!decoded?.roles.includes('ROLE_ADMIN')) {
+                const worldPath = pathname.split('/')[2]; // /admin/[world]
+                if (!decoded?.adminWorlds?.includes(worldPath)) {
                     return NextResponse.redirect(new URL('/', req.url));
                 }
             }
