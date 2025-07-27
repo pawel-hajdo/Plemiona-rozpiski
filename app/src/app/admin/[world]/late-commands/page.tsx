@@ -26,10 +26,10 @@ import {
 import TableContainer from "@/components/tableContainer";
 import PaginationControls from "@/components/paginationControlrs";
 import {
-    loadColumnVisibilityAdmin,
+    loadColumnVisibilityAdmin, loadCommandsFilter,
     loadPageSize,
     loadSortingPreference,
-    saveColumnVisibilityAdmin,
+    saveColumnVisibilityAdmin, saveCommandsFilter,
     savePageSize
 } from "@/lib/localStorage";
 import {DateTime} from "luxon";
@@ -53,14 +53,20 @@ export default function LateCommandsPage({ params }: PageProps) {
     const [isLoading, setIsLoading] = useState(true);
     const [error, setError] = useState("")
     const [globalFilter, setGlobalFilter] = React.useState("");
+    const [commandsFilter, setCommandsFilter] = useState<"all" | "important">(loadCommandsFilter);
     const router = useRouter();
+    const [isMounted, setIsMounted] = useState(false);
+
+    useEffect(() => {
+        setIsMounted(true);
+    }, []);
 
     useEffect(() => {
         const fetchCommands = async () => {
             try {
                 setIsLoading(true);
                 setError(null);
-                const data = await getLateCommandsAdmin(params.world);
+                const data = await getLateCommandsAdmin(params.world, 0, 10000, commandsFilter);
                 setCommands(data);
             } catch (err) {
                 console.error('Failed to fetch late commands:', err);
@@ -83,7 +89,7 @@ export default function LateCommandsPage({ params }: PageProps) {
         };
         setColumnVisibility(loadColumnVisibilityAdmin());
         fetchCommands();
-    }, [params.world, router]);
+    }, [params.world, router, commandsFilter]);
 
     useEffect(() => {
         if (Object.keys(columnVisibility).length > 0) {
@@ -94,6 +100,15 @@ export default function LateCommandsPage({ params }: PageProps) {
     useEffect(() => {
         savePageSize(pagination.pageSize);
     }, [pagination.pageSize]);
+
+    useEffect(() => {
+        saveCommandsFilter(commandsFilter);
+    }, [commandsFilter]);
+
+    const toggleFilter = () => {
+        const newFilter = commandsFilter === "all" ? "important" : "all";
+        setCommandsFilter(newFilter);
+    };
 
     const getRowClasses = (row: any) => {
         const currentTime = DateTime.now().setZone('Europe/Warsaw');
@@ -338,7 +353,7 @@ export default function LateCommandsPage({ params }: PageProps) {
                         </SelectGroup>
                     </SelectContent>
                 </Select>
-                <div className="relative w-[58%] xs:max-w-[65%] sm:max-w-sm">
+                <div className="relative w-[50%] xs:max-w-[65%] sm:max-w-sm">
                     <Input
                         placeholder="Filtruj..."
                         value={globalFilter ?? ""}
@@ -355,6 +370,12 @@ export default function LateCommandsPage({ params }: PageProps) {
                         </button>
                     )}
                 </div>
+                <Button variant="outline" onClick={toggleFilter}>
+                    {!isMounted
+                        ? "Pokaż ważne"
+                        : commandsFilter === "all" ? "Pokaż ważne" : "Pokaż wszystkie"
+                    }
+                </Button>
                 <DropdownMenu>
                     <DropdownMenuTrigger asChild>
                         <Button variant="outline" className="ml-auto">

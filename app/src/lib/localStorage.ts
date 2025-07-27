@@ -73,3 +73,17 @@ export const loadWorldFilters = (availableWorlds: string[]): Record<string, bool
 export const saveWorldFilters = (worlds: Record<string, boolean>) => {
     localStorage.setItem('selectedWorldFilters', JSON.stringify(worlds));
 };
+
+export const saveCommandsFilter = (filter: "all" | "important") => {
+    localStorage.setItem('adminCommandFilter', filter);
+};
+
+export const loadCommandsFilter = (): "all" | "important" => {
+    if (typeof window !== "undefined") {
+        const filter = localStorage.getItem('adminCommandFilter');
+        if (filter === "important" || filter === "all") {
+            return filter;
+        }
+    }
+    return "all";
+};
