@@ -48,6 +48,18 @@ export const loadColumnVisibility = (): VisibilityState => {
     return  {};
 };
 
+export const saveColumnVisibilityAdmin = (visibility: VisibilityState) => {
+    localStorage.setItem('columnVisibilityAdmin', JSON.stringify(visibility));
+};
+
+export const loadColumnVisibilityAdmin = (): VisibilityState => {
+    if (typeof window !== 'undefined') {
+        const savedVisibility = localStorage.getItem('columnVisibilityAdmin');
+        return savedVisibility ? JSON?.parse(savedVisibility) : {};
+    }
+    return  {};
+};
+
 export const loadWorldFilters = (availableWorlds: string[]): Record<string, boolean> => {
     const defaultFilters = Object.fromEntries(availableWorlds.map(w => [w, true]));
     if (typeof window !== 'undefined') {

@@ -2,8 +2,8 @@ import axios from 'axios';
 import {getTokenFromCookies} from "@/lib/utils";
 
 const api = axios.create({
-    // baseURL: process.env.NEXT_PUBLIC_API_BASE_URL,
-    baseURL: 'https://plemionarozpiski.pl/api'
+    baseURL: process.env.NEXT_PUBLIC_API_BASE_URL,
+    // baseURL: 'https://plemionarozpiski.pl/api'
 });
 
 api.interceptors.request.use(
@@ -191,6 +191,11 @@ export const downloadReports = async (date: string | null = null) => {
     link.click();
 };
 
-
+export const getLateCommandsAdmin = async (world: string, page = 0, size = 100, filter: string = 'all') => {
+    const response = await api.get('/commands/admin/bad-commands', {
+        params: {world, page, size, filter},
+    });
+    return response.data;
+};
 
 export default api;

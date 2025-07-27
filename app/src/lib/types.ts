@@ -76,4 +76,25 @@ export interface Player {
     playerName: string;
 }
 
+export interface AdminCommand {
+    id: number;
+    commandNumberId: number;
+    minTime: string;
+    maxTime: string;
+    source: string;
+    sourceId: string;
+    target: string;
+    targetId: string;
+    type: string;
+    playerId: string;
+    playerName: string;
+    world: string;
+    link: string;
+    attackTime: string | null;
+    deleted: boolean;
+    attackSequenceNumber: number;
+    totalCommandsFromSource: number;
+    operationName: string;
+    minutesLate: number;
+}
 
