@@ -128,14 +128,12 @@ public class CommandService {
         return commandRepository.findCommandsByPlayerIdAdmin(playerId, world, pageable);
     }
 
-
     @Transactional
     public ResponseEntity<String> deleteTargetVillages(List<String> targetVillages, String world) {
         commandRepository.deleteByTargetInAndWorld(targetVillages, world);
         commandRepository.recalculateCommandStatistics();
         return ResponseEntity.ok("Commands deleted and statistics recalculated successfully");
     }
-
 
     public List<AdminCommandResponse> getBadCommands(int page, int size, String filter, String world) {
         Pageable pageable = PageRequest.of(page, size);

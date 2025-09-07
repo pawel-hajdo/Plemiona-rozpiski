@@ -18,9 +18,6 @@ export default function AdminLayout({
     return (
         <div className="min-h-screen flex flex-col md:flex-row text-black dark:text-white">
             <aside className="w-full md:w-64 bg-gray-100 dark:bg-gray-900 p-4 border-b md:border-b-0 md:border-r border-gray-200 dark:border-gray-700">
-                <h2 className="text-lg md:text-xl font-bold mb-4">
-                    Admin: {params.world}
-                </h2>
                 <nav className="grid grid-cols-2 md:block gap-2">
                     {sidebarItems.map((item) => (
                         <Link

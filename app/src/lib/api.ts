@@ -214,4 +214,14 @@ export const shiftCommandTimes = async (shiftcommandIds: number[], world: string
     return response.data;
 };
 
+export const getPlayerCommandsAdmin = async (playerId: string, world: string) => {
+    const response = await api.get(`/commands/admin/players/${playerId}?page=0&size=10000&world=${world}`);
+    return response.data;
+}
+
+export const getPlayersWithCommandsAdmin = async (world: string)=> {
+    const response = await api.get(`/commands/admin/players?world=${world}`);
+    return response.data;
+}
+
 export default api;

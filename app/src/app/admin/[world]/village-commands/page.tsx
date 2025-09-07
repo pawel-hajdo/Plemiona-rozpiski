@@ -116,7 +116,6 @@ export default function VillageCommandsPage({ params }: PageProps) {
 
             await fetchCommands();
         } catch (err) {
-            console.error('Failed to shift commands:', err);
             if (err instanceof Error) {
                 if (err.message.includes('Access denied')) {
                     setError('Brak uprawnień administratora');

@@ -126,20 +126,7 @@ public class CommandController {
         return ResponseEntity.ok(statistics);
     }
 
-    @GetMapping("/admin/players")
-    public ResponseEntity<List<CommandPlayerInfoResponse>> getDistinctPlayersWithCommands(
-            @RequestParam String world,
-            HttpServletRequest request
-    ) {
-        if (!jwtService.checkWorldAdmin(world, request)) {
-            return new ResponseEntity<>(HttpStatus.FORBIDDEN);
-        }
-
-        List<CommandPlayerInfoResponse> players = commandService.getDistinctPlayersWithCommands(world);
-        return ResponseEntity.ok(players);
-    }
-
-    @GetMapping("/admin/player/{playerId}")
+    @GetMapping("/admin/players/{playerId}")
     public ResponseEntity<List<AdminCommandResponse>> getPlayerCommandsAdmin(
             @PathVariable Integer playerId,
             @RequestParam(defaultValue = "0") int page,
@@ -153,6 +140,19 @@ public class CommandController {
 
         List<AdminCommandResponse> commands = commandService.getCommandsByPlayerIdAdmin(playerId, world, page, size);
         return ResponseEntity.ok(commands);
+    }
+
+    @GetMapping("/admin/players")
+    public ResponseEntity<List<CommandPlayerInfoResponse>> getDistinctPlayersWithCommands(
+            @RequestParam String world,
+            HttpServletRequest request
+    ) {
+        if (!jwtService.checkWorldAdmin(world, request)) {
+            return new ResponseEntity<>(HttpStatus.FORBIDDEN);
+        }
+
+        List<CommandPlayerInfoResponse> players = commandService.getDistinctPlayersWithCommands(world);
+        return ResponseEntity.ok(players);
     }
 
     @DeleteMapping("/admin/villages")
