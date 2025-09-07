@@ -184,16 +184,17 @@ public class CommandController {
 
     @GetMapping("/admin/villages")
     public ResponseEntity<List<AdminCommandResponse>> getCommandsForTargetVillage(
-            @RequestBody CommandTargetRequest commandTargetRequest,
+            @RequestParam String targetVillage,
+            @RequestParam String world,
             HttpServletRequest request
     ) {
-        if (!jwtService.checkWorldAdmin(commandTargetRequest.world(), request)) {
+        if (!jwtService.checkWorldAdmin(world, request)) {
             return new ResponseEntity<>(HttpStatus.FORBIDDEN);
         }
 
         List<AdminCommandResponse> commands = commandService.getCommandsForTargetVillage(
-                commandTargetRequest.targetVillage(),
-                commandTargetRequest.world()
+                targetVillage,
+                world
         );
         return ResponseEntity.ok(commands);
     }
