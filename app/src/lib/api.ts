@@ -2,8 +2,8 @@ import axios from 'axios';
 import {getTokenFromCookies} from "@/lib/utils";
 
 const api = axios.create({
-    baseURL: process.env.NEXT_PUBLIC_API_BASE_URL,
-    // baseURL: 'https://plemionarozpiski.pl/api'
+    // baseURL: process.env.NEXT_PUBLIC_API_BASE_URL,
+    baseURL: 'https://plemionarozpiski.pl/api'
 });
 
 api.interceptors.request.use(
@@ -194,6 +194,22 @@ export const downloadReports = async (date: string | null = null) => {
 export const getLateCommandsAdmin = async (world: string, page = 0, size = 100, filter: string = 'all') => {
     const response = await api.get('/commands/admin/bad-commands', {
         params: {world, page, size, filter},
+    });
+    return response.data;
+};
+
+export const getVillageCommandsAdmin = async(world: string, targetVillage: string) => {
+    const response = await api.get('/commands/admin/villages', {
+        params: {world, targetVillage},
+    });
+    return response.data;
+};
+
+export const shiftCommandTimes = async (shiftcommandIds: number[], world: string, shiftMinutes: number) => {
+    const response = await api.post('/commands/admin/shift-commands', {
+        "commandIds": shiftcommandIds,
+        "world": world,
+        "shiftMinutes": shiftMinutes
     });
     return response.data;
 };

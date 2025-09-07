@@ -126,7 +126,7 @@ export default function LateCommandsPage({ params }: PageProps) {
 
     const columnNames: ColumnNames = {
         commandNumberId: "ID",
-        player: "Gracz",
+        playerName: "Gracz",
         source: "Źródło",
         target: "Cel",
         minTime: "Min time",
