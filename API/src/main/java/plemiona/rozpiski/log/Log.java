@@ -20,6 +20,7 @@ public class Log {
     private Long userId;
 
     @Column(name = "log_type")
+    @Enumerated(EnumType.STRING)
     private LogType type;
 
     @Column(name = "date")

@@ -67,6 +67,7 @@ public class UserService {
         newUser.setPlayerId(playerId);
         newUser.setRegisterWorld(request.world());
         newUser.setReportsAccess(false);
+        newUser.setRegisterDate(ZonedDateTime.now(ZoneId.of("Europe/Warsaw")).toLocalDateTime());
 
         userRepository.save(newUser);
         saveToLogs(newUser.getId(), LogType.USER_REGISTER);
@@ -85,6 +86,9 @@ public class UserService {
         authenticationManager.authenticate(
                 new UsernamePasswordAuthenticationToken(request.name(), request.password())
         );
+        user.setLastLoginDate(ZonedDateTime.now(ZoneId.of("Europe/Warsaw")).toLocalDateTime());
+        userRepository.save(user);
+
         Map<String, Object> claims = new HashMap<>();
         claims.put("playerId", user.getPlayerId().toString());
         claims.put("reportsAccess", user.getReportsAccess());

@@ -6,6 +6,7 @@ import lombok.Setter;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
 
+import java.time.LocalDateTime;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.HashSet;
@@ -41,6 +42,12 @@ public class User implements UserDetails {
 
     @Column(name = "reports_access")
     private Boolean reportsAccess;
+
+    @Column(name = "register_date")
+    private LocalDateTime registerDate;
+
+    @Column(name = "last_login_date")
+    private LocalDateTime lastLoginDate;
 
     @Override
     public Collection<? extends GrantedAuthority> getAuthorities() {

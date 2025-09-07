@@ -22,11 +22,6 @@ public class CommandController {
         this.jwtService = jwtService;
     }
 
-//    @GetMapping
-//    public List<CommandResponse> getAllCommands(){
-//        return commandService.getAllCommands();
-//    }
-
     @GetMapping("/player/{playerId}")
     public ResponseEntity<List<CommandResponse>> getCommandsByPlayerId(
             @PathVariable Integer playerId,
