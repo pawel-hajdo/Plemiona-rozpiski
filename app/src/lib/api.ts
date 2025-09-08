@@ -224,4 +224,15 @@ export const getPlayersWithCommandsAdmin = async (world: string)=> {
     return response.data;
 }
 
+export const deleteVillagesAdmin = async (targetVillages: string[], world: string) => {
+    const response = await api.delete('/commands/admin/villages', {
+        data: {
+            targetVillages,
+            world
+        }
+    });
+    return response.data;
+};
+
+
 export default api;
