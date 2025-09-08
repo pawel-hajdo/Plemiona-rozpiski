@@ -65,7 +65,7 @@ export default function LateCommandsPage({ params }: PageProps) {
         const fetchCommands = async () => {
             try {
                 setIsLoading(true);
-                setError(null);
+                setError("");
                 const data = await getLateCommandsAdmin(params.world, 0, 10000, commandsFilter);
                 setCommands(data);
             } catch (err) {

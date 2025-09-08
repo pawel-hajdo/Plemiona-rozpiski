@@ -91,6 +91,7 @@ export default function Register() {
                         <SelectValue placeholder="Świat" />
                     </SelectTrigger>
                     <SelectContent>
+                        <SelectGroup>
                             <SelectItem value="pl211">pl211</SelectItem>
                             <SelectItem value="pl218">pl218</SelectItem>
                         </SelectGroup>

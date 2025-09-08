@@ -25,9 +25,11 @@ export type ColumnNames = {
     source: string,
     target: string,
     type: string,
-    commandCount: string,
-    link: string,
-    world: string,
+    commandCount?: string,
+    link?: string,
+    world?: string,
+    minutesLate?: string,
+    playerName?: string
 }
 
 export interface VillageData {
