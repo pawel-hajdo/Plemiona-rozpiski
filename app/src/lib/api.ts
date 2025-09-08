@@ -1,5 +1,6 @@
 import axios from 'axios';
 import {getTokenFromCookies} from "@/lib/utils";
+import { loadFetchLimit } from './localStorage';
 
 const api = axios.create({
     // baseURL: process.env.NEXT_PUBLIC_API_BASE_URL,
@@ -22,12 +23,14 @@ api.interceptors.request.use(
 );
 
 export const getPlayerCommands = async (playerId: string) => {
-    const response = await api.get(`/commands/player/${playerId}?page=0&size=5000`);
+    const fetchLimit = loadFetchLimit();
+    const response = await api.get(`/commands/player/${playerId}?page=0&size=${fetchLimit}`);
     return response.data;
 };
 
 export const getDeletedCommands = async (playerId: string) => {
-    const response = await api.get(`/commands/player/${playerId}/deleted?page=0&size=5000`);
+    const fetchLimit = loadFetchLimit();
+    const response = await api.get(`/commands/player/${playerId}/deleted?page=0&size=${fetchLimit}`);
     return response.data;
 }
 export const softDeleteCommands = async (commandIds: any, playerId: string) => {

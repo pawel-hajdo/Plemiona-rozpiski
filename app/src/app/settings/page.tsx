@@ -15,8 +15,10 @@ import {ModeToggle} from "@/components/modeToogle";
 import {Select, SelectContent, SelectGroup, SelectItem, SelectTrigger, SelectValue} from "@/components/ui/select";
 import {FormEvent, useState} from "react";
 import {
+    loadFetchLimit,
     loadLinksToOpenCount,
     loadSortingPreference,
+    saveFetchLimit,
     saveLinksToOpenCount,
     saveSortingPreference
 } from "@/lib/localStorage";
@@ -36,6 +38,7 @@ export default function Settings() {
     const [newPasswordConfirm, setNewPasswordConfirm] = useState("")
     const [error, setError] = useState("")
     const [showCurrentPassword, setShowCurrentPassword] = useState(false);
+    const [fetchLimit, setFetchLimit] = useState(loadFetchLimit);
     const [isSubmitting, setIsSubmitting] = useState(false);
 
     const handleCommandsCountChange = (value: string) => {
@@ -52,6 +55,15 @@ export default function Settings() {
         setSorting(value);
         saveSortingPreference(sortingPreference);
     };
+
+    const handleFetchLimitChange = (value: string) => {
+        const numericValue = parseInt(value, 10);
+        if (!isNaN(numericValue)) {
+            setFetchLimit(numericValue);
+            saveFetchLimit(numericValue);
+        }
+    };
+
 
     const handleSubmit = async (e: FormEvent<HTMLFormElement>) => {
         e.preventDefault();
@@ -91,6 +103,25 @@ export default function Settings() {
             <div className="flex flex-wrap gap-4 mb-4 items-center">
                 <Label className="text-lg">Motyw strony:</Label>
                 <ModeToggle />
+            </div>
+            <div className="flex flex-wrap gap-4 mb-4 items-center">
+                <Label className="text-lg">Ilość pobieranych komend:</Label>
+                <Select
+                    value={fetchLimit.toString()}
+                    onValueChange={handleFetchLimitChange}
+                >
+                    <SelectTrigger className="max-w-xs sm:max-w-[120px]">
+                    <SelectValue placeholder="Wybierz ilość" />
+                    </SelectTrigger>
+                    <SelectContent>
+                    <SelectGroup>
+                        <SelectItem value="500">500</SelectItem>
+                        <SelectItem value="1000">1000</SelectItem>
+                        <SelectItem value="2500">2500</SelectItem>
+                        <SelectItem value="5000">5000</SelectItem>
+                    </SelectGroup>
+                    </SelectContent>
+                </Select>
             </div>
             <div className="flex flex-wrap gap-4 mb-4 items-center">
                 <Label className="text-lg">Ilość otwieranych komend jednym kliknięciem:</Label>

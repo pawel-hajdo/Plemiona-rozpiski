@@ -87,3 +87,16 @@ export const loadCommandsFilter = (): "all" | "important" => {
     }
     return "all";
 };
+
+export const saveFetchLimit = (limit: number) => {
+    localStorage.setItem('fetchLimit', limit.toString());
+};
+
+export const loadFetchLimit = () => {
+    if (typeof window !== 'undefined') {
+        const limit = localStorage.getItem('fetchLimit');
+        return limit ? parseInt(limit, 10) : 5000; // default = 5000
+    }
+    return 1000;
+};
+
