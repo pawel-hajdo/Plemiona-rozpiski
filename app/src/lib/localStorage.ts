@@ -62,13 +62,29 @@ export const loadColumnVisibilityAdmin = (): VisibilityState => {
 
 export const loadWorldFilters = (availableWorlds: string[]): Record<string, boolean> => {
     const defaultFilters = Object.fromEntries(availableWorlds.map(w => [w, true]));
-    if (typeof window !== 'undefined') {
-        const worlds = localStorage.getItem('selectedWorldFilters');
 
-        return worlds ? JSON.parse(worlds) : defaultFilters;
+    if (typeof window !== 'undefined') {
+        const saved = localStorage.getItem('selectedWorldFilters');
+        if (saved) {
+            try {
+                const parsed: Record<string, boolean> = JSON.parse(saved);
+                const updated: Record<string, boolean> = {};
+                availableWorlds.forEach(world => {
+                    updated[world] = parsed.hasOwnProperty(world) ? parsed[world] : true;
+                });
+                localStorage.setItem('selectedWorldFilters', JSON.stringify(updated));
+                return updated;
+            } catch {
+                localStorage.setItem('selectedWorldFilters', JSON.stringify(defaultFilters));
+                return defaultFilters;
+            }
+        }
     }
-    return defaultFilters
+
+    localStorage.setItem('selectedWorldFilters', JSON.stringify(defaultFilters));
+    return defaultFilters;
 };
+
 
 export const saveWorldFilters = (worlds: Record<string, boolean>) => {
     localStorage.setItem('selectedWorldFilters', JSON.stringify(worlds));
