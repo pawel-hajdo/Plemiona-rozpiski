@@ -77,49 +77,55 @@ export default function PlayerCommandsPage({ params }: PageProps) {
         savePageSize(pagination.pageSize);
     }, [pagination.pageSize]);
 
-    const fetchCommands = async () => {
-        try {
-            setIsLoading(true);
-            setError("");
-            const data = await getPlayerCommandsAdmin(selectedPlayerId, params.world,);
-            setCommands(data);
-        } catch (err) {
+    useEffect(() => {
+        if (!selectedPlayerId) return;
 
-            if (err instanceof Error) {
-                if (err.message.includes('Access denied')) {
-                    setError('Brak uprawnień administratora');
-                } else if (err.message.includes('Authentication required')) {
-                    router.push('/login');
-                    return;
+        const fetchData = async () => {
+            try {
+                setIsLoading(true);
+                setError("");
+                const data = await getPlayerCommandsAdmin(selectedPlayerId, params.world);
+                setCommands(data);
+            } catch (err) {
+                if (err instanceof Error) {
+                    if (err.message.includes("Access denied")) {
+                        setError("Brak uprawnień administratora");
+                    } else if (err.message.includes("Authentication required")) {
+                        router.push("/login");
+                        return;
+                    } else {
+                        setError("Błąd podczas pobierania danych");
+                    }
                 } else {
-                    setError('Błąd podczas pobierania danych');
+                    setError("Nieznany błąd");
                 }
-            } else {
-                setError('Nieznany błąd');
+            } finally {
+                setIsLoading(false);
             }
-        } finally {
-            setIsLoading(false);
-        }
-    };
+        };
 
-    const handleKeyPress = (e: React.KeyboardEvent<HTMLInputElement>) => {
-        if (e.key === 'Enter') {
-            fetchCommands();
-        }
-    };
+        fetchData();
+    }, [selectedPlayerId, params.world, router]);
 
     const getRowClasses = (row: any) => {
         const currentTime = DateTime.now().setZone('Europe/Warsaw');
 
         const minTime = DateTime.fromISO(row.original.minTime, { zone: 'Europe/Warsaw' });
         const maxTime = DateTime.fromISO(row.original.maxTime, { zone: 'Europe/Warsaw' });
+        const minutesLate = row.original.minutesLate;
 
-        if (currentTime > maxTime) {
-            return 'bg-red-800 hover:bg-red-600 dark:bg-red-900 dark:hover:bg-red-700';
-        } else if (currentTime < minTime) {
-            return 'bg-gray-500 hover:bg-gray-400 dark:bg-zinc-950 dark:hover:bg-zinc-800';
+        if (minutesLate !== null && minutesLate < 0) {
+            return 'bg-green-700 hover:bg-green-600 dark:bg-green-900 dark:hover:bg-green-700';
         }
-        return '';
+
+        if (
+            (minutesLate !== null && minutesLate > 0) ||
+            (minutesLate === null && currentTime > maxTime)
+        ) {
+            return 'bg-red-800 hover:bg-red-600 dark:bg-red-900 dark:hover:bg-red-700';
+        }
+
+        return 'bg-gray-500 hover:bg-gray-400 dark:bg-zinc-950 dark:hover:bg-zinc-800';
     };
 
     const columnNames: ColumnNames = {
@@ -235,7 +241,7 @@ export default function PlayerCommandsPage({ params }: PageProps) {
             cell: ({ row }) => (
                 <div>
                     <a
-                        href={`https://${row.original.world}.plemiona.pl/game.php?village=${row.original.sourceId}`}
+                        href={`https://${row.original.world}.plemiona.pl/game.php?screen=info_village&id=${row.original.sourceId}`}
                         target="_blank"
                         rel="noopener noreferrer"
                     >
@@ -354,13 +360,6 @@ export default function PlayerCommandsPage({ params }: PageProps) {
                         </SelectContent>
                     </Select>
                 </div>
-                <Button 
-                    onClick={fetchCommands}
-                    disabled={isLoading || !selectedPlayerId.trim()}
-                    className="min-w-[100px]"
-                >
-                    {isLoading ? 'Pobieranie...' : 'Pobierz'}
-                </Button>
             </div>
             <div className="flex flex-wrap items-center py-4 gap-2 sm:gap-3">
                 <Select

@@ -147,13 +147,20 @@ export default function VillageCommandsPage({ params }: PageProps) {
 
         const minTime = DateTime.fromISO(row.original.minTime, { zone: 'Europe/Warsaw' });
         const maxTime = DateTime.fromISO(row.original.maxTime, { zone: 'Europe/Warsaw' });
+        const minutesLate = row.original.minutesLate;
 
-        if (currentTime > maxTime) {
-            return 'bg-red-800 hover:bg-red-600 dark:bg-red-900 dark:hover:bg-red-700';
-        } else if (currentTime < minTime) {
-            return 'bg-gray-500 hover:bg-gray-400 dark:bg-zinc-950 dark:hover:bg-zinc-800';
+        if (minutesLate !== null && minutesLate < 0) {
+            return 'bg-green-700 hover:bg-green-600 dark:bg-green-900 dark:hover:bg-green-700';
         }
-        return '';
+
+        if (
+            (minutesLate !== null && minutesLate > 0) ||
+            (minutesLate === null && currentTime > maxTime)
+        ) {
+            return 'bg-red-800 hover:bg-red-600 dark:bg-red-900 dark:hover:bg-red-700';
+        }
+
+        return 'bg-gray-500 hover:bg-gray-400 dark:bg-zinc-950 dark:hover:bg-zinc-800';
     };
 
     const columnNames: ColumnNames = {
@@ -291,7 +298,7 @@ export default function VillageCommandsPage({ params }: PageProps) {
             cell: ({ row }) => (
                 <div>
                     <a
-                        href={`https://${row.original.world}.plemiona.pl/game.php?village=${row.original.sourceId}`}
+                        href={`https://${row.original.world}.plemiona.pl/game.php?screen=info_village&id=${row.original.sourceId}`}
                         target="_blank"
                         rel="noopener noreferrer"
                     >

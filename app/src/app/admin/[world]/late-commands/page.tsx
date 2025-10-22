@@ -237,7 +237,7 @@ export default function LateCommandsPage({ params }: PageProps) {
             cell: ({ row }) => (
                 <div>
                     <a
-                        href={`https://${row.original.world}.plemiona.pl/game.php?village=${row.original.sourceId}`}
+                        href={`https://${row.original.world}.plemiona.pl/game.php?screen=info_village&id=${row.original.sourceId}`}
                         target="_blank"
                         rel="noopener noreferrer"
                     >
