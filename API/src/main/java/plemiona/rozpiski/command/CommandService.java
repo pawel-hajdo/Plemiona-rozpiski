@@ -137,14 +137,17 @@ public class CommandService {
 
     public List<AdminCommandResponse> getBadCommands(int page, int size, String filter, String world) {
         Pageable pageable = PageRequest.of(page, size);
+        LocalDateTime nowWarsaw = ZonedDateTime.now(ZoneId.of("Europe/Warsaw")).toLocalDateTime();
+
         switch (filter.toLowerCase()) {
             case "important":
-                return commandRepository.findBadCommandsImportant(world, pageable);
+                return commandRepository.findBadCommandsImportant(world, nowWarsaw, pageable);
             case "all":
             default:
-                return commandRepository.findBadCommands(world, pageable);
+                return commandRepository.findBadCommands(world, nowWarsaw, pageable);
         }
     }
+
 
     public List<AdminCommandResponse> getCommandsForTargetVillage(String targetVillage, String world) {
             return commandRepository.findByTargetInOrderByMinTimeAsc(targetVillage, world);

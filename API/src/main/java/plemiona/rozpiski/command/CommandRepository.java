@@ -7,6 +7,7 @@ import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 
+import java.time.LocalDateTime;
 import java.util.List;
 
 public interface CommandRepository extends JpaRepository<Command,Long> {
@@ -126,11 +127,15 @@ public interface CommandRepository extends JpaRepository<Command,Long> {
         END
     )
     FROM Command c
-    WHERE (c.maxTime < c.deleted OR (c.maxTime < CURRENT_TIMESTAMP AND c.deleted IS NULL))
+    WHERE (c.maxTime < c.deleted OR (c.maxTime < :currentTime AND c.deleted IS NULL))
     AND c.world = :world
     ORDER BY c.maxTime ASC
-""")
-    List<AdminCommandResponse> findBadCommands(@Param("world") String world, Pageable pageable);
+    """)
+    List<AdminCommandResponse> findBadCommands(
+            @Param("world") String world,
+            @Param("currentTime") LocalDateTime currentTime,
+            Pageable pageable
+    );
 
 
     @Query("""
@@ -159,12 +164,17 @@ public interface CommandRepository extends JpaRepository<Command,Long> {
         END
     )
     FROM Command c
-    WHERE (c.maxTime < c.deleted OR (c.maxTime < CURRENT_TIMESTAMP AND c.deleted IS NULL))
+    WHERE (c.maxTime < c.deleted OR (c.maxTime < :currentTime AND c.deleted IS NULL))
     AND (c.type LIKE 'SZLACHCIC%' OR c.type LIKE '%OFF%' OR c.type LIKE 'Gruby%')
     AND c.world = :world
     ORDER BY c.maxTime ASC
-""")
-    List<AdminCommandResponse> findBadCommandsImportant(@Param("world") String world, Pageable pageable);
+    """)
+    List<AdminCommandResponse> findBadCommandsImportant(
+            @Param("world") String world,
+            @Param("currentTime") LocalDateTime currentTime,
+            Pageable pageable
+    );
+
 
     @Query("""
     SELECT new plemiona.rozpiski.command.AdminCommandResponse(
