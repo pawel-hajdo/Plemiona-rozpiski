@@ -92,8 +92,8 @@ export default function Register() {
                     </SelectTrigger>
                     <SelectContent>
                         <SelectGroup>
-                            <SelectItem value="pl211">pl211</SelectItem>
                             <SelectItem value="pl218">pl218</SelectItem>
+                            <SelectItem value="pl222">pl222</SelectItem>
                         </SelectGroup>
                     </SelectContent>
                 </Select>

@@ -74,7 +74,7 @@ export function CommandsTable({deleted} :any) {
     const [globalFilter, setGlobalFilter] = React.useState("");
     const [isLoading, setIsLoading] = useState(true);
 
-    const availableWorlds = ["pl211", "pl218"];
+    const availableWorlds = ["pl218", "pl222"];
     const [worldFilters, setWorldFilters] = useState<Record<string, boolean>>({});
     const [showWorldFilters, setShowWorldFilters] = useState(false);
 
