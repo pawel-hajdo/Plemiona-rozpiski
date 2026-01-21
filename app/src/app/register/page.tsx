@@ -32,15 +32,17 @@ export default function Register() {
         e.preventDefault();
 
         setError("");
+        const trimmedLogin = userLogin.trim();
+        const trimmedPassword = userPassword.trim();
 
-        if (!userLogin || !userPassword || !world) {
+        if (!trimmedLogin || !trimmedPassword || !world) {
             setError("Proszę wypełnić wszystkie pola.");
             return;
         }
         setIsSubmitting(true);
 
         try {
-            const responseData = await registerUser(userLogin, userPassword, code, world);
+            const responseData = await registerUser(trimmedLogin, trimmedPassword, code, world);
             setCookieToken(responseData.token);
             router.push("/");
         } catch (error) {

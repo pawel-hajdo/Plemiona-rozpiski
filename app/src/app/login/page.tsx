@@ -23,15 +23,17 @@ export default function Login() {
         e.preventDefault();
 
         setError("");
+        const trimmedLogin = userLogin.trim();
+        const trimmedPassword = userPassword.trim();
 
-        if (!userLogin || !userPassword) {
+        if (!trimmedLogin || !trimmedPassword) {
             setError("Proszę wypełnić wszystkie pola.");
             return;
         }
         setIsSubmitting(true);
 
         try {
-            const responseData = await authUser(userLogin, userPassword);
+            const responseData = await authUser(trimmedLogin, trimmedPassword);
             document.cookie = `token=${responseData.token}; path=/; max-age=21600`;
             setCookieToken(responseData.token);
             router.push("/");

@@ -33,15 +33,17 @@ export default function Register() {
         e.preventDefault();
 
         setError("");
+        const trimmedLogin = userLogin.trim();
+        const trimmedPassword = userPassword.trim();
 
-        if (!userLogin || !userPassword || !world) {
+        if (!trimmedLogin  || !trimmedPassword || !world) {
             setError("Proszę wypełnić wszystkie pola.");
             return;
         }
         setIsSubmitting(true);
 
         try {
-            await resetPassword(userLogin, userPassword, code, world);
+            await resetPassword(trimmedLogin, trimmedPassword, code, world);
             router.push("/login");
         } catch (error) {
             if (error instanceof AxiosError) {
