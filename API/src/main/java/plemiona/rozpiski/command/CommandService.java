@@ -78,6 +78,29 @@ public class CommandService {
         return commandRepository.findDistinctSourceWithCountByPlayerIdAndTypeLike(playerId, type);
     }
 
+    public List<SourceVillagesSitterResponse> getSourceVillagesForActiveSittings(Integer sitterId, String type) {
+        List<AccountSitting> sittings =
+                accountSittingRepository.findBySitterIdAndStatusIn(
+                        sitterId,
+                        List.of(AccountSittingStatus.ACTIVE)
+                );
+
+        List<SourceVillagesSitterResponse> result = new ArrayList<>();
+
+        for (AccountSitting sitting : sittings) {
+            result.addAll(
+                    commandRepository.findSourceVillagesForPlayerAndWorld(
+                            sitting.getPlayerId(),
+                            sitting.getWorld(),
+                            type
+                    )
+            );
+        }
+
+        return result;
+    }
+
+
     public List<CommandResponse> getCommandsForActiveSittings(Integer sitterId) {
         List<AccountSitting> activeSittings = accountSittingRepository.findBySitterIdAndStatusIn(sitterId, Collections.singletonList(AccountSittingStatus.ACTIVE));
         Map<Integer, List<String>> playerWorldMap = activeSittings.stream()
@@ -171,6 +194,19 @@ public class CommandService {
         });
 
         commandRepository.saveAll(commands);
+    }
+
+    @Transactional
+    public ResponseEntity<String> deleteCommandsAdmin(List<Long> commandIds, String world) {
+        List<Command> commands = commandRepository.findByIdInAndWorld(commandIds, world);
+    
+        if (commands.isEmpty()) {
+            throw new CommandNotFoundException("No commands found for given IDs in world: " + world);
+        }
+
+        commandRepository.deleteAll(commands);
+
+        return ResponseEntity.ok("Commands deleted");
     }
 
     private String shiftAttackTimeString(String attackTime, int shiftMinutes) {

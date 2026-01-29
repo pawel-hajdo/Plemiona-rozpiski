@@ -87,6 +87,21 @@ public class CommandController {
         return ResponseEntity.ok(villages);
     }
 
+    @GetMapping("/sitter/{playerId}/sourceVillages")
+    public ResponseEntity<List<SourceVillagesSitterResponse>> getSourceVillagesForActiveSittings(
+            @PathVariable Integer playerId,
+            @RequestParam String type,
+            HttpServletRequest request
+    ) {
+        if (!jwtService.checkUser(playerId.toString(), request)) {
+            return new ResponseEntity<>(HttpStatus.FORBIDDEN);
+        }
+
+        return ResponseEntity.ok(commandService.getSourceVillagesForActiveSittings(playerId, type)
+        );
+    }
+
+
     @GetMapping("/sitter/{playerId}")
     public ResponseEntity<List<CommandResponse>> getCommandsForActiveSittings(
             @PathVariable Integer playerId,
@@ -214,5 +229,17 @@ public class CommandController {
                 shiftRequest.world()
         );
         return ResponseEntity.ok("Commands shifted successfully");
+    }
+
+    @DeleteMapping("/admin/commands")
+    public ResponseEntity<String> deleteCommandsAdmin(
+            @RequestBody CommandDeleteRequest deleteRequest,
+            HttpServletRequest request
+    ) {
+        if (!jwtService.checkWorldAdmin(deleteRequest.world(), request)) {
+            return new ResponseEntity<>(HttpStatus.FORBIDDEN);
+        }
+
+        return commandService.deleteCommandsAdmin(deleteRequest.commandIds(), deleteRequest.world());
     }
 }

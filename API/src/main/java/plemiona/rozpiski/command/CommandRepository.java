@@ -244,4 +244,31 @@ public interface CommandRepository extends JpaRepository<Command,Long> {
     ORDER BY c.maxTime ASC
 """)
     List<AdminCommandResponse> findCommandsByPlayerIdAdmin(@Param("playerId") Integer playerId, @Param("world") String world, Pageable pageable);
+
+
+    @Query("""
+    SELECT new plemiona.rozpiski.command.SourceVillagesSitterResponse(
+        c.source,
+        COUNT(c),
+        c.world,
+        c.playerName
+    )
+    FROM Command c
+    WHERE c.playerId = :playerId
+      AND c.world = :world
+      AND c.type LIKE %:type%
+    GROUP BY c.source, c.world, c.playerName
+    ORDER BY COUNT(c) DESC
+    """)
+    List<SourceVillagesSitterResponse> findSourceVillagesForPlayerAndWorld(
+            @Param("playerId") Integer playerId,
+            @Param("world") String world,
+            @Param("type") String type
+    );
+
+    @Query("SELECT c FROM Command c WHERE c.id IN :commandIds AND c.world = :world")
+    List<Command> findByIdInAndWorld(
+            @Param("commandIds") List<Long> commandIds,
+            @Param("world") String world
+    );
 }
