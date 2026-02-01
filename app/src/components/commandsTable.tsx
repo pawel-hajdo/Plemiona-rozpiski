@@ -79,6 +79,12 @@ export function CommandsTable({deleted} :any) {
     const [worldFilters, setWorldFilters] = useState<Record<string, boolean>>({});
     const [showWorldFilters, setShowWorldFilters] = useState(false);
 
+    const getTypeColor = (type: string): string => {
+        if (/off/i.test(type) || (/szlachcic/i.test(type) || (/gruby/i.test(type)) || (/kareta/i.test(type))))
+            return 'text-green-500 dark:text-green-500 ';
+        return ''; // domyślny kolor
+    };
+
     useEffect(() => {
         const fetchCommandsData = async () => {
             try {
@@ -164,7 +170,7 @@ export function CommandsTable({deleted} :any) {
         const maxTime = DateTime.fromISO(row.original.maxTime, { zone: 'Europe/Warsaw' });
 
         if (currentTime > maxTime) {
-            return 'bg-red-800 hover:bg-red-600 dark:bg-red-900 dark:hover:bg-red-700';
+            return 'bg-red-700 hover:bg-red-600 dark:bg-red-900 dark:hover:bg-red-700';
         } else if (currentTime < minTime) {
             return 'bg-gray-500 hover:bg-gray-400 dark:bg-zinc-950 dark:hover:bg-zinc-800';
         }
@@ -412,16 +418,12 @@ export function CommandsTable({deleted} :any) {
                 </Button>
             ),
             cell: ({ row }) => {
-                // const minTime = new Date(row.original.minTime);
-                // const maxTime = new Date(row.original.maxTime);
-                // const isWithinOneHour = (maxTime.getTime() - minTime.getTime()) <= 3600000;
-
+                const type = row.getValue("type") as string;
+                const colorClass = getTypeColor(type);
                 return (
-                    <div
-                        // className={isWithinOneHour ? 'font-semibold text-green-500 dark:text-green-400' : ''}
-                    >
-                        {row.getValue("type")}
-                    </div>
+                <div className={colorClass}>
+                    {type}
+                </div>
                 );
             },
         },
