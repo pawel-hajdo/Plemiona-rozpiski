@@ -24,6 +24,7 @@ import {
     DropdownMenuCheckboxItem,
     DropdownMenuContent,
     DropdownMenuTrigger,
+    DropdownMenuItem
 } from "@/components/ui/dropdown-menu"
 import { Input } from "@/components/ui/input"
 
@@ -74,7 +75,7 @@ export function CommandsTable({deleted} :any) {
     const [globalFilter, setGlobalFilter] = React.useState("");
     const [isLoading, setIsLoading] = useState(true);
 
-    const availableWorlds = ["pl218", "pl222"];
+    const availableWorlds = ["pl218", "pl221", "pl222"];
     const [worldFilters, setWorldFilters] = useState<Record<string, boolean>>({});
     const [showWorldFilters, setShowWorldFilters] = useState(false);
 
@@ -215,6 +216,11 @@ export function CommandsTable({deleted} :any) {
         }
     }
 
+    const handleFilterByCoords = (coords: string) => {
+        setGlobalFilter(coords);
+        setPagination(prev => ({ ...prev, pageIndex: 0 }));
+    };
+
     const columnNames: ColumnNames = {
         commandNumberId: "ID",
         minTime: "Min time",
@@ -331,17 +337,31 @@ export function CommandsTable({deleted} :any) {
                     <CaretSortIcon className="ml-2 h-4 w-4" />
                 </Button>
             ),
-            cell: ({ row }) => (
-                <div>
+    cell: ({ row }) => (
+        <DropdownMenu>
+            <DropdownMenuTrigger asChild>
+                <button className="text-left">
+                    {row.getValue("source")}
+                </button>
+            </DropdownMenuTrigger>
+            <DropdownMenuContent align="start">
+                <DropdownMenuItem asChild>
                     <a
                         href={`https://${row.original.world}.plemiona.pl/game.php?village=${row.original.sourceId}`}
                         target="_blank"
                         rel="noopener noreferrer"
                     >
-                        {row.getValue("source")}
+                        Przejdź do plemion
                     </a>
-                </div>
-            ),
+                </DropdownMenuItem>
+                <DropdownMenuItem
+                    onClick={() => handleFilterByCoords(row.getValue("source"))}
+                >
+                    Filtruj w tabeli
+                </DropdownMenuItem>
+            </DropdownMenuContent>
+        </DropdownMenu>
+    ),
         },
         {
             accessorKey: "target",
@@ -355,15 +375,29 @@ export function CommandsTable({deleted} :any) {
                 </Button>
             ),
             cell: ({ row }) => (
-                <div>
+                <DropdownMenu>
+                    <DropdownMenuTrigger asChild>
+                        <button className="text-left">
+                            {row.getValue("target")}
+                        </button>
+                    </DropdownMenuTrigger>
+                    <DropdownMenuContent align="start">
+                <DropdownMenuItem asChild>
                     <a
                         href={`https://${row.original.world}.plemiona.pl/game.php?screen=info_village&id=${row.original.targetId}`}
                         target="_blank"
                         rel="noopener noreferrer"
                     >
-                        {row.getValue("target")}
+                        Przejdź do plemion
                     </a>
-                </div>
+                        </DropdownMenuItem>
+                        <DropdownMenuItem
+                            onClick={() => handleFilterByCoords(row.getValue("target"))}
+                        >
+                            Filtruj w tabeli
+                        </DropdownMenuItem>
+                    </DropdownMenuContent>
+                </DropdownMenu>
             ),
         },
         {
