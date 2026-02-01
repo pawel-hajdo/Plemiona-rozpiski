@@ -105,6 +105,11 @@ export const getSourceVillagesByType = async (playerId: string, type: string) =>
     return response.data;
 }
 
+export const getSittingsSourceVillagesByType = async (playerId: string, type: string) => {
+    const response = await api.get(`/commands/sitter/${playerId}/sourceVillages?type=${type}`)
+    return response.data;
+}
+
 export const setAccountSitter = async (playerId: string, sitterName: string, world: string) => {
     const response = await api.post(`/sittings/owner/${playerId}`, {
         "sitterName": sitterName,

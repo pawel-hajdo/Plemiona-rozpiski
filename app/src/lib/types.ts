@@ -38,6 +38,13 @@ export interface VillageData {
     world: string;
 }
 
+export interface SittingVillageData {
+    source: string;
+    count: number;
+    world: string;
+    playerName: string;
+}
+
 export enum AccountSittingStatus {
     PENDING = "PENDING",
     ACTIVE = "ACTIVE",
