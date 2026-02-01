@@ -1,7 +1,7 @@
 'use client';
 
 import { useEffect, useState } from 'react';
-import { getVillageCommandsAdmin, shiftCommandTimes} from "@/lib/api";
+import { getVillageCommandsAdmin, shiftCommandTimes, deleteVillageCommandsAdmin} from "@/lib/api";
 import {AdminCommand, ColumnNames, Command} from "@/lib/types";
 import { useRouter } from 'next/navigation';
 import {
@@ -57,6 +57,7 @@ export default function VillageCommandsPage({ params }: PageProps) {
     const [villageCoords, setVillageCoords] = useState("");
     const [shiftMinutes, setShiftMinutes] = useState("");
     const [isShifting, setIsShifting] = useState(false);
+    const [isDeleting, setIsDeleting] = useState(false);
     const router = useRouter();
 
     useEffect(() => {
@@ -132,6 +133,39 @@ export default function VillageCommandsPage({ params }: PageProps) {
             setIsShifting(false);
             setRowSelection({});
             setShiftMinutes("");
+            setError("");
+        }
+    };
+
+    const deleteSelectedCommands = async () => {
+        const selectedRows = Object.keys(rowSelection);
+        if (selectedRows.length === 0) return;
+
+        const selectedCommandIds = selectedRows.map(rowId => {
+            const row = table.getRow(rowId);
+            return row.original.id;
+        });
+
+        try {
+            setIsDeleting(true);
+            setError("");
+
+            await deleteVillageCommandsAdmin(selectedCommandIds, params.world);
+
+            await fetchCommands();
+        } catch (err) {
+            if (err instanceof Error) {
+                if (err.message.includes('Access denied')) {
+                    setError('Brak uprawnień administratora');
+                } else {
+                    setError('Błąd podczas usuwania komend');
+                }
+            } else {
+                setError('Nieznany błąd podczas usuwania');
+            }
+        } finally {
+            setIsDeleting(false);
+            setRowSelection({});
             setError("");
         }
     };
@@ -432,7 +466,7 @@ export default function VillageCommandsPage({ params }: PageProps) {
                         </SelectGroup>
                     </SelectContent>
                 </Select>
-                <div className="relative w-[50%] xs:max-w-[65%] sm:max-w-sm">
+                <div className="relative flex-1 min-w-[100px] max-w-sm">
                     <Input
                         placeholder="Filtruj..."
                         value={globalFilter ?? ""}
@@ -460,9 +494,17 @@ export default function VillageCommandsPage({ params }: PageProps) {
                     onClick={shiftSelectedCommands}
                     disabled={isShifting || Object.keys(rowSelection).length === 0 || !shiftMinutes.trim()}
                     variant="secondary"
-                    className="min-w-[120px]"
+                    className="min-w-[90px]"
                 >
                     {isShifting ? 'Przesuwanie...' : 'Przesuń czas'}
+                </Button>
+                <Button
+                    onClick={deleteSelectedCommands}
+                    disabled={isLoading || Object.keys(rowSelection).length === 0}
+                    variant="destructive"
+                    className="min-w-[90px]"
+                >
+                    {isDeleting ? 'Usuwanie' : 'Usuń'}
                 </Button>
                 <DropdownMenu>
                     <DropdownMenuTrigger asChild>

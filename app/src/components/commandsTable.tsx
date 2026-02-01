@@ -501,7 +501,7 @@ export function CommandsTable({deleted} :any) {
                 >
                     Otwórz {linksToOpenCount}
                 </Button>
-                <div className="relative w-[30%] xs:max-w-[65%] sm:max-w-sm">
+                <div className="relative flex-1 min-w-[100px] max-w-sm">
                     <Input
                         placeholder="Filtruj po kordach lub typie rozkazu..."
                         value={globalFilter ?? ""}
