@@ -242,4 +242,12 @@ public class CommandController {
 
         return commandService.deleteCommandsAdmin(deleteRequest.commandIds(), deleteRequest.world());
     }
+
+    @PostMapping("/admin")
+    public ResponseEntity<String> createCommands(
+            @RequestBody List<CommandCreateRequest> commands
+    ) {
+        commandService.createBulkCommands(commands);
+        return ResponseEntity.ok(String.format("Successfully processed %d commands and updated statistics", commands.size()));
+    }
 }

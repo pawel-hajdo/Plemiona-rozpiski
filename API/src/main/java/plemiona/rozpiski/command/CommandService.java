@@ -4,6 +4,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.http.ResponseEntity;
+import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import plemiona.rozpiski.accountSitting.AccountSitting;
@@ -11,6 +12,7 @@ import plemiona.rozpiski.accountSitting.AccountSittingRepository;
 import plemiona.rozpiski.accountSitting.AccountSittingStatus;
 import plemiona.rozpiski.exceptions.CommandNotFoundException;
 
+import java.sql.Timestamp;
 import java.time.LocalDateTime;
 import java.time.ZoneId;
 import java.time.ZonedDateTime;
@@ -27,11 +29,13 @@ public class CommandService {
 
     private final CommandRepository commandRepository;
     private final AccountSittingRepository accountSittingRepository;
+    private final JdbcTemplate jdbcTemplate;
 
     @Autowired
-    public CommandService(CommandRepository commandRepository, AccountSittingRepository accountSittingRepository) {
+    public CommandService(CommandRepository commandRepository, AccountSittingRepository accountSittingRepository, JdbcTemplate jdbcTemplate) {
         this.commandRepository = commandRepository;
         this.accountSittingRepository = accountSittingRepository;
+        this.jdbcTemplate = jdbcTemplate;
     }
 //    public List<CommandResponse> getAllCommands(){
 //        return commandRepository.findAll().stream().map(this::mapToCommandResponse).collect(Collectors.toList());
@@ -207,6 +211,36 @@ public class CommandService {
         commandRepository.deleteAll(commands);
 
         return ResponseEntity.ok("Commands deleted");
+    }
+
+    @Transactional
+    public void createBulkCommands(List<CommandCreateRequest> requests) {
+        String sql = """
+                INSERT INTO plemiona.command_list (
+                    command_number_id, command_type, command_min_time, command_max_time,
+                    command_source, command_source_id, command_target, command_target_id,
+                    command_world, command_player_id, command_player_name, operation_name,
+                    command_attack_time
+                ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+        """;
+
+        jdbcTemplate.batchUpdate(sql, requests, 1000, (ps, command) -> {
+            ps.setObject(1, command.commandNumberId());
+            ps.setString(2, command.type());
+            ps.setTimestamp(3, Timestamp.valueOf(command.minTime()));
+            ps.setTimestamp(4, Timestamp.valueOf(command.maxTime()));
+            ps.setString(5, command.source());
+            ps.setString(6, command.sourceId());
+            ps.setString(7, command.target());
+            ps.setString(8, command.targetId());
+            ps.setString(9, command.world());
+            ps.setString(10, command.playerId());
+            ps.setString(11, command.playerName());
+            ps.setString(12, command.operationName());
+            ps.setString(13, command.attackTime());
+        });
+
+        commandRepository.recalculateCommandStatistics();
     }
 
     private String shiftAttackTimeString(String attackTime, int shiftMinutes) {
