@@ -250,4 +250,11 @@ public class CommandController {
         commandService.createBulkCommands(commands);
         return ResponseEntity.ok(String.format("Successfully processed %d commands and updated statistics", commands.size()));
     }
+
+    @DeleteMapping("/admin")
+    public ResponseEntity<String> deleteCommandsByOperation(
+            @RequestBody CommandDeleteByOperationRequest deleteRequest
+    ) {
+        return commandService.deleteCommandsByOperation(deleteRequest.operationName());
+    }
 }

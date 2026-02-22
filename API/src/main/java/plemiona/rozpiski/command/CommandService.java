@@ -104,7 +104,6 @@ public class CommandService {
         return result;
     }
 
-
     public List<CommandResponse> getCommandsForActiveSittings(Integer sitterId) {
         List<AccountSitting> activeSittings = accountSittingRepository.findBySitterIdAndStatusIn(sitterId, Collections.singletonList(AccountSittingStatus.ACTIVE));
         Map<Integer, List<String>> playerWorldMap = activeSittings.stream()
@@ -175,7 +174,6 @@ public class CommandService {
         }
     }
 
-
     public List<AdminCommandResponse> getCommandsForTargetVillage(String targetVillage, String world) {
             return commandRepository.findByTargetInOrderByMinTimeAsc(targetVillage, world);
     }
@@ -241,6 +239,13 @@ public class CommandService {
         });
 
         commandRepository.recalculateCommandStatistics();
+    }
+
+    @Transactional
+    public ResponseEntity<String> deleteCommandsByOperation(String operationName) {
+        commandRepository.deleteByOperationName(operationName);
+        commandRepository.recalculateCommandStatistics();
+        return ResponseEntity.ok("Commands for operation '" + operationName + "' deleted successfully");
     }
 
     private String shiftAttackTimeString(String attackTime, int shiftMinutes) {

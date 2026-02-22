@@ -271,4 +271,8 @@ public interface CommandRepository extends JpaRepository<Command,Long> {
             @Param("commandIds") List<Long> commandIds,
             @Param("world") String world
     );
+
+    @Modifying
+    @Query("DELETE FROM Command c WHERE c.operationName = :operationName")
+    void deleteByOperationName(@Param("operationName") String operationName);
 }
