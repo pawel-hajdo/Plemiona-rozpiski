@@ -275,4 +275,27 @@ public interface CommandRepository extends JpaRepository<Command,Long> {
     @Modifying
     @Query("DELETE FROM Command c WHERE c.operationName = :operationName")
     void deleteByOperationName(@Param("operationName") String operationName);
+
+    @Query("""
+    SELECT new plemiona.rozpiski.command.CommandExportResponse(
+        c.commandNumberId,
+        c.type,
+        c.minTime,
+        c.maxTime,
+        c.attackTime,
+        c.source,
+        c.sourceId,
+        c.target,
+        c.targetId,
+        c.playerId,
+        c.playerName,
+        c.world,
+        c.operationName,
+        c.deleted
+    )
+    FROM Command c
+    WHERE c.operationName = :operationName
+    ORDER BY c.maxTime ASC
+    """)
+    List<CommandExportResponse> findAllByOperationName(@Param("operationName") String operationName);
 }

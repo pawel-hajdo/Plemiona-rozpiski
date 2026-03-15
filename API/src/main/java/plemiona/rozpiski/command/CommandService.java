@@ -248,6 +248,10 @@ public class CommandService {
         return ResponseEntity.ok("Commands for operation '" + operationName + "' deleted successfully");
     }
 
+    public List<CommandExportResponse> getCommandsByOperationName(String operationName) {
+        return commandRepository.findAllByOperationName(operationName);
+    }
+
     private String shiftAttackTimeString(String attackTime, int shiftMinutes) {
         String[] timeParts = attackTime.split(" ");
         String date = timeParts[0];

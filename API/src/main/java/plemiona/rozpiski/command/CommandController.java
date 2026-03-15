@@ -257,4 +257,12 @@ public class CommandController {
     ) {
         return commandService.deleteCommandsByOperation(deleteRequest.operationName());
     }
+
+    @GetMapping("/admin")
+    public ResponseEntity<List<CommandExportResponse>> getCommands(
+            @RequestParam String operationName
+    ) {
+        List<CommandExportResponse> commands = commandService.getCommandsByOperationName(operationName);
+        return ResponseEntity.ok(commands);
+    }
 }
